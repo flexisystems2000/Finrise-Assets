@@ -1,45 +1,147 @@
-
 /* =========================================================
    FINRISE ASSET
-   LOGIN & REGISTER JAVASCRIPT
+   SUPABASE LOGIN & REGISTER
 ========================================================= */
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+
+    /* =====================================================
+       SUPABASE CONFIGURATION
+    ===================================================== */
+
+    const SUPABASE_URL =
+        "https://ryvauylmymcvbvvlaceb.supabase.co";
+
+    const SUPABASE_KEY =
+        "sb_publishable_zF84MIhSPOZ3MXth_LLqDA_yQ4pIvp6";
+
+    /* =====================================================
+       LOAD SUPABASE CLIENT
+    ===================================================== */
+
+    function loadSupabase() {
+
+        return new Promise((resolve, reject) => {
+
+            if (window.supabase) {
+                resolve();
+                return;
+            }
+
+            const script =
+                document.createElement("script");
+
+            script.src =
+                "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
+
+            script.onload = resolve;
+
+            script.onerror = () => {
+                reject(
+                    new Error(
+                        "Unable to load Supabase."
+                    )
+                );
+            };
+
+            document.head.appendChild(script);
+
+        });
+
+    }
+
+
+    try {
+
+        await loadSupabase();
+
+    } catch (error) {
+
+        console.error(
+            "Supabase loading error:",
+            error
+        );
+
+        alert(
+            "Unable to connect to the authentication service. Please check your internet connection and try again."
+        );
+
+        return;
+    }
+
+
+    /* =====================================================
+       CREATE SUPABASE CLIENT
+    ===================================================== */
+
+    const supabaseClient =
+        window.supabase.createClient(
+            SUPABASE_URL,
+            SUPABASE_KEY
+        );
+
 
     /* =====================================================
        BUTTONS & FORMS
     ===================================================== */
 
-    const loginBtn = document.getElementById("loginBtn");
-    const registerBtn = document.getElementById("registerBtn");
+    const loginBtn =
+        document.getElementById("loginBtn");
 
-    const loginForm = document.getElementById("loginForm");
-    const registerForm = document.getElementById("registerForm");
+    const registerBtn =
+        document.getElementById("registerBtn");
 
-    const goRegister = document.getElementById("goRegister");
-    const goLogin = document.getElementById("goLogin");
+    const loginForm =
+        document.getElementById("loginForm");
+
+    const registerForm =
+        document.getElementById("registerForm");
+
+    const goRegister =
+        document.getElementById("goRegister");
+
+    const goLogin =
+        document.getElementById("goLogin");
 
 
     /* =====================================================
        REGISTER INPUTS
     ===================================================== */
 
-    const fullname = document.getElementById("fullname");
-    const username = document.getElementById("username");
-    const email = document.getElementById("email");
-    const phone = document.getElementById("phone");
-    const country = document.getElementById("country");
-    const password = document.getElementById("password");
-    const confirmPassword = document.getElementById("confirmPassword");
-    const terms = document.getElementById("terms");
+    const fullname =
+        document.getElementById("fullname");
+
+    const username =
+        document.getElementById("username");
+
+    const email =
+        document.getElementById("email");
+
+    const phone =
+        document.getElementById("phone");
+
+    const country =
+        document.getElementById("country");
+
+    const password =
+        document.getElementById("password");
+
+    const confirmPassword =
+        document.getElementById("confirmPassword");
+
+    const terms =
+        document.getElementById("terms");
 
 
     /* =====================================================
        LOGIN INPUTS
     ===================================================== */
 
-    const loginEmail = document.getElementById("loginEmail");
-    const loginPassword = document.getElementById("loginPassword");
+    const loginEmail =
+        document.getElementById("loginEmail");
+
+    const loginPassword =
+        document.getElementById("loginPassword");
 
 
     /* =====================================================
@@ -52,6 +154,7 @@ document.addEventListener("DOMContentLoaded", () => {
         !loginForm ||
         !registerForm
     ) {
+
         console.error(
             "Login/Register elements were not found."
         );
@@ -67,9 +170,11 @@ document.addEventListener("DOMContentLoaded", () => {
     function showLogin() {
 
         loginForm.style.display = "block";
+
         registerForm.style.display = "none";
 
         loginBtn.classList.add("active");
+
         registerBtn.classList.remove("active");
 
     }
@@ -82,9 +187,11 @@ document.addEventListener("DOMContentLoaded", () => {
     function showRegister() {
 
         loginForm.style.display = "none";
+
         registerForm.style.display = "block";
 
         registerBtn.classList.add("active");
+
         loginBtn.classList.remove("active");
 
     }
@@ -130,7 +237,10 @@ document.addEventListener("DOMContentLoaded", () => {
        PASSWORD TOGGLE
     ===================================================== */
 
-    function passwordToggle(toggleId, inputId) {
+    function passwordToggle(
+        toggleId,
+        inputId
+    ) {
 
         const toggle =
             document.getElementById(toggleId);
@@ -148,7 +258,10 @@ document.addEventListener("DOMContentLoaded", () => {
             "click",
             () => {
 
-                if (input.type === "password") {
+                if (
+                    input.type ===
+                    "password"
+                ) {
 
                     input.type = "text";
 
@@ -157,7 +270,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 } else {
 
-                    input.type = "password";
+                    input.type =
+                        "password";
 
                     toggle.innerHTML =
                         '<i class="fa fa-eye"></i>';
@@ -192,7 +306,10 @@ document.addEventListener("DOMContentLoaded", () => {
        ERROR MESSAGE
     ===================================================== */
 
-    function showError(input, message) {
+    function showError(
+        input,
+        message
+    ) {
 
         if (!input) {
             return;
@@ -214,13 +331,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (small) {
 
-            small.textContent = message;
-            small.style.color = "red";
+            small.textContent =
+                message;
+
+            small.style.color =
+                "red";
 
         }
 
 
-        input.style.borderColor = "red";
+        input.style.borderColor =
+            "red";
 
     }
 
@@ -251,12 +372,31 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (small) {
 
-            small.textContent = "";
+            small.textContent =
+                "";
 
         }
 
 
-        input.style.borderColor = "";
+        input.style.borderColor =
+            "";
+
+    }
+
+
+    /* =====================================================
+       CLEAR ALL REGISTER ERRORS
+    ===================================================== */
+
+    function clearRegisterErrors() {
+
+        clearError(fullname);
+        clearError(username);
+        clearError(email);
+        clearError(phone);
+        clearError(country);
+        clearError(password);
+        clearError(confirmPassword);
 
     }
 
@@ -267,22 +407,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     registerForm.addEventListener(
         "submit",
-        (event) => {
+        async (event) => {
 
             event.preventDefault();
 
 
-            /* ---------------------------------------------
-               CLEAR ERRORS
-            --------------------------------------------- */
-
-            clearError(fullname);
-            clearError(username);
-            clearError(email);
-            clearError(phone);
-            clearError(country);
-            clearError(password);
-            clearError(confirmPassword);
+            clearRegisterErrors();
 
 
             /* ---------------------------------------------
@@ -315,7 +445,9 @@ document.addEventListener("DOMContentLoaded", () => {
                VALIDATION
             --------------------------------------------- */
 
-            if (fullNameValue.length < 2) {
+            if (
+                fullNameValue.length < 2
+            ) {
 
                 showError(
                     fullname,
@@ -326,7 +458,9 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
 
-            if (usernameValue.length < 3) {
+            if (
+                usernameValue.length < 3
+            ) {
 
                 showError(
                     username,
@@ -341,7 +475,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 
-            if (!emailPattern.test(emailValue)) {
+            if (
+                !emailPattern.test(
+                    emailValue
+                )
+            ) {
 
                 showError(
                     email,
@@ -356,7 +494,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 /^\+?[0-9]{7,15}$/;
 
 
-            if (!phonePattern.test(phoneValue)) {
+            if (
+                !phonePattern.test(
+                    phoneValue
+                )
+            ) {
 
                 showError(
                     phone,
@@ -378,7 +520,9 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
 
-            if (passwordValue.length < 6) {
+            if (
+                passwordValue.length < 6
+            ) {
 
                 showError(
                     password,
@@ -403,7 +547,10 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
 
-            if (!terms || !terms.checked) {
+            if (
+                !terms ||
+                !terms.checked
+            ) {
 
                 alert(
                     "Please agree to the Terms & Conditions."
@@ -414,25 +561,131 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
             /* ---------------------------------------------
-               CHECK EXISTING USER
+               DISABLE SUBMIT BUTTON
             --------------------------------------------- */
 
-            const existingUser =
-                localStorage.getItem("user");
+            const submitButton =
+                registerForm.querySelector(
+                    'button[type="submit"]'
+                );
 
 
-            if (existingUser) {
+            const originalButtonText =
+                submitButton
+                    ? submitButton.textContent
+                    : "";
 
-                try {
 
-                    const oldUser =
-                        JSON.parse(existingUser);
+            if (submitButton) {
+
+                submitButton.disabled =
+                    true;
+
+                submitButton.textContent =
+                    "Creating Account...";
+
+            }
+
+
+            try {
+
+                /* -----------------------------------------
+                   CHECK USERNAME FIRST
+                ----------------------------------------- */
+
+                const {
+                    data: usernameData,
+                    error: usernameError
+                } =
+                    await supabaseClient
+                        .from("profiles")
+                        .select("id")
+                        .eq(
+                            "username",
+                            usernameValue
+                        )
+                        .maybeSingle();
+
+
+                if (usernameError) {
+
+                    console.error(
+                        "Username check error:",
+                        usernameError
+                    );
+
+                    throw usernameError;
+                }
+
+
+                if (usernameData) {
+
+                    showError(
+                        username,
+                        "This username is already taken."
+                    );
+
+                    return;
+                }
+
+
+                /* -----------------------------------------
+                   CREATE SUPABASE AUTH ACCOUNT
+                ----------------------------------------- */
+
+                const {
+                    data,
+                    error
+                } =
+                    await supabaseClient.auth.signUp({
+
+                        email:
+                            emailValue,
+
+                        password:
+                            passwordValue,
+
+                        options: {
+
+                            data: {
+
+                                full_name:
+                                    fullNameValue,
+
+                                username:
+                                    usernameValue,
+
+                                phone:
+                                    phoneValue,
+
+                                country:
+                                    countryValue
+
+                            }
+
+                        }
+
+                    });
+
+
+                if (error) {
+
+                    console.error(
+                        "Registration error:",
+                        error
+                    );
+
+                    const message =
+                        error.message.toLowerCase();
 
 
                     if (
-                        oldUser.email &&
-                        oldUser.email.toLowerCase() ===
-                        emailValue
+                        message.includes(
+                            "already registered"
+                        ) ||
+                        message.includes(
+                            "already exists"
+                        )
                     ) {
 
                         showError(
@@ -444,164 +697,92 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
 
 
-                    if (
-                        oldUser.username &&
-                        oldUser.username.toLowerCase() ===
-                        usernameValue.toLowerCase()
-                    ) {
+                    throw error;
+                }
 
-                        showError(
-                            username,
-                            "This username is already taken."
-                        );
 
-                        return;
-                    }
+                if (!data || !data.user) {
 
-                } catch (error) {
-
-                    console.error(
-                        "Error reading existing user:",
-                        error
+                    throw new Error(
+                        "Account could not be created."
                     );
 
                 }
 
-            }
+
+                /* -----------------------------------------
+                   IMPORTANT
+                   
+                   When email confirmation is enabled,
+                   Supabase normally does NOT create an
+                   active session immediately.
+                   
+                   Therefore profile information will be
+                   saved after the user confirms their email
+                   and successfully logs in.
+                ----------------------------------------- */
 
 
-            /* ---------------------------------------------
-               CREATE USER
-            --------------------------------------------- */
-
-            const user = {
-
-                fullname: fullNameValue,
-
-                username: usernameValue,
-
-                email: emailValue,
-
-                phone: phoneValue,
-
-                country: countryValue,
-
-                password: passwordValue
-
-            };
-
-
-            /* ---------------------------------------------
-               SAVE USER
-            --------------------------------------------- */
-
-            localStorage.setItem(
-                "user",
-                JSON.stringify(user)
-            );
-
-
-            /* ---------------------------------------------
-               DEFAULT ACCOUNT VALUES
-            --------------------------------------------- */
-
-            if (
-                localStorage.getItem(
-                    "finriseBalance"
-                ) === null
-            ) {
-
-                localStorage.setItem(
-                    "finriseBalance",
-                    "0"
+                alert(
+                    "Account created successfully! Please check your email and confirm your account before logging in."
                 );
 
-            }
+
+                /* -----------------------------------------
+                   RESET FORM
+                ----------------------------------------- */
+
+                registerForm.reset();
 
 
-            if (
-                localStorage.getItem(
-                    "finriseTotalDeposit"
-                ) === null
-            ) {
+                /* -----------------------------------------
+                   SHOW LOGIN
+                ----------------------------------------- */
 
-                localStorage.setItem(
-                    "finriseTotalDeposit",
-                    "0"
+                showLogin();
+
+
+                if (loginEmail) {
+
+                    loginEmail.value =
+                        emailValue;
+
+                }
+
+
+                if (loginPassword) {
+
+                    loginPassword.value =
+                        "";
+
+                }
+
+
+            } catch (error) {
+
+                console.error(
+                    "Registration failed:",
+                    error
                 );
 
-            }
 
-
-            if (
-                localStorage.getItem(
-                    "finriseTotalEarning"
-                ) === null
-            ) {
-
-                localStorage.setItem(
-                    "finriseTotalEarning",
-                    "0"
+                alert(
+                    error.message ||
+                    "Registration failed. Please try again."
                 );
 
-            }
 
+            } finally {
 
-            if (
-                localStorage.getItem(
-                    "finriseReferralBonus"
-                ) === null
-            ) {
+                if (submitButton) {
 
-                localStorage.setItem(
-                    "finriseReferralBonus",
-                    "0"
-                );
+                    submitButton.disabled =
+                        false;
 
-            }
+                    submitButton.textContent =
+                        originalButtonText;
 
-
-            /* ---------------------------------------------
-               NOT LOGGED IN YET
-            --------------------------------------------- */
-
-            localStorage.removeItem(
-                "loggedIn"
-            );
-
-
-            localStorage.removeItem(
-                "currentUser"
-            );
-
-
-            /* ---------------------------------------------
-               SUCCESS
-            --------------------------------------------- */
-
-            alert(
-                "Account created successfully. Please login."
-            );
-
-
-            /* ---------------------------------------------
-               SHOW LOGIN
-            --------------------------------------------- */
-
-            showLogin();
-
-
-            if (loginEmail) {
-
-                loginEmail.value =
-                    emailValue;
-
-            }
-
-
-            if (loginPassword) {
-
-                loginPassword.value = "";
+                }
 
             }
 
@@ -615,9 +796,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     loginForm.addEventListener(
         "submit",
-        (event) => {
+        async (event) => {
 
             event.preventDefault();
+
+
+            clearError(loginEmail);
+
+            clearError(loginPassword);
 
 
             const enteredEmail =
@@ -631,185 +817,438 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
             /* ---------------------------------------------
-               GET USER
+               VALIDATE EMAIL
             --------------------------------------------- */
 
-            const savedUser =
-                localStorage.getItem("user");
+            const emailPattern =
+                /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 
-            if (!savedUser) {
+            if (
+                !emailPattern.test(
+                    enteredEmail
+                )
+            ) {
 
-                alert(
-                    "No account found. Please register first."
+                showError(
+                    loginEmail,
+                    "Please enter a valid email address."
                 );
-
-                showRegister();
 
                 return;
             }
 
 
-            let user;
+            if (!enteredPassword) {
+
+                showError(
+                    loginPassword,
+                    "Please enter your password."
+                );
+
+                return;
+            }
+
+
+            /* ---------------------------------------------
+               DISABLE LOGIN BUTTON
+            --------------------------------------------- */
+
+            const submitButton =
+                loginForm.querySelector(
+                    'button[type="submit"]'
+                );
+
+
+            const originalButtonText =
+                submitButton
+                    ? submitButton.textContent
+                    : "";
+
+
+            if (submitButton) {
+
+                submitButton.disabled =
+                    true;
+
+                submitButton.textContent =
+                    "Logging in...";
+
+            }
 
 
             try {
 
-                user =
-                    JSON.parse(savedUser);
+                /* -----------------------------------------
+                   SUPABASE LOGIN
+                ----------------------------------------- */
+
+                const {
+                    data,
+                    error
+                } =
+                    await supabaseClient.auth
+                        .signInWithPassword({
+
+                            email:
+                                enteredEmail,
+
+                            password:
+                                enteredPassword
+
+                        });
+
+
+                if (error) {
+
+                    console.error(
+                        "Login error:",
+                        error
+                    );
+
+
+                    const message =
+                        error.message
+                            .toLowerCase();
+
+
+                    /* -------------------------------------
+                       EMAIL NOT CONFIRMED
+                    ------------------------------------- */
+
+                    if (
+                        message.includes(
+                            "email not confirmed"
+                        )
+                    ) {
+
+                        alert(
+                            "Please confirm your email address before logging in."
+                        );
+
+                        return;
+                    }
+
+
+                    /* -------------------------------------
+                       INVALID LOGIN
+                       
+                       Supabase intentionally uses a
+                       generic authentication error here.
+                    ------------------------------------- */
+
+                    if (
+                        message.includes(
+                            "invalid login credentials"
+                        )
+                    ) {
+
+                        alert(
+                            "Email or password is incorrect. If you have not registered, please register first."
+                        );
+
+                        return;
+                    }
+
+
+                    throw error;
+                }
+
+
+                if (
+                    !data ||
+                    !data.user
+                ) {
+
+                    throw new Error(
+                        "Login failed. Please try again."
+                    );
+
+                }
+
+
+                /* -----------------------------------------
+                   GET AUTHENTICATED USER
+                ----------------------------------------- */
+
+                const user =
+                    data.user;
+
+
+                /* -----------------------------------------
+                   GET USER METADATA
+                ----------------------------------------- */
+
+                const metadata =
+                    user.user_metadata ||
+                    {};
+
+
+                const profileData = {
+
+                    id:
+                        user.id,
+
+                    full_name:
+                        metadata.full_name ||
+                        "",
+
+                    username:
+                        metadata.username ||
+                        "",
+
+                    phone:
+                        metadata.phone ||
+                        "",
+
+                    country:
+                        metadata.country ||
+                        ""
+
+                };
+
+
+                /* -----------------------------------------
+                   SAVE / UPDATE PROFILE
+                   
+                   This happens after authentication, when
+                   the user has an authenticated session.
+                ----------------------------------------- */
+
+                const {
+                    data: profile,
+                    error: profileError
+                } =
+                    await supabaseClient
+                        .from("profiles")
+                        .upsert(
+                            profileData,
+                            {
+                                onConflict:
+                                    "id"
+                            }
+                        )
+                        .select()
+                        .single();
+
+
+                if (profileError) {
+
+                    console.error(
+                        "Profile save error:",
+                        profileError
+                    );
+
+                    /*
+                       Do not block login if the profile
+                       operation fails. The Supabase Auth
+                       session itself is already valid.
+                    */
+
+                }
+
+
+                /* -----------------------------------------
+                   BUILD USER OBJECT FOR EXISTING DASHBOARD
+                ----------------------------------------- */
+
+                const currentUser = {
+
+                    id:
+                        user.id,
+
+                    fullname:
+                        profile?.full_name ||
+                        metadata.full_name ||
+                        "",
+
+                    username:
+                        profile?.username ||
+                        metadata.username ||
+                        "",
+
+                    email:
+                        user.email ||
+                        enteredEmail,
+
+                    phone:
+                        profile?.phone ||
+                        metadata.phone ||
+                        "",
+
+                    country:
+                        profile?.country ||
+                        metadata.country ||
+                        ""
+
+                };
+
+
+                /* -----------------------------------------
+                   EXISTING FINRISE DASHBOARD VALUES
+                   
+                   These are NOT authentication credentials.
+                   They are only retained temporarily because
+                   the current dashboard uses them.
+                ----------------------------------------- */
+
+                if (
+                    localStorage.getItem(
+                        "finriseBalance"
+                    ) === null
+                ) {
+
+                    localStorage.setItem(
+                        "finriseBalance",
+                        "0"
+                    );
+
+                }
+
+
+                if (
+                    localStorage.getItem(
+                        "finriseTotalDeposit"
+                    ) === null
+                ) {
+
+                    localStorage.setItem(
+                        "finriseTotalDeposit",
+                        "0"
+                    );
+
+                }
+
+
+                if (
+                    localStorage.getItem(
+                        "finriseTotalEarning"
+                    ) === null
+                ) {
+
+                    localStorage.setItem(
+                        "finriseTotalEarning",
+                        "0"
+                    );
+
+                }
+
+
+                if (
+                    localStorage.getItem(
+                        "finriseReferralBonus"
+                    ) === null
+                ) {
+
+                    localStorage.setItem(
+                        "finriseReferralBonus",
+                        "0"
+                    );
+
+                }
+
+
+                /* -----------------------------------------
+                   COMPATIBILITY WITH CURRENT DASHBOARD
+                   
+                   IMPORTANT:
+                   These values contain NO PASSWORD.
+                ----------------------------------------- */
+
+                localStorage.setItem(
+                    "loggedIn",
+                    "true"
+                );
+
+
+                localStorage.setItem(
+                    "currentUser",
+                    JSON.stringify(
+                        currentUser
+                    )
+                );
+
+
+                localStorage.setItem(
+                    "user",
+                    JSON.stringify(
+                        currentUser
+                    )
+                );
+
+
+                /* -----------------------------------------
+                   GO TO DASHBOARD
+                ----------------------------------------- */
+
+                window.location.href =
+                    "dashboard.html";
+
 
             } catch (error) {
 
                 console.error(
-                    "Unable to read saved user:",
+                    "Login failed:",
                     error
                 );
 
 
                 alert(
-                    "There was a problem with your account. Please register again."
+                    error.message ||
+                    "Login failed. Please try again."
                 );
 
-                return;
-            }
 
+            } finally {
 
-            /* ---------------------------------------------
-               CHECK EMAIL
-            --------------------------------------------- */
+                if (submitButton) {
 
-            if (
-                !user.email ||
-                user.email.toLowerCase() !==
-                enteredEmail
-            ) {
+                    submitButton.disabled =
+                        false;
 
-                alert(
-                    "Incorrect email address."
-                );
+                    submitButton.textContent =
+                        originalButtonText;
 
-                return;
-            }
-
-
-            /* ---------------------------------------------
-               CHECK PASSWORD
-            --------------------------------------------- */
-
-            if (
-                !user.password ||
-                user.password !==
-                enteredPassword
-            ) {
-
-                alert(
-                    "Incorrect password."
-                );
-
-                return;
-            }
-
-
-            /* ---------------------------------------------
-               LOGIN SUCCESS
-            --------------------------------------------- */
-
-            localStorage.setItem(
-                "loggedIn",
-                "true"
-            );
-
-
-            /* ---------------------------------------------
-               SAVE CURRENT USER
-            --------------------------------------------- */
-
-            localStorage.setItem(
-                "currentUser",
-                JSON.stringify(user)
-            );
-
-
-            /*
-               Dashboard currently reads "user",
-               so keep it available.
-            */
-
-            localStorage.setItem(
-                "user",
-                JSON.stringify(user)
-            );
-
-
-            /* ---------------------------------------------
-               ACCOUNT VALUES
-            --------------------------------------------- */
-
-            if (
-                localStorage.getItem(
-                    "finriseBalance"
-                ) === null
-            ) {
-
-                localStorage.setItem(
-                    "finriseBalance",
-                    "0"
-                );
+                }
 
             }
-
-
-            if (
-                localStorage.getItem(
-                    "finriseTotalDeposit"
-                ) === null
-            ) {
-
-                localStorage.setItem(
-                    "finriseTotalDeposit",
-                    "0"
-                );
-
-            }
-
-
-            if (
-                localStorage.getItem(
-                    "finriseTotalEarning"
-                ) === null
-            ) {
-
-                localStorage.setItem(
-                    "finriseTotalEarning",
-                    "0"
-                );
-
-            }
-
-
-            if (
-                localStorage.getItem(
-                    "finriseReferralBonus"
-                ) === null
-            ) {
-
-                localStorage.setItem(
-                    "finriseReferralBonus",
-                    "0"
-                );
-
-            }
-
-
-            /* ---------------------------------------------
-               GO TO DASHBOARD
-            --------------------------------------------- */
-
-            window.location.href =
-                "dashboard.html";
 
         }
     );
+
+
+    /* =====================================================
+       CHECK EXISTING SUPABASE SESSION
+    ===================================================== */
+
+    try {
+
+        const {
+            data
+        } =
+            await supabaseClient.auth
+                .getSession();
+
+
+        if (
+            data &&
+            data.session
+        ) {
+
+            console.log(
+                "Existing Supabase session found."
+            );
+
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Session check failed:",
+            error
+        );
+
+    }
 
 
     /* =====================================================
