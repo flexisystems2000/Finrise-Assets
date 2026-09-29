@@ -1,5 +1,7 @@
-html body {
-    min-width: 1200px;
+html,
+body {
+    min-width: 0;
+    width: 100%;
 }
 
 body {
