@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
 
@@ -10,73 +11,187 @@
 
     <title>Email Verification | Finrise Asset</title>
 
+    <!-- Google Font -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
+
+        /* =====================================================
+           FINRISE ASSET BRAND COLORS
+        ===================================================== */
+
+        :root {
+            --navy: #08121d;
+            --navy-light: #101f2d;
+            --gold: #f7c948;
+            --gold-dark: #dcae32;
+            --white: #ffffff;
+            --text-light: #dce3ea;
+            --text-muted: #9eabb8;
+            --success: #39c77a;
+            --danger: #ef5350;
+            --border: rgba(255, 255, 255, 0.10);
         }
 
+
+        /* =====================================================
+           RESET
+        ===================================================== */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+
+        html {
+            min-width: 0;
+            width: 100%;
+        }
+
+
         body {
+            min-width: 0;
+            width: 100%;
             min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
+
             font-family:
+                "Open Sans",
                 Arial,
                 Helvetica,
                 sans-serif;
-            background: #f5f7fa;
-            color: #1f2937;
+
+            background:
+                radial-gradient(
+                    circle at top,
+                    #142536 0%,
+                    var(--navy) 48%,
+                    #050c13 100%
+                );
+
+            color: var(--white);
+
+            display: flex;
+            flex-direction: column;
+
+            overflow-x: hidden;
         }
 
-        .verify-container {
+
+        /* =====================================================
+           HEADER
+        ===================================================== */
+
+        header {
             width: 100%;
-            max-width: 430px;
-            background: #ffffff;
-            border-radius: 18px;
-            padding: 40px 28px;
-            text-align: center;
-            box-shadow:
-                0 10px 35px rgba(0, 0, 0, 0.08);
+            padding: 22px 6%;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            border-bottom: 1px solid var(--border);
+
+            background: rgba(8, 18, 29, 0.92);
+
+            backdrop-filter: blur(12px);
         }
 
-        .logo {
-            width: 70px;
-            height: 70px;
-            margin: 0 auto 20px;
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+
+            text-decoration: none;
+            color: var(--white);
+        }
+
+
+        .brand-logo {
+            width: 43px;
+            height: 43px;
 
             display: flex;
             align-items: center;
             justify-content: center;
 
-            border-radius: 50%;
+            border-radius: 10px;
 
-            background: #0b7a3b;
-            color: #ffffff;
+            background: var(--gold);
 
-            font-size: 28px;
+            color: var(--navy);
+
+            font-size: 21px;
             font-weight: 700;
         }
 
-        h1 {
-            font-size: 26px;
-            margin-bottom: 12px;
-            color: #111827;
+
+        .brand-name {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: 0.2px;
         }
 
-        .message {
-            font-size: 15px;
-            line-height: 1.6;
-            color: #6b7280;
-            margin-bottom: 25px;
+
+        .brand-name span {
+            color: var(--gold);
         }
+
+
+        /* =====================================================
+           MAIN
+        ===================================================== */
+
+        main {
+            width: 100%;
+            flex: 1;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            padding: 60px 20px;
+        }
+
+
+        .verification-card {
+            width: 100%;
+            max-width: 470px;
+
+            padding: 45px 38px;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(16, 31, 45, 0.98),
+                    rgba(8, 18, 29, 0.98)
+                );
+
+            border: 1px solid var(--border);
+
+            border-radius: 18px;
+
+            box-shadow:
+                0 25px 70px rgba(0, 0, 0, 0.40);
+
+            text-align: center;
+        }
+
+
+        /* =====================================================
+           ICON
+        ===================================================== */
 
         .status-icon {
-            width: 64px;
-            height: 64px;
-            margin: 0 auto 20px;
+            width: 82px;
+            height: 82px;
+
+            margin: 0 auto 25px;
 
             display: flex;
             align-items: center;
@@ -84,214 +199,480 @@
 
             border-radius: 50%;
 
-            background: #e8f7ee;
-            color: #0b7a3b;
+            background:
+                rgba(247, 201, 72, 0.12);
 
-            font-size: 30px;
-            font-weight: bold;
+            border:
+                1px solid rgba(247, 201, 72, 0.35);
+
+            color: var(--gold);
+
+            font-size: 38px;
+            font-weight: 700;
         }
 
-        .button {
-            display: inline-block;
 
-            width: 100%;
-            padding: 14px 20px;
+        .status-icon.success {
+            color: var(--success);
 
-            border: none;
-            border-radius: 10px;
+            background:
+                rgba(57, 199, 122, 0.10);
 
-            background: #0b7a3b;
-            color: #ffffff;
+            border-color:
+                rgba(57, 199, 122, 0.30);
+        }
+
+
+        .status-icon.error {
+            color: var(--danger);
+
+            background:
+                rgba(239, 83, 80, 0.10);
+
+            border-color:
+                rgba(239, 83, 80, 0.30);
+        }
+
+
+        /* =====================================================
+           LOADING SPINNER
+        ===================================================== */
+
+        .spinner {
+            width: 48px;
+            height: 48px;
+
+            margin: 0 auto 27px;
+
+            border-radius: 50%;
+
+            border:
+                4px solid rgba(255, 255, 255, 0.12);
+
+            border-top-color:
+                var(--gold);
+
+            animation:
+                spin 0.8s linear infinite;
+        }
+
+
+        @keyframes spin {
+
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+
+        }
+
+
+        /* =====================================================
+           TEXT
+        ===================================================== */
+
+        h1 {
+            color: var(--white);
+
+            font-size: 29px;
+            line-height: 1.25;
+
+            margin-bottom: 14px;
+
+            font-weight: 700;
+        }
+
+
+        .message {
+            color: var(--text-muted);
 
             font-size: 15px;
+            line-height: 1.7;
+
+            margin-bottom: 28px;
+        }
+
+
+        .highlight {
+            color: var(--gold);
             font-weight: 600;
+        }
+
+
+        /* =====================================================
+           BUTTON
+        ===================================================== */
+
+        .button {
+            width: 100%;
+
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            min-height: 50px;
+
+            padding: 13px 20px;
+
+            border: none;
+            border-radius: 8px;
+
+            background: var(--gold);
+            color: var(--navy);
+
+            font-family: inherit;
+
+            font-size: 15px;
+            font-weight: 700;
 
             text-decoration: none;
 
             cursor: pointer;
 
             transition:
+                transform 0.2s ease,
                 background 0.2s ease,
-                transform 0.2s ease;
+                box-shadow 0.2s ease;
         }
+
 
         .button:hover {
-            background: #096832;
-            transform: translateY(-1px);
+            background: #ffd75e;
+
+            transform: translateY(-2px);
+
+            box-shadow:
+                0 8px 25px rgba(247, 201, 72, 0.20);
         }
+
+
+        .button:active {
+            transform: translateY(0);
+        }
+
 
         .button.secondary {
-            margin-top: 10px;
-            background: #eef2f7;
-            color: #374151;
+            margin-top: 12px;
+
+            background:
+                rgba(255, 255, 255, 0.06);
+
+            color: var(--text-light);
+
+            border:
+                1px solid var(--border);
         }
+
 
         .button.secondary:hover {
-            background: #e3e8ef;
+            background:
+                rgba(255, 255, 255, 0.10);
+
+            box-shadow: none;
         }
 
-        .loading {
-            color: #6b7280;
-        }
 
-        .error {
-            color: #dc2626;
-        }
+        /* =====================================================
+           FOOTER
+        ===================================================== */
 
-        .hidden {
-            display: none;
-        }
+        footer {
+            width: 100%;
 
-        .spinner {
-            width: 42px;
-            height: 42px;
+            padding: 22px 20px;
 
-            margin: 0 auto 20px;
+            text-align: center;
 
-            border: 4px solid #e5e7eb;
-            border-top-color: #0b7a3b;
+            border-top:
+                1px solid var(--border);
 
-            border-radius: 50%;
-
-            animation:
-                spin 0.8s linear infinite;
-        }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        .brand {
-            margin-top: 25px;
+            color: var(--text-muted);
 
             font-size: 13px;
-            color: #9ca3af;
+
+            background:
+                rgba(5, 12, 19, 0.65);
         }
 
-        @media (max-width: 480px) {
 
-            .verify-container {
-                padding: 35px 22px;
+        footer span {
+            color: var(--gold);
+        }
+
+
+        /* =====================================================
+           HIDDEN
+        ===================================================== */
+
+        .hidden {
+            display: none !important;
+        }
+
+
+        /* =====================================================
+           MOBILE
+        ===================================================== */
+
+        @media (max-width: 600px) {
+
+            header {
+                padding: 18px 20px;
             }
+
+
+            .brand-logo {
+                width: 39px;
+                height: 39px;
+
+                font-size: 19px;
+            }
+
+
+            .brand-name {
+                font-size: 18px;
+            }
+
+
+            main {
+                padding:
+                    40px 16px;
+            }
+
+
+            .verification-card {
+                padding:
+                    36px 23px;
+
+                border-radius: 15px;
+            }
+
 
             h1 {
-                font-size: 23px;
+                font-size: 24px;
+            }
+
+
+            .message {
+                font-size: 14px;
+            }
+
+
+            .status-icon {
+                width: 72px;
+                height: 72px;
+
+                font-size: 32px;
             }
 
         }
+
+
+        /* =====================================================
+           VERY SMALL PHONES
+        ===================================================== */
+
+        @media (max-width: 360px) {
+
+            .verification-card {
+                padding:
+                    30px 18px;
+            }
+
+
+            h1 {
+                font-size: 22px;
+            }
+
+
+            .brand-name {
+                font-size: 17px;
+            }
+
+        }
+
     </style>
 </head>
 
+
 <body>
 
-    <main class="verify-container">
 
-        <!-- LOGO -->
-        <div class="logo">
-            F
-        </div>
+    <!-- =====================================================
+         HEADER
+    ===================================================== -->
 
+    <header>
 
-        <!-- LOADING STATE -->
-        <section id="loadingState">
-
-            <div class="spinner"></div>
-
-            <h1>
-                Verifying your email
-            </h1>
-
-            <p class="message">
-                Please wait while we confirm your Finrise Asset account.
-            </p>
-
-        </section>
-
-
-        <!-- SUCCESS STATE -->
-        <section
-            id="successState"
-            class="hidden"
+        <a
+            href="index.html"
+            class="brand"
         >
 
-            <div class="status-icon">
-                ✓
+            <div class="brand-logo">
+                F
             </div>
 
-            <h1>
-                Email Verified!
-            </h1>
-
-            <p class="message">
-                Your Finrise Asset account has been successfully verified.
-                You can now log in and access your account.
-            </p>
-
-            <a
-                href="logIn_Page.html"
-                class="button"
-            >
-                Continue to Login
-            </a>
-
-        </section>
-
-
-        <!-- ERROR STATE -->
-        <section
-            id="errorState"
-            class="hidden"
-        >
-
-            <div
-                class="status-icon"
-                style="
-                    background:#fee2e2;
-                    color:#dc2626;
-                "
-            >
-                !
+            <div class="brand-name">
+                Finrise <span>Asset</span>
             </div>
 
-            <h1>
-                Verification Failed
-            </h1>
+        </a>
 
-            <p
-                id="errorMessage"
-                class="message error"
+    </header>
+
+
+
+    <!-- =====================================================
+         MAIN
+    ===================================================== -->
+
+    <main>
+
+        <div class="verification-card">
+
+
+            <!-- =============================================
+                 LOADING
+            ============================================== -->
+
+            <section
+                id="loadingState"
             >
-                We could not verify your email.
-            </p>
 
-            <a
-                href="logIn_Page.html"
-                class="button"
+                <div class="spinner"></div>
+
+                <h1>
+                    Verifying Your Email
+                </h1>
+
+                <p class="message">
+                    Please wait while we confirm your
+                    <span class="highlight">
+                        Finrise Asset
+                    </span>
+                    account.
+                </p>
+
+            </section>
+
+
+
+            <!-- =============================================
+                 SUCCESS
+            ============================================== -->
+
+            <section
+                id="successState"
+                class="hidden"
             >
-                Back to Login
-            </a>
 
-        </section>
+                <div
+                    class="status-icon success"
+                >
+                    ✓
+                </div>
+
+                <h1>
+                    Email Verified!
+                </h1>
+
+                <p class="message">
+                    Your email address has been successfully
+                    verified. Your
+                    <span class="highlight">
+                        Finrise Asset
+                    </span>
+                    account is now ready to use.
+                </p>
+
+                <a
+                    href="logIn_Page.html"
+                    class="button"
+                >
+                    Continue to Login
+                </a>
+
+            </section>
 
 
-        <div class="brand">
-            © 2026 Finrise Asset
+
+            <!-- =============================================
+                 ERROR
+            ============================================== -->
+
+            <section
+                id="errorState"
+                class="hidden"
+            >
+
+                <div
+                    class="status-icon error"
+                >
+                    !
+                </div>
+
+                <h1>
+                    Verification Failed
+                </h1>
+
+                <p
+                    id="errorMessage"
+                    class="message"
+                >
+                    We could not verify your email.
+                </p>
+
+                <a
+                    href="logIn_Page.html"
+                    class="button"
+                >
+                    Back to Login
+                </a>
+
+                <a
+                    href="index.html"
+                    class="button secondary"
+                >
+                    Back to Finrise Asset
+                </a>
+
+            </section>
+
+
         </div>
 
     </main>
 
 
-    <!-- SUPABASE -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- =====================================================
+         FOOTER
+    ===================================================== -->
+
+    <footer>
+        © 2026 <span>Finrise Asset</span>. All rights reserved.
+    </footer>
+
+
+
+    <!-- =====================================================
+         SUPABASE
+    ===================================================== -->
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+    ></script>
+
 
 
     <script>
 
-        /* =================================================
+        /* =====================================================
            SUPABASE CONFIGURATION
-        ================================================= */
+        ===================================================== */
 
         const SUPABASE_URL =
             "https://jdcqczgrgnlqfzfgnsog.supabase.co";
@@ -300,9 +681,10 @@
             "sb_publishable_C1cHus8zHeSRzWEnQn0kiA_c4m45QH9";
 
 
-        /* =================================================
+
+        /* =====================================================
            CREATE SUPABASE CLIENT
-        ================================================= */
+        ===================================================== */
 
         const supabaseClient =
             window.supabase.createClient(
@@ -318,9 +700,10 @@
             );
 
 
-        /* =================================================
+
+        /* =====================================================
            ELEMENTS
-        ================================================= */
+        ===================================================== */
 
         const loadingState =
             document.getElementById(
@@ -343,9 +726,10 @@
             );
 
 
-        /* =================================================
+
+        /* =====================================================
            SHOW SUCCESS
-        ================================================= */
+        ===================================================== */
 
         function showSuccess() {
 
@@ -364,9 +748,10 @@
         }
 
 
-        /* =================================================
+
+        /* =====================================================
            SHOW ERROR
-        ================================================= */
+        ===================================================== */
 
         function showError(message) {
 
@@ -388,17 +773,18 @@
         }
 
 
-        /* =================================================
-           VERIFY SESSION
-        ================================================= */
+
+        /* =====================================================
+           VERIFY EMAIL
+        ===================================================== */
 
         async function verifyEmail() {
 
             try {
 
                 /*
-                 * Supabase processes the authentication
-                 * callback from the confirmation link.
+                 * Supabase Auth processes the confirmation
+                 * callback when the user reaches this page.
                  */
 
                 const {
@@ -412,22 +798,22 @@
                 if (error) {
 
                     console.error(
-                        "Verification error:",
+                        "Supabase verification error:",
                         error
                     );
 
                     showError(
-                        "We could not verify your email. The confirmation link may have expired."
+                        "We could not verify your email. Your confirmation link may have expired."
                     );
 
                     return;
                 }
 
 
-                /*
-                 * A valid session means Supabase has
-                 * successfully completed authentication.
-                 */
+
+                /* =========================================
+                   CHECK FOR AUTH SESSION
+                ========================================== */
 
                 if (
                     data &&
@@ -440,23 +826,25 @@
                 }
 
 
-                /*
-                 * Check the URL for an authentication
-                 * error returned by Supabase.
-                 */
 
-                const url =
+                /* =========================================
+                   CHECK URL FOR SUPABASE ERROR
+                ========================================== */
+
+                const currentUrl =
                     new URL(
                         window.location.href
                     );
 
+
                 const errorDescription =
-                    url.searchParams.get(
+                    currentUrl.searchParams.get(
                         "error_description"
                     );
 
+
                 const errorCode =
-                    url.searchParams.get(
+                    currentUrl.searchParams.get(
                         "error_code"
                     );
 
@@ -475,9 +863,10 @@
                 }
 
 
-                /*
-                 * No session and no explicit error.
-                 */
+
+                /* =========================================
+                   NO SESSION / NO ERROR
+                ========================================== */
 
                 showError(
                     "We could not verify your email. Please request a new confirmation email and try again."
@@ -499,13 +888,15 @@
         }
 
 
-        /* =================================================
-           START VERIFICATION
-        ================================================= */
+
+        /* =====================================================
+           START
+        ===================================================== */
 
         verifyEmail();
 
     </script>
 
 </body>
+
 </html>
