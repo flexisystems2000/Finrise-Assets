@@ -10,17 +10,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     ===================================================== */
 
     const SUPABASE_URL =
-        "https://ryvauylmymcvbvvlaceb.supabase.co";
+        "https://jdcqczgrgnlqfzfgnsog.supabase.co";
 
     const SUPABASE_KEY =
-        "sb_publishable_zF84MIhSPOZ3MXth_LLqDA_yQ4pIvp6";
+        "sb_publishable_C1cHus8zHeSRzWEnQn0kiA_c4m45QH9";
+
 
     /* =====================================================
-       LOAD SUPABASE CLIENT
+       LOAD SUPABASE
     ===================================================== */
 
     function loadSupabase() {
-
         return new Promise((resolve, reject) => {
 
             if (window.supabase) {
@@ -28,8 +28,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 return;
             }
 
-            const script =
-                document.createElement("script");
+            const script = document.createElement("script");
 
             script.src =
                 "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
@@ -45,16 +44,12 @@ document.addEventListener("DOMContentLoaded", async () => {
             };
 
             document.head.appendChild(script);
-
         });
-
     }
 
 
     try {
-
         await loadSupabase();
-
     } catch (error) {
 
         console.error(
@@ -63,7 +58,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         );
 
         alert(
-            "Unable to connect to the authentication service. Please check your internet connection and try again."
+            "Unable to connect to the authentication service. Please check your internet connection."
         );
 
         return;
@@ -71,18 +66,25 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
     /* =====================================================
-       CREATE SUPABASE CLIENT
+       SUPABASE CLIENT
     ===================================================== */
 
     const supabaseClient =
         window.supabase.createClient(
             SUPABASE_URL,
-            SUPABASE_KEY
+            SUPABASE_KEY,
+            {
+                auth: {
+                    autoRefreshToken: true,
+                    persistSession: true,
+                    detectSessionInUrl: true
+                }
+            }
         );
 
 
     /* =====================================================
-       BUTTONS & FORMS
+       FORMS / BUTTONS
     ===================================================== */
 
     const loginBtn =
@@ -145,7 +147,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
     /* =====================================================
-       SAFETY CHECK
+       REQUIRED ELEMENT CHECK
     ===================================================== */
 
     if (
@@ -170,13 +172,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     function showLogin() {
 
         loginForm.style.display = "block";
-
         registerForm.style.display = "none";
 
         loginBtn.classList.add("active");
-
         registerBtn.classList.remove("active");
-
     }
 
 
@@ -187,25 +186,21 @@ document.addEventListener("DOMContentLoaded", async () => {
     function showRegister() {
 
         loginForm.style.display = "none";
-
         registerForm.style.display = "block";
 
         registerBtn.classList.add("active");
-
         loginBtn.classList.remove("active");
-
     }
 
 
     /* =====================================================
-       BUTTON EVENTS
+       SWITCH BUTTONS
     ===================================================== */
 
     loginBtn.addEventListener(
         "click",
         showLogin
     );
-
 
     registerBtn.addEventListener(
         "click",
@@ -214,22 +209,18 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
     if (goRegister) {
-
         goRegister.addEventListener(
             "click",
             showRegister
         );
-
     }
 
 
     if (goLogin) {
-
         goLogin.addEventListener(
             "click",
             showLogin
         );
-
     }
 
 
@@ -237,10 +228,7 @@ document.addEventListener("DOMContentLoaded", async () => {
        PASSWORD TOGGLE
     ===================================================== */
 
-    function passwordToggle(
-        toggleId,
-        inputId
-    ) {
+    function passwordToggle(toggleId, inputId) {
 
         const toggle =
             document.getElementById(toggleId);
@@ -248,20 +236,15 @@ document.addEventListener("DOMContentLoaded", async () => {
         const input =
             document.getElementById(inputId);
 
-
         if (!toggle || !input) {
             return;
         }
-
 
         toggle.addEventListener(
             "click",
             () => {
 
-                if (
-                    input.type ===
-                    "password"
-                ) {
+                if (input.type === "password") {
 
                     input.type = "text";
 
@@ -270,17 +253,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                 } else {
 
-                    input.type =
-                        "password";
+                    input.type = "password";
 
                     toggle.innerHTML =
                         '<i class="fa fa-eye"></i>';
-
                 }
-
             }
         );
-
     }
 
 
@@ -289,12 +268,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         "password"
     );
 
-
     passwordToggle(
         "toggle2",
         "confirmPassword"
     );
-
 
     passwordToggle(
         "toggle3",
@@ -303,46 +280,31 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
     /* =====================================================
-       ERROR MESSAGE
+       SHOW ERROR
     ===================================================== */
 
-    function showError(
-        input,
-        message
-    ) {
+    function showError(input, message) {
 
         if (!input) {
             return;
         }
 
-
         const inputBox =
             input.closest(".inputBox");
-
 
         if (!inputBox) {
             return;
         }
 
-
         const small =
             inputBox.querySelector("small");
 
-
         if (small) {
-
-            small.textContent =
-                message;
-
-            small.style.color =
-                "red";
-
+            small.textContent = message;
+            small.style.color = "red";
         }
 
-
-        input.style.borderColor =
-            "red";
-
+        input.style.borderColor = "red";
     }
 
 
@@ -356,36 +318,26 @@ document.addEventListener("DOMContentLoaded", async () => {
             return;
         }
 
-
         const inputBox =
             input.closest(".inputBox");
-
 
         if (!inputBox) {
             return;
         }
 
-
         const small =
             inputBox.querySelector("small");
 
-
         if (small) {
-
-            small.textContent =
-                "";
-
+            small.textContent = "";
         }
 
-
-        input.style.borderColor =
-            "";
-
+        input.style.borderColor = "";
     }
 
 
     /* =====================================================
-       CLEAR ALL REGISTER ERRORS
+       CLEAR REGISTER ERRORS
     ===================================================== */
 
     function clearRegisterErrors() {
@@ -397,7 +349,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         clearError(country);
         clearError(password);
         clearError(confirmPassword);
-
     }
 
 
@@ -411,12 +362,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             event.preventDefault();
 
-
             clearRegisterErrors();
 
 
             /* ---------------------------------------------
-               GET VALUES
+               VALUES
             --------------------------------------------- */
 
             const fullNameValue =
@@ -445,9 +395,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                VALIDATION
             --------------------------------------------- */
 
-            if (
-                fullNameValue.length < 2
-            ) {
+            if (fullNameValue.length < 2) {
 
                 showError(
                     fullname,
@@ -458,9 +406,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
 
 
-            if (
-                usernameValue.length < 3
-            ) {
+            if (usernameValue.length < 3) {
 
                 showError(
                     username,
@@ -475,11 +421,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 
-            if (
-                !emailPattern.test(
-                    emailValue
-                )
-            ) {
+            if (!emailPattern.test(emailValue)) {
 
                 showError(
                     email,
@@ -494,11 +436,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 /^\+?[0-9]{7,15}$/;
 
 
-            if (
-                !phonePattern.test(
-                    phoneValue
-                )
-            ) {
+            if (!phonePattern.test(phoneValue)) {
 
                 showError(
                     phone,
@@ -520,9 +458,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
 
 
-            if (
-                passwordValue.length < 6
-            ) {
+            if (passwordValue.length < 6) {
 
                 showError(
                     password,
@@ -561,14 +497,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
             /* ---------------------------------------------
-               DISABLE SUBMIT BUTTON
+               BUTTON
             --------------------------------------------- */
 
             const submitButton =
                 registerForm.querySelector(
                     'button[type="submit"]'
                 );
-
 
             const originalButtonText =
                 submitButton
@@ -578,19 +513,17 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             if (submitButton) {
 
-                submitButton.disabled =
-                    true;
+                submitButton.disabled = true;
 
                 submitButton.textContent =
                     "Creating Account...";
-
             }
 
 
             try {
 
                 /* -----------------------------------------
-                   CHECK USERNAME FIRST
+                   CHECK USERNAME
                 ----------------------------------------- */
 
                 const {
@@ -630,7 +563,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
                 /* -----------------------------------------
-                   CREATE SUPABASE AUTH ACCOUNT
+                   CREATE SUPABASE ACCOUNT
                 ----------------------------------------- */
 
                 const {
@@ -660,11 +593,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                                 country:
                                     countryValue
-
                             }
-
                         }
-
                     });
 
 
@@ -706,55 +636,31 @@ document.addEventListener("DOMContentLoaded", async () => {
                     throw new Error(
                         "Account could not be created."
                     );
-
                 }
 
 
                 /* -----------------------------------------
-                   IMPORTANT
-                   
-                   When email confirmation is enabled,
-                   Supabase normally does NOT create an
-                   active session immediately.
-                   
-                   Therefore profile information will be
-                   saved after the user confirms their email
-                   and successfully logs in.
+                   EMAIL CONFIRMATION
                 ----------------------------------------- */
 
-
                 alert(
-                    "Account created successfully! Please check your email and confirm your account before logging in."
+                    "Registration successful! Please check your email and confirm your account before logging in."
                 );
 
 
-                /* -----------------------------------------
-                   RESET FORM
-                ----------------------------------------- */
-
                 registerForm.reset();
-
-
-                /* -----------------------------------------
-                   SHOW LOGIN
-                ----------------------------------------- */
 
                 showLogin();
 
 
                 if (loginEmail) {
-
                     loginEmail.value =
                         emailValue;
-
                 }
 
 
                 if (loginPassword) {
-
-                    loginPassword.value =
-                        "";
-
+                    loginPassword.value = "";
                 }
 
 
@@ -764,7 +670,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                     "Registration failed:",
                     error
                 );
-
 
                 alert(
                     error.message ||
@@ -776,16 +681,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                 if (submitButton) {
 
-                    submitButton.disabled =
-                        false;
+                    submitButton.disabled = false;
 
                     submitButton.textContent =
                         originalButtonText;
-
                 }
-
             }
-
         }
     );
 
@@ -800,9 +701,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             event.preventDefault();
 
-
             clearError(loginEmail);
-
             clearError(loginPassword);
 
 
@@ -811,24 +710,19 @@ document.addEventListener("DOMContentLoaded", async () => {
                     .trim()
                     .toLowerCase();
 
-
             const enteredPassword =
                 loginPassword.value;
 
 
             /* ---------------------------------------------
-               VALIDATE EMAIL
+               VALIDATION
             --------------------------------------------- */
 
             const emailPattern =
                 /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 
-            if (
-                !emailPattern.test(
-                    enteredEmail
-                )
-            ) {
+            if (!emailPattern.test(enteredEmail)) {
 
                 showError(
                     loginEmail,
@@ -851,14 +745,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
             /* ---------------------------------------------
-               DISABLE LOGIN BUTTON
+               BUTTON
             --------------------------------------------- */
 
             const submitButton =
                 loginForm.querySelector(
                     'button[type="submit"]'
                 );
-
 
             const originalButtonText =
                 submitButton
@@ -868,19 +761,17 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             if (submitButton) {
 
-                submitButton.disabled =
-                    true;
+                submitButton.disabled = true;
 
                 submitButton.textContent =
                     "Logging in...";
-
             }
 
 
             try {
 
                 /* -----------------------------------------
-                   SUPABASE LOGIN
+                   AUTHENTICATE
                 ----------------------------------------- */
 
                 const {
@@ -895,7 +786,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                             password:
                                 enteredPassword
-
                         });
 
 
@@ -906,15 +796,9 @@ document.addEventListener("DOMContentLoaded", async () => {
                         error
                     );
 
-
                     const message =
-                        error.message
-                            .toLowerCase();
+                        error.message.toLowerCase();
 
-
-                    /* -------------------------------------
-                       EMAIL NOT CONFIRMED
-                    ------------------------------------- */
 
                     if (
                         message.includes(
@@ -930,13 +814,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                     }
 
 
-                    /* -------------------------------------
-                       INVALID LOGIN
-                       
-                       Supabase intentionally uses a
-                       generic authentication error here.
-                    ------------------------------------- */
-
                     if (
                         message.includes(
                             "invalid login credentials"
@@ -944,7 +821,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     ) {
 
                         alert(
-                            "Email or password is incorrect. If you have not registered, please register first."
+                            "Email/username not found or password is incorrect. Please check your details or register first."
                         );
 
                         return;
@@ -963,93 +840,110 @@ document.addEventListener("DOMContentLoaded", async () => {
                     throw new Error(
                         "Login failed. Please try again."
                     );
-
                 }
 
-
-                /* -----------------------------------------
-                   GET AUTHENTICATED USER
-                ----------------------------------------- */
 
                 const user =
                     data.user;
 
 
                 /* -----------------------------------------
-                   GET USER METADATA
+                   USER METADATA
                 ----------------------------------------- */
 
                 const metadata =
-                    user.user_metadata ||
-                    {};
-
-
-                const profileData = {
-
-                    id:
-                        user.id,
-
-                    full_name:
-                        metadata.full_name ||
-                        "",
-
-                    username:
-                        metadata.username ||
-                        "",
-
-                    phone:
-                        metadata.phone ||
-                        "",
-
-                    country:
-                        metadata.country ||
-                        ""
-
-                };
+                    user.user_metadata || {};
 
 
                 /* -----------------------------------------
-                   SAVE / UPDATE PROFILE
-                   
-                   This happens after authentication, when
-                   the user has an authenticated session.
+                   GET PROFILE
                 ----------------------------------------- */
 
+                let profile = null;
+
+
                 const {
-                    data: profile,
+                    data: profileData,
                     error: profileError
                 } =
                     await supabaseClient
                         .from("profiles")
-                        .upsert(
-                            profileData,
-                            {
-                                onConflict:
-                                    "id"
-                            }
+                        .select(
+                            "id, full_name, username, phone, country, created_at"
                         )
-                        .select()
-                        .single();
+                        .eq(
+                            "id",
+                            user.id
+                        )
+                        .maybeSingle();
 
 
                 if (profileError) {
 
                     console.error(
-                        "Profile save error:",
+                        "Profile fetch error:",
                         profileError
                     );
 
-                    /*
-                       Do not block login if the profile
-                       operation fails. The Supabase Auth
-                       session itself is already valid.
-                    */
+                } else {
 
+                    profile =
+                        profileData;
                 }
 
 
                 /* -----------------------------------------
-                   BUILD USER OBJECT FOR EXISTING DASHBOARD
+                   CREATE PROFILE IF MISSING
+                ----------------------------------------- */
+
+                if (!profile) {
+
+                    const {
+                        data: newProfile,
+                        error: createProfileError
+                    } =
+                        await supabaseClient
+                            .from("profiles")
+                            .insert({
+
+                                id:
+                                    user.id,
+
+                                full_name:
+                                    metadata.full_name || "",
+
+                                username:
+                                    metadata.username || "",
+
+                                phone:
+                                    metadata.phone || "",
+
+                                country:
+                                    metadata.country || ""
+                            })
+                            .select()
+                            .single();
+
+
+                    if (createProfileError) {
+
+                        console.error(
+                            "Profile creation error:",
+                            createProfileError
+                        );
+
+                    } else {
+
+                        profile =
+                            newProfile;
+                    }
+                }
+
+
+                /* -----------------------------------------
+                   CURRENT USER OBJECT
+                   
+                   NO PASSWORD IS STORED.
                 ----------------------------------------- */
 
                 const currentUser = {
@@ -1080,16 +974,14 @@ document.addEventListener("DOMContentLoaded", async () => {
                         profile?.country ||
                         metadata.country ||
                         ""
-
                 };
 
 
                 /* -----------------------------------------
-                   EXISTING FINRISE DASHBOARD VALUES
+                   EXISTING FINRISE DASHBOARD DATA
                    
-                   These are NOT authentication credentials.
-                   They are only retained temporarily because
-                   the current dashboard uses them.
+                   These values are NOT authentication
+                   credentials.
                 ----------------------------------------- */
 
                 if (
@@ -1102,7 +994,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                         "finriseBalance",
                         "0"
                     );
-
                 }
 
 
@@ -1116,7 +1007,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                         "finriseTotalDeposit",
                         "0"
                     );
-
                 }
 
 
@@ -1130,7 +1020,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                         "finriseTotalEarning",
                         "0"
                     );
-
                 }
 
 
@@ -1144,15 +1033,14 @@ document.addEventListener("DOMContentLoaded", async () => {
                         "finriseReferralBonus",
                         "0"
                     );
-
                 }
 
 
                 /* -----------------------------------------
-                   COMPATIBILITY WITH CURRENT DASHBOARD
+                   COMPATIBILITY VALUES
                    
                    IMPORTANT:
-                   These values contain NO PASSWORD.
+                   No password is saved.
                 ----------------------------------------- */
 
                 localStorage.setItem(
@@ -1178,7 +1066,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
                 /* -----------------------------------------
-                   GO TO DASHBOARD
+                   DASHBOARD
                 ----------------------------------------- */
 
                 window.location.href =
@@ -1192,7 +1080,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                     error
                 );
 
-
                 alert(
                     error.message ||
                     "Login failed. Please try again."
@@ -1203,42 +1090,44 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                 if (submitButton) {
 
-                    submitButton.disabled =
-                        false;
+                    submitButton.disabled = false;
 
                     submitButton.textContent =
                         originalButtonText;
-
                 }
-
             }
-
         }
     );
 
 
     /* =====================================================
-       CHECK EXISTING SUPABASE SESSION
+       EXISTING SESSION
     ===================================================== */
 
     try {
 
         const {
-            data
+            data,
+            error
         } =
-            await supabaseClient.auth
-                .getSession();
+            await supabaseClient.auth.getSession();
 
 
-        if (
+        if (error) {
+
+            console.error(
+                "Session check error:",
+                error
+            );
+
+        } else if (
             data &&
             data.session
         ) {
 
             console.log(
-                "Existing Supabase session found."
+                "Existing Supabase session detected."
             );
-
         }
 
     } catch (error) {
@@ -1247,12 +1136,11 @@ document.addEventListener("DOMContentLoaded", async () => {
             "Session check failed:",
             error
         );
-
     }
 
 
     /* =====================================================
-       INITIAL FORM
+       DEFAULT SCREEN
     ===================================================== */
 
     showLogin();
