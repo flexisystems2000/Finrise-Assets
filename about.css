@@ -1,0 +1,72 @@
+.about_Section {
+    width: 100%;
+    background-color: aquamarine;
+    height: 500px;
+    background-image: url(image/breadcrumb_bg.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+    overflow: hidden;
+    position: relative;
+
+}
+
+.about_Section img {
+    top: 100px;
+    margin-left: 80px;
+    position: absolute;
+}
+
+.braImg3 {
+    position: absolute;
+    left: 350px;
+    top: 300px;
+}
+
+.braImg5 {
+    position: absolute;
+    left: 880px;
+    top: 100px;
+   animation: float 4s ease-in-out infinite;
+}
+
+.braImg2 {
+    position: absolute;
+    left: 0px;
+    top: 310px;
+    animation: float 4s ease-in-out infinite;
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-20px);
+    }
+}
+
+
+.braImgText {
+    position: absolute;
+    left: 120px;
+    top: 210px;
+    font-size: 35px;
+    color: #021a83;
+    /* animation: float 4s ease-in-out infinite; */
+}
+
+.braImgText p{
+    font-size: 20px;
+    
+}
+
+.hh {
+    color: #d4a63d;
+}
+
+a {
+    text-decoration: none;
+}

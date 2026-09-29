@@ -1,0 +1,232 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial;
+}
+
+body {
+
+    background: #050505;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    height: 100vh;
+
+}
+
+.container {
+
+    width: 1100px;
+
+    display: flex;
+
+    background: #111;
+
+    border-radius: 20px;
+
+    overflow: hidden;
+
+    box-shadow: 0 20px 60px rgba(0, 0, 0, .5);
+
+}
+
+.left {
+
+    width: 60%;
+
+    padding: 50px;
+
+}
+
+.right {
+
+    width: 40%;
+
+    background: linear-gradient(140deg, #00c853, #1de9b6);
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    flex-direction: column;
+
+    color: #fff;
+
+}
+
+.right h2 {
+
+    font-size: 45px;
+
+    margin-bottom: 15px;
+
+}
+
+.left h1 {
+
+    color: #fff;
+
+    margin-bottom: 10px;
+
+}
+
+.left p {
+
+    color: #aaa;
+
+    margin-bottom: 30px;
+
+}
+
+.input-box {
+
+    position: relative;
+
+    margin-bottom: 25px;
+
+}
+
+.input-box input,
+.input-box select {
+
+    width: 100%;
+
+    padding: 15px 45px;
+
+    background: #1d1d1d;
+
+    border: none;
+
+    outline: none;
+
+    color: #fff;
+
+    border-radius: 10px;
+
+    font-size: 15px;
+
+}
+
+.input-box i {
+
+    position: absolute;
+
+    left: 15px;
+
+    top: 16px;
+
+    color: #00e676;
+
+}
+
+.password span {
+
+    position: absolute;
+
+    right: 15px;
+
+    top: 15px;
+
+    cursor: pointer;
+
+    color: #fff;
+
+}
+
+button {
+
+    width: 100%;
+
+    padding: 15px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    background: #00e676;
+
+    font-size: 17px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    margin-top: 15px;
+
+    transition: .3s;
+
+}
+
+button:hover {
+
+    transform: scale(1.02);
+
+}
+
+small {
+    color: red;
+    display: block;
+    margin-top: 5px;
+
+}
+
+.terms {
+
+    display: flex;
+    gap: 10px;
+    color: white;
+    margin-bottom: 20px;
+
+}
+
+.login {
+
+    text-align: center;
+
+    margin-top: 20px;
+
+    color: #fff;
+
+}
+
+.login a {
+
+    color: #00e676;
+
+    text-decoration: none;
+
+}
+
+@media(max-width:900px) {
+
+    .container {
+
+        flex-direction: column;
+
+        width: 95%;
+
+        height: auto;
+
+    }
+
+    .left,
+    .right {
+
+        width: 100%;
+
+    }
+
+    .right {
+
+        padding: 50px;
+
+    }
+
+}

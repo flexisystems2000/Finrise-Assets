@@ -1,0 +1,3738 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=1200">
+
+    <title>Finrise Asset Dashboard</title>
+
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Dashboard CSS -->
+    <link rel="stylesheet" href="dashboardS.css">
+    <!-- Deposit CSS -->
+    <link rel="stylesheet" href="deposit.css">
+    <!-- Withdraw CSS -->
+    <link rel="stylesheet" href="withdraw.css">
+    <!-- Transcation CSS -->
+    <link rel="stylesheet" href="transcation.css">
+    <link rel="stylesheet" href="trading.css">
+    <link rel="stylesheet" href="profile.css">
+    <link rel="stylesheet" href="referral.css">
+    <link rel="stylesheet" href="setting.css">
+
+    <style>
+        /* Page navigation */
+        .page-section { display: none; }
+        .page-section.active { display: block; }
+        .sidebar .nav-item { cursor: pointer; }
+        .sidebar .nav-item.active {
+            color: #d4af37;
+            background: rgba(212, 175, 55, 0.10);
+            border-left: 3px solid #d4af37;
+        }
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <div class="dashboard">
+
+
+        <!-- ==================================================
+             SIDEBAR
+        ================================================== -->
+
+        <aside class="sidebar">
+
+            <div class="logo">
+                <h2>Finrise <span>Asset</span></h2>
+            </div>
+
+            <ul>
+
+                <li class="nav-item active" data-page="dashboard">
+                    <i class="bi bi-grid-fill"></i>
+                    <span>Dashboard</span>
+                </li>
+
+                <li class="nav-item" data-page="deposit">
+                    <i class="bi bi-wallet2"></i>
+                    <span>Deposit</span>
+                </li>
+
+                <li class="nav-item" data-page="withdraw">
+                    <i class="bi bi-cash-stack"></i>
+                    <span>Withdraw</span>
+                </li>
+
+                <li class="nav-item" data-page="trading">
+                    <i class="bi bi-bar-chart-line-fill"></i>
+                    <span>Trading</span>
+                </li>
+
+                <li class="nav-item" data-page="transactions">
+                    <i class="bi bi-clock-history"></i>
+                    <span>Transactions</span>
+                </li>
+
+                <li class="nav-item" data-page="referral">
+                    <i class="bi bi-people-fill"></i>
+                    <span>Referral</span>
+                </li>
+
+                <li class="nav-item" data-page="profile">
+                    <i class="bi bi-person-fill"></i>
+                    <span>Profile</span>
+                </li>
+
+                <li class="nav-item" data-page="settings">
+                    <i class="bi bi-gear-fill"></i>
+                    <span>Settings</span>
+                </li>
+
+                <li id="logout" style="cursor: pointer;">
+                    <i class="bi bi-box-arrow-right"></i>
+                    <span>Logout</span>
+                </li>
+
+            </ul>
+
+        </aside>
+
+
+
+        <main class="main">
+
+            <!-- NAVBAR -->
+            <div class="navbar">
+
+                <button class="menu-btn" type="button">
+                    <i class="bi bi-list"></i>
+                </button>
+
+                <div id="clock"></div>
+
+                <div class="profile">
+
+                    <i class="bi bi-bell-fill notification"></i>
+
+                    <img id="profileImage" src="https://i.pravatar.cc/150?img=12" alt="User Profile">
+
+                    <div class="profile-info">
+                        <h4 id="userName">Loading...</h4>
+                        <small id="userEmail">Loading...</small>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- DASHBOARD -->
+            <section id="dashboard" class="page-section active">
+
+                <div class="welcome">
+
+                    <h1 id="welcome">Welcome</h1>
+
+                    <p>
+                        Welcome back to
+                        <strong>Finrise Asset</strong>.
+                        We're glad to have you here.
+                    </p>
+
+                </div>
+
+
+                <div class="cards">
+
+                    <div class="card">
+                        <div>
+                            <h4>Account Balance</h4>
+                            <h2 id="balance">$0.00</h2>
+                        </div>
+
+                        <i class="bi bi-wallet-fill"></i>
+                    </div>
+
+
+                    <div class="card">
+                        <div>
+                            <h4>Total Deposit</h4>
+                            <h2 id="totalDeposit">$0.00</h2>
+                        </div>
+
+                        <i class="bi bi-arrow-down-circle-fill"></i>
+                    </div>
+
+
+                    <div class="card">
+                        <div>
+                            <h4>Total Earnings</h4>
+                            <h2 id="totalEarning">$0.00</h2>
+                        </div>
+
+                        <i class="bi bi-graph-up-arrow"></i>
+                    </div>
+
+
+                    <div class="card">
+                        <div>
+                            <h4>Referral Bonus</h4>
+                            <h2 id="referralBonus">$0.00</h2>
+                        </div>
+
+                        <i class="bi bi-gift-fill"></i>
+                    </div>
+
+                </div>
+
+
+                <!-- TRADINGVIEW -->
+                <div class="chart">
+
+                    <h2>Portfolio Performance</h2>
+
+                    <div class="tradingview-widget-container">
+
+                        <div id="tradingview_chart"></div>
+
+                        <script src="https://s3.tradingview.com/tv.js"></script>
+
+                        <script>
+
+                            new TradingView.widget({
+
+                                width: "100%",
+                                height: 600,
+
+                                symbol: "BINANCE:BTCUSDT",
+
+                                interval: "15",
+
+                                timezone: "Etc/UTC",
+
+                                theme: "dark",
+
+                                style: "1",
+
+                                locale: "en",
+
+                                toolbar_bg: "#0f172a",
+
+                                enable_publishing: false,
+
+                                allow_symbol_change: true,
+
+                                container_id: "tradingview_chart",
+
+                                studies: [
+                                    "MASimple@tv-basicstudies",
+                                    "RSI@tv-basicstudies",
+                                    "MACD@tv-basicstudies"
+                                ]
+
+                            });
+
+                        </script>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- DEPOSIT -->
+            <section id="deposit" class="page-section">
+
+
+                <!-- Deposit Header -->
+
+                <div class="deposit-header">
+
+                    <div>
+
+                        <span class="section-label">
+                            FUND YOUR ACCOUNT
+                        </span>
+
+                        <h1>Deposit Funds</h1>
+
+                        <p>
+                            Add funds securely to your Finrise Asset account.
+                        </p>
+
+                    </div>
+
+
+                    <div class="deposit-balance">
+
+                        <span>Available Balance</span>
+
+                        <strong id="depositBalance">
+                            $0.00
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- Deposit Grid -->
+
+                <div class="deposit-grid">
+
+
+                    <!-- =============================================
+             LEFT: DEPOSIT FORM
+        ============================================== -->
+
+                    <div class="deposit-card">
+
+                        <div class="deposit-title">
+
+                            <div class="deposit-icon">
+                                <i class="bi bi-wallet2"></i>
+                            </div>
+
+                            <div>
+
+                                <h2>Make a Deposit</h2>
+
+                                <p>
+                                    Select your preferred payment method.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- Payment Methods -->
+
+                        <label class="deposit-label">
+                            Payment Method
+                        </label>
+
+
+                        <div class="deposit-methods">
+
+
+                            <!-- Crypto -->
+
+                            <button type="button" class="deposit-method active" data-method="crypto">
+
+                                <span class="deposit-method-icon">
+                                    <i class="bi bi-currency-bitcoin"></i>
+                                </span>
+
+                                <span>
+                                    <strong>Crypto</strong>
+                                    <small>BTC / ETH</small>
+                                </span>
+
+                                <span class="deposit-radio"></span>
+
+                            </button>
+
+
+
+                            <!-- USDT -->
+
+                            <button type="button" class="deposit-method" data-method="usdt">
+
+                                <span class="deposit-method-icon">
+                                    <i class="bi bi-currency-dollar"></i>
+                                </span>
+
+                                <span>
+                                    <strong>USDT</strong>
+                                    <small>TRC20 / ERC20</small>
+                                </span>
+
+                                <span class="deposit-radio"></span>
+
+                            </button>
+
+
+
+                            <!-- Bank -->
+
+                            <button type="button" class="deposit-method" data-method="bank">
+
+                                <span class="deposit-method-icon">
+                                    <i class="bi bi-bank"></i>
+                                </span>
+
+                                <span>
+                                    <strong>Bank Transfer</strong>
+                                    <small>Bank payment</small>
+                                </span>
+
+                                <span class="deposit-radio"></span>
+
+                            </button>
+
+                        </div>
+
+
+
+                        <!-- Amount -->
+
+                        <div class="deposit-form-group">
+
+                            <div class="deposit-label-row">
+
+                                <label for="depositAmount">
+                                    Deposit Amount
+                                </label>
+
+                                <span>
+                                    Min. $20
+                                </span>
+
+                            </div>
+
+
+                            <div class="deposit-amount-box">
+
+                                <span>$</span>
+
+                                <input type="number" id="depositAmount" min="20" step="0.01" placeholder="0.00">
+
+                                <small>USD</small>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- Payment Details -->
+
+                        <div class="payment-details" id="paymentDetails">
+
+                            <div class="payment-details-header">
+
+                                <div>
+
+                                    <h3 id="paymentTitle">
+                                        Bitcoin Payment
+                                    </h3>
+
+                                    <p id="paymentDescription">
+                                        Send the exact amount to the wallet below.
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+
+
+                            <!-- Wallet -->
+
+                            <div class="payment-row" id="cryptoPayment">
+
+                                <label>
+                                    Wallet Address
+                                </label>
+
+                                <div class="copy-box">
+
+                                    <input type="text" id="walletAddress" value="0xa9a39426ad9a451a8d58bda654099dbaed1cb75f" readonly>
+
+                                    <button type="button" id="copyWallet">
+                                        <i class="bi bi-copy"></i>
+                                        Copy
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+
+
+                            <!-- Network -->
+
+                            <div class="payment-row" id="networkPayment">
+
+                                <label>
+                                    Network
+                                </label>
+
+                                <select id="depositNetwork">
+
+                                    <option value="TRC20">
+                                        TRC20
+                                    </option>
+
+                                    <option value="ERC20">
+                                        ERC20
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+
+                            <!-- Bank Details -->
+
+                            <div class="bank-details" id="bankPayment">
+
+                                <div>
+                                    <span>Bank Name</span>
+                                    <strong id="bankName">
+                                        Finrise Bank
+                                    </strong>
+                                </div>
+
+                                <div>
+                                    <span>Account Name</span>
+                                    <strong id="accountName">
+                                        Finrise Asset
+                                    </strong>
+                                </div>
+
+                                <div>
+                                    <span>Account Number</span>
+                                    <strong id="accountNumber">
+                                        
+                                    </strong>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- Notice -->
+
+                        <div class="deposit-notice">
+
+                            <i class="bi bi-shield-check"></i>
+
+                            <div>
+
+                                <strong>
+                                    Important
+                                </strong>
+
+                                <p>
+                                    Only send funds using the selected
+                                    network and payment method. Incorrect
+                                    transfers may not be recoverable.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- Submit -->
+
+                        <button type="button" class="deposit-btn" id="depositBtn">
+
+                            <i class="bi bi-check-circle"></i>
+
+                            I Have Made Payment
+
+                        </button>
+
+                    </div>
+
+
+
+                    <!-- =============================================
+             RIGHT SIDE
+        ============================================== -->
+
+                    <div class="deposit-side">
+
+
+                        <!-- Deposit Information -->
+
+                        <div class="deposit-info-card">
+
+                            <div class="deposit-info-icon">
+                                <i class="bi bi-info-circle"></i>
+                            </div>
+
+                            <h3>
+                                Deposit Information
+                            </h3>
+
+                            <p>
+                                Please follow the payment instructions
+                                carefully before submitting your deposit.
+                            </p>
+
+
+                            <div class="deposit-info-line">
+
+                                <span>
+                                    Minimum Deposit
+                                </span>
+
+                                <strong>
+                                    $20
+                                </strong>
+
+                            </div>
+
+
+                            <div class="deposit-info-line">
+
+                                <span>
+                                    Maximum Deposit
+                                </span>
+
+                                <strong>
+                                    No Limit
+                                </strong>
+
+                            </div>
+
+
+                            <div class="deposit-info-line">
+
+                                <span>
+                                    Processing
+                                </span>
+
+                                <strong>
+                                    Pending Review
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- Recent Deposits -->
+
+                        <div class="deposit-history-card">
+
+                            <div class="deposit-history-header">
+
+                                <div>
+
+                                    <h3>
+                                        Recent Deposits
+                                    </h3>
+
+                                    <p>
+                                        Your latest deposit requests
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+
+                            <div id="depositHistory">
+
+                                <div class="deposit-empty">
+
+                                    <i class="bi bi-wallet2"></i>
+
+                                    <p>
+                                        No deposits yet
+                                    </p>
+
+                                    <small>
+                                        Your deposit history will appear here.
+                                    </small>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+
+
+            </section>
+
+
+            <!-- WITHDRAW -->
+            <section id="withdraw" class="page-section">
+
+                <div class="withdraw-section">
+
+
+                    <!-- ==================================================
+                         WITHDRAW HEADER
+                    ================================================== -->
+
+                    <div class="withdraw-header">
+
+
+                        <div>
+
+                            <span class="section-label">
+                                FINRISE ASSET
+                            </span>
+
+
+                            <h1>
+                                Withdraw Funds
+                            </h1>
+
+
+                            <p>
+                                Transfer your available balance securely.
+                            </p>
+
+                        </div>
+
+
+
+                        <!-- Balance -->
+
+                        <div class="balance-card">
+
+                            <span>
+                                Available Balance
+                            </span>
+
+
+                            <strong id="withdrawBalance">
+                                $0.00
+                            </strong>
+
+
+                            <small>
+                                Available for withdrawal
+                            </small>
+
+                        </div>
+
+
+                    </div>
+
+
+
+                    <!-- ==================================================
+                         WITHDRAW GRID
+                    ================================================== -->
+
+                    <div class="withdraw-grid">
+
+
+                        <!-- ==================================================
+                             WITHDRAW FORM
+                        ================================================== -->
+
+                        <div class="withdraw-card">
+
+
+                            <!-- Title -->
+
+                            <div class="card-title">
+
+
+                                <div class="title-icon">
+                                    ↗
+                                </div>
+
+
+                                <div>
+
+                                    <h2>
+                                        Request Withdrawal
+                                    </h2>
+
+                                    <p>
+                                        Choose your preferred withdrawal method.
+                                    </p>
+
+                                </div>
+
+
+                            </div>
+
+
+
+                            <!-- Withdrawal Methods -->
+
+                            <div class="method-title">
+                                Withdrawal Method
+                            </div>
+
+
+                            <div class="methods">
+
+
+                                <!-- Crypto -->
+
+                                <button type="button" class="method active" data-method="crypto">
+
+                                    <span class="method-icon">
+                                        ₿
+                                    </span>
+
+
+                                    <span>
+
+                                        <strong>
+                                            Crypto Wallet
+                                        </strong>
+
+                                        <small>
+                                            BTC, ETH, USDT
+                                        </small>
+
+                                    </span>
+
+
+                                    <span class="radio"></span>
+
+                                </button>
+
+
+
+                                <!-- Bank -->
+
+                                <button type="button" class="method" data-method="bank">
+
+                                    <span class="method-icon">
+                                        ₦
+                                    </span>
+
+
+                                    <span>
+
+                                        <strong>
+                                            Bank Transfer
+                                        </strong>
+
+                                        <small>
+                                            Local bank account
+                                        </small>
+
+                                    </span>
+
+
+                                    <span class="radio"></span>
+
+                                </button>
+
+
+
+                                <!-- USDT -->
+
+                                <button type="button" class="method" data-method="usdt">
+
+                                    <span class="method-icon">
+                                        ₮
+                                    </span>
+
+
+                                    <span>
+
+                                        <strong>
+                                            USDT
+                                        </strong>
+
+                                        <small>
+                                            TRC20 / ERC20
+                                        </small>
+
+                                    </span>
+
+
+                                    <span class="radio"></span>
+
+                                </button>
+
+
+                            </div>
+
+
+
+                            <!-- ==================================================
+                                 DESTINATION
+                            ================================================== -->
+
+                            <div class="form-group">
+
+
+                                <label id="destinationLabel">
+                                    Wallet Address
+                                </label>
+
+
+                                <div class="input-box">
+
+                                    <input type="text" id="destination" placeholder="Enter wallet address">
+
+
+                                    <span class="input-icon">
+                                        ⌁
+                                    </span>
+
+                                </div>
+
+
+                                <small class="input-help" id="destinationHelp">
+                                    Make sure the wallet address is correct.
+                                </small>
+
+
+                            </div>
+
+
+
+                            <!-- ==================================================
+                                 NETWORK
+                            ================================================== -->
+
+                            <div class="form-group" id="networkGroup">
+
+
+                                <label>
+                                    Network
+                                </label>
+
+
+                                <div class="select-box">
+
+                                    <select id="network">
+
+                                        <option value="">
+                                            Select network
+                                        </option>
+
+                                        <option value="TRC20">
+                                            USDT - TRC20
+                                        </option>
+
+                                        <option value="ERC20">
+                                            USDT - ERC20
+                                        </option>
+
+                                        <option value="BEP20">
+                                            USDT - BEP20
+                                        </option>
+
+                                        <option value="BTC">
+                                            Bitcoin Network
+                                        </option>
+
+                                        <option value="ETH">
+                                            Ethereum Network
+                                        </option>
+
+                                    </select>
+
+                                </div>
+
+
+                            </div>
+
+
+
+                            <!-- ==================================================
+                                 AMOUNT
+                            ================================================== -->
+
+                            <div class="form-group">
+
+
+                                <div class="label-row">
+
+                                    <label>
+                                        Amount
+                                    </label>
+
+
+                                    <button type="button" id="maxBtn" class="max-btn">
+                                        MAX
+                                    </button>
+
+                                </div>
+
+
+                                <div class="amount-input">
+
+
+                                    <span class="currency">
+                                        $
+                                    </span>
+
+
+                                    <input type="number" id="amount" placeholder="0.00" min="0" step="0.01">
+
+
+                                    <span class="usd">
+                                        USD
+                                    </span>
+
+
+                                </div>
+
+
+                                <div class="amount-limit">
+
+                                    Minimum withdrawal:
+                                    <strong>
+                                        $20.00
+                                    </strong>
+
+                                </div>
+
+
+                            </div>
+
+
+
+                            <!-- ==================================================
+                                 SUMMARY
+                            ================================================== -->
+
+                            <div class="withdraw-summary">
+
+
+                                <div>
+
+                                    <span>
+                                        Withdrawal Fee
+                                    </span>
+
+                                    <strong id="fee">
+                                        $5.00
+                                    </strong>
+
+                                </div>
+
+
+                                <div>
+
+                                    <span>
+                                        Processing Time
+                                    </span>
+
+                                    <strong>
+                                        5–30 Minutes
+                                    </strong>
+
+                                </div>
+
+
+                                <div class="receive-row">
+
+                                    <span>
+                                        You Receive
+                                    </span>
+
+                                    <strong id="receive">
+                                        $0.00
+                                    </strong>
+
+                                </div>
+
+
+                            </div>
+
+
+
+                            <!-- ==================================================
+                                 SECURITY
+                            ================================================== -->
+
+                            <div class="security-notice">
+
+
+                                <span>
+                                    🔐
+                                </span>
+
+
+                                <div>
+
+                                    <strong>
+                                        Secure Withdrawal
+                                    </strong>
+
+
+                                    <p>
+                                        Please verify your withdrawal details
+                                        before submitting. Incorrect payment
+                                        information may cause delays.
+                                    </p>
+
+                                </div>
+
+
+                            </div>
+
+
+
+                            <!-- Withdraw Button -->
+
+                            <button type="button" class="withdraw-btn" id="withdrawBtn">
+
+                                🔒
+                                Request Withdrawal
+
+                            </button>
+
+
+                        </div>
+
+
+
+                        <!-- ==================================================
+                             RIGHT SIDE
+                        ================================================== -->
+
+                        <div class="withdraw-side">
+
+
+                            <!-- Quick Info -->
+
+                            <div class="info-card">
+
+
+                                <div class="info-icon">
+                                    ✓
+                                </div>
+
+
+                                <h3>
+                                    Fast & Secure
+                                </h3>
+
+
+                                <p>
+                                    Your withdrawal request will be securely
+                                    reviewed before processing.
+                                </p>
+
+
+                                <div class="info-line">
+
+                                    <span>
+                                        Processing
+                                    </span>
+
+                                    <strong>
+                                        5–30 min
+                                    </strong>
+
+                                </div>
+
+
+                                <div class="info-line">
+
+                                    <span>
+                                        Minimum
+                                    </span>
+
+                                    <strong>
+                                        $20
+                                    </strong>
+
+                                </div>
+
+
+                                <div class="info-line">
+
+                                    <span>
+                                        Maximum
+                                    </span>
+
+                                    <strong>
+                                        $10,000
+                                    </strong>
+
+                                </div>
+
+
+                            </div>
+
+
+
+                            <!-- Recent Withdrawals -->
+
+                            <div class="history-card">
+
+
+                                <div class="history-header">
+
+
+                                    <div>
+
+                                        <h3>
+                                            Recent Withdrawals
+                                        </h3>
+
+                                        <p>
+                                            Your latest withdrawal requests
+                                        </p>
+
+                                    </div>
+
+
+                                    <button type="button">
+                                        View All
+                                    </button>
+
+
+                                </div>
+
+
+
+                                <div id="historyList">
+
+
+                                    <div class="transaction">
+
+
+                                        <div class="transaction-icon">
+                                            ₮
+                                        </div>
+
+
+                                        <div class="transaction-info">
+
+                                            <strong>
+                                                No Withdrawals Yet
+                                            </strong>
+
+                                            <small>
+                                                Your withdrawal history will appear here.
+                                            </small>
+
+                                        </div>
+
+
+                                        <div class="transaction-right">
+
+                                            <strong>
+                                                --
+                                            </strong>
+
+                                        </div>
+
+
+                                    </div>
+
+
+                                </div>
+
+
+                            </div>
+
+
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+
+
+            </section>
+
+
+
+            <!-- ==================================================
+                 WITHDRAW CONFIRMATION MODAL
+            ================================================== -->
+
+            <div class="modal-overlay" id="withdrawModal">
+
+
+                <div class="withdraw-modal">
+
+
+                    <!-- Close -->
+
+                    <button type="button" class="close-modal" id="closeModal">
+                        ×
+                    </button>
+
+
+                    <!-- Icon -->
+
+                    <div class="modal-icon">
+                        ✓
+                    </div>
+
+
+                    <h2>
+                        Confirm Withdrawal
+                    </h2>
+
+
+                    <p>
+                        Please review your withdrawal details before
+                        continuing.
+                    </p>
+
+
+                    <!-- Details -->
+
+                    <div class="modal-details">
+
+
+                        <div>
+
+                            <span>
+                                Method
+                            </span>
+
+                            <strong id="confirmMethod">
+                                Crypto Wallet
+                            </strong>
+
+                        </div>
+
+
+                        <div>
+
+                            <span>
+                                Amount
+                            </span>
+
+                            <strong id="confirmAmount">
+                                $0.00
+                            </strong>
+
+                        </div>
+
+
+                        <div>
+
+                            <span>
+                                Fee
+                            </span>
+
+                            <strong id="confirmFee">
+                                $5.00
+                            </strong>
+
+                        </div>
+
+
+                        <div>
+
+                            <span>
+                                You Receive
+                            </span>
+
+                            <strong id="confirmReceive">
+                                $0.00
+                            </strong>
+
+                        </div>
+
+
+                    </div>
+
+
+
+                    <!-- Modal Buttons -->
+
+                    <div class="modal-actions">
+
+
+                        <button type="button" class="cancel-btn" id="cancelBtn">
+                            Cancel
+                        </button>
+
+
+                        <button type="button" class="confirm-btn" id="confirmBtn">
+                            Confirm Withdrawal
+                        </button>
+
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+            </section>
+
+
+            <!-- TRADING -->
+            <section id="trading" class="page-section">
+
+                <!-- Trading Header -->
+                <div class="trading-header">
+
+                    <div>
+                        <span class="section-label">
+                            MARKETS
+                        </span>
+
+                        <h1>Trading</h1>
+
+                        <p>
+                            Monitor the market, trade assets and manage your investments.
+                        </p>
+                    </div>
+
+                    <div class="trading-balance">
+
+                        <span>Available Balance</span>
+
+                        <strong id="tradingBalance">
+                            $0.00
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+         MARKET SELECTOR
+    ================================================== -->
+
+                <div class="market-selector">
+
+                    <button class="asset-btn active" data-symbol="BINANCE:BTCUSDT" data-name="BTC/USDT"
+                        data-price="65000">
+                        <span class="asset-icon btc">
+                            ₿
+                        </span>
+
+                        <div>
+                            <strong>BTC/USDT</strong>
+                            <small>Bitcoin</small>
+                        </div>
+                    </button>
+
+
+                    <button class="asset-btn" data-symbol="BINANCE:ETHUSDT" data-name="ETH/USDT" data-price="3200">
+                        <span class="asset-icon eth">
+                            Ξ
+                        </span>
+
+                        <div>
+                            <strong>ETH/USDT</strong>
+                            <small>Ethereum</small>
+                        </div>
+                    </button>
+
+
+                    <button class="asset-btn" data-symbol="BINANCE:SOLUSDT" data-name="SOL/USDT" data-price="145">
+                        <span class="asset-icon sol">
+                            S
+                        </span>
+
+                        <div>
+                            <strong>SOL/USDT</strong>
+                            <small>Solana</small>
+                        </div>
+                    </button>
+
+
+                    <button class="asset-btn" data-symbol="OANDA:XAUUSD" data-name="XAU/USD" data-price="3400">
+                        <span class="asset-icon gold">
+                            Au
+                        </span>
+
+                        <div>
+                            <strong>XAU/USD</strong>
+                            <small>Gold</small>
+                        </div>
+                    </button>
+
+                </div>
+
+
+                <!-- =================================================
+         MARKET STATS
+    ================================================== -->
+
+                <div class="market-stats">
+
+                    <div class="market-stat">
+
+                        <span>Price</span>
+
+                        <strong id="marketPrice">
+                            $65,000.00
+                        </strong>
+
+                    </div>
+
+
+                    <div class="market-stat">
+
+                        <span>24h Change</span>
+
+                        <strong class="positive">
+                            +2.48%
+                        </strong>
+
+                    </div>
+
+
+                    <div class="market-stat">
+
+                        <span>24h High</span>
+
+                        <strong>
+                            $66,420.00
+                        </strong>
+
+                    </div>
+
+
+                    <div class="market-stat">
+
+                        <span>24h Low</span>
+
+                        <strong>
+                            $63,120.00
+                        </strong>
+
+                    </div>
+
+
+                    <div class="market-stat">
+
+                        <span>24h Volume</span>
+
+                        <strong>
+                            $28.45B
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+         CHART + ORDER PANEL
+    ================================================== -->
+
+                <div class="trading-grid">
+
+                    <!-- Chart -->
+
+                    <div class="trading-chart-card">
+
+                        <div class="chart-header">
+
+                            <div>
+
+                                <h2 id="chartAsset">
+                                    BTC/USDT
+                                </h2>
+
+                                <span>
+                                    Live Market Chart
+                                </span>
+
+                            </div>
+
+                            <div class="chart-timeframes">
+
+                                <button class="timeframe active">
+                                    15m
+                                </button>
+
+                                <button class="timeframe">
+                                    1H
+                                </button>
+
+                                <button class="timeframe">
+                                    4H
+                                </button>
+
+                                <button class="timeframe">
+                                    1D
+                                </button>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="tradingview-widget-container">
+
+                            <div id="finriseTradingChart"></div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Order Panel -->
+
+                    <div class="order-card">
+
+                        <div class="order-tabs">
+
+                            <button class="order-tab active" data-order="buy">
+                                Buy
+                            </button>
+
+                            <button class="order-tab" data-order="sell">
+                                Sell
+                            </button>
+
+                        </div>
+
+
+                        <div class="order-content">
+
+                            <div class="order-info">
+
+                                <span>Available Balance</span>
+
+                                <strong id="orderBalance">
+                                    $0.00
+                                </strong>
+
+                            </div>
+
+
+                            <label>
+                                Asset
+                            </label>
+
+                            <div class="selected-asset">
+
+                                <span class="asset-icon btc" id="orderAssetIcon">
+                                    ₿
+                                </span>
+
+                                <div>
+
+                                    <strong id="orderAsset">
+                                        BTC/USDT
+                                    </strong>
+
+                                    <small>
+                                        Market Order
+                                    </small>
+
+                                </div>
+
+                            </div>
+
+
+                            <label for="tradeAmount">
+                                Amount
+                            </label>
+
+                            <div class="amount-input">
+
+                                <span>$</span>
+
+                                <input type="number" id="tradeAmount" placeholder="0.00" min="1">
+
+                            </div>
+
+
+                            <div class="order-summary">
+
+                                <div>
+
+                                    <span>Current Price</span>
+
+                                    <strong id="orderPrice">
+                                        $65,000.00
+                                    </strong>
+
+                                </div>
+
+
+                                <div>
+
+                                    <span>Estimated Quantity</span>
+
+                                    <strong id="estimatedQuantity">
+                                        0.000000
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+
+                            <button type="button" id="placeTradeBtn" class="place-trade buy">
+                                Buy BTC
+                            </button>
+
+
+                            <small class="order-note">
+                                Market prices can change rapidly.
+                            </small>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+         INVESTMENT PLANS
+    ================================================== -->
+
+                <div class="plans-section">
+
+                    <div class="section-heading">
+
+                        <div>
+
+                            <span class="section-label">
+                                INVESTMENT
+                            </span>
+
+                            <h2>Investment Plans</h2>
+
+                            <p>
+                                Choose an investment plan that fits your goals.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="plans-grid">
+
+
+                        <!-- Starter -->
+
+                        <div class="investment-plan">
+
+                            <div class="plan-top">
+
+                                <span class="plan-badge">
+                                    STARTER
+                                </span>
+
+                                <i class="bi bi-rocket-takeoff"></i>
+
+                            </div>
+
+
+                            <h3>
+                                Starter Plan
+                            </h3>
+
+
+                            <div class="plan-return">
+
+                                <strong>
+                                    5%
+                                </strong>
+
+                                <span>
+                                    Target Return
+                                </span>
+
+                            </div>
+
+
+                            <div class="plan-details">
+
+                                <div>
+                                    <span>Minimum</span>
+                                    <strong>$50</strong>
+                                </div>
+
+                                <div>
+                                    <span>Duration</span>
+                                    <strong>7 Days</strong>
+                                </div>
+
+                            </div>
+
+
+                            <ul>
+
+                                <li>
+                                    <i class="bi bi-check-circle"></i>
+                                    Beginner friendly
+                                </li>
+
+                                <li>
+                                    <i class="bi bi-check-circle"></i>
+                                    Portfolio tracking
+                                </li>
+
+                                <li>
+                                    <i class="bi bi-check-circle"></i>
+                                    24/7 dashboard access
+                                </li>
+
+                            </ul>
+
+
+                            <button class="invest-btn" data-plan="Starter Plan" data-min="50" data-return="5"
+                                data-duration="7">
+                                Invest Now
+                            </button>
+
+                        </div>
+
+
+                        <!-- Silver -->
+
+                        <div class="investment-plan">
+
+                            <div class="plan-top">
+
+                                <span class="plan-badge">
+                                    SILVER
+                                </span>
+
+                                <i class="bi bi-bar-chart-fill"></i>
+
+                            </div>
+
+
+                            <h3>
+                                Silver Plan
+                            </h3>
+
+
+                            <div class="plan-return">
+
+                                <strong>
+                                    10%
+                                </strong>
+
+                                <span>
+                                    Target Return
+                                </span>
+
+                            </div>
+
+
+                            <div class="plan-details">
+
+                                <div>
+                                    <span>Minimum</span>
+                                    <strong>$500</strong>
+                                </div>
+
+                                <div>
+                                    <span>Duration</span>
+                                    <strong>14 Days</strong>
+                                </div>
+
+                            </div>
+
+
+                            <ul>
+
+                                <li>
+                                    <i class="bi bi-check-circle"></i>
+                                    Higher target return
+                                </li>
+
+                                <li>
+                                    <i class="bi bi-check-circle"></i>
+                                    Portfolio tracking
+                                </li>
+
+                                <li>
+                                    <i class="bi bi-check-circle"></i>
+                                    Dedicated support
+                                </li>
+
+                            </ul>
+
+
+                            <button class="invest-btn" data-plan="Silver Plan" data-min="500" data-return="10"
+                                data-duration="14">
+                                Invest Now
+                            </button>
+
+                        </div>
+
+
+                        <!-- Gold -->
+
+                        <div class="investment-plan featured">
+
+                            <span class="popular-plan">
+                                POPULAR
+                            </span>
+
+
+                            <div class="plan-top">
+
+                                <span class="plan-badge">
+                                    GOLD
+                                </span>
+
+                                <i class="bi bi-gem"></i>
+
+                            </div>
+
+
+                            <h3>
+                                Gold Plan
+                            </h3>
+
+
+                            <div class="plan-return">
+
+                                <strong>
+                                    20%
+                                </strong>
+
+                                <span>
+                                    Target Return
+                                </span>
+
+                            </div>
+
+
+                            <div class="plan-details">
+
+                                <div>
+                                    <span>Minimum</span>
+                                    <strong>$1,000</strong>
+                                </div>
+
+                                <div>
+                                    <span>Duration</span>
+                                    <strong>30 Days</strong>
+                                </div>
+
+                            </div>
+
+
+                            <ul>
+
+                                <li>
+                                    <i class="bi bi-check-circle"></i>
+                                    Premium investment
+                                </li>
+
+                                <li>
+                                    <i class="bi bi-check-circle"></i>
+                                    Advanced tracking
+                                </li>
+
+                                <li>
+                                    <i class="bi bi-check-circle"></i>
+                                    Priority support
+                                </li>
+
+                            </ul>
+
+
+                            <button class="invest-btn" data-plan="Gold Plan" data-min="1000" data-return="20"
+                                data-duration="30">
+                                Invest Now
+                            </button>
+
+                        </div>
+
+
+                        <!-- Platinum -->
+
+                        <div class="investment-plan">
+
+                            <div class="plan-top">
+
+                                <span class="plan-badge">
+                                    PLATINUM
+                                </span>
+
+                                <i class="bi bi-trophy-fill"></i>
+
+                            </div>
+
+
+                            <h3>
+                                Platinum Plan
+                            </h3>
+
+
+                            <div class="plan-return">
+
+                                <strong>
+                                    35%
+                                </strong>
+
+                                <span>
+                                    Target Return
+                                </span>
+
+                            </div>
+
+
+                            <div class="plan-details">
+
+                                <div>
+                                    <span>Minimum</span>
+                                    <strong>$5,000</strong>
+                                </div>
+
+                                <div>
+                                    <span>Duration</span>
+                                    <strong>60 Days</strong>
+                                </div>
+
+                            </div>
+
+
+                            <ul>
+
+                                <li>
+                                    <i class="bi bi-check-circle"></i>
+                                    Premium portfolio
+                                </li>
+
+                                <li>
+                                    <i class="bi bi-check-circle"></i>
+                                    Advanced analytics
+                                </li>
+
+                                <li>
+                                    <i class="bi bi-check-circle"></i>
+                                    Priority support
+                                </li>
+
+                            </ul>
+
+
+                            <button class="invest-btn" data-plan="Platinum Plan" data-min="5000" data-return="35"
+                                data-duration="60">
+                                Invest Now
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+         MY INVESTMENTS
+    ================================================== -->
+
+                <div class="my-investments">
+
+                    <div class="section-heading">
+
+                        <div>
+
+                            <span class="section-label">
+                                PORTFOLIO
+                            </span>
+
+                            <h2>My Investments</h2>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="investments-table-wrapper">
+
+                        <table class="investments-table">
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>Plan</th>
+
+                                    <th>Amount</th>
+
+                                    <th>Target Return</th>
+
+                                    <th>Expected</th>
+
+                                    <th>Duration</th>
+
+                                    <th>Status</th>
+
+                                </tr>
+
+                            </thead>
+
+
+                            <tbody id="investmentsBody">
+
+                                <!-- JavaScript -->
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+
+                    <div class="no-investments" id="noInvestments">
+
+                        <i class="bi bi-pie-chart"></i>
+
+                        <h3>
+                            No investments yet
+                        </h3>
+
+                        <p>
+                            Choose an investment plan above to get started.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+         TRADE HISTORY
+    ================================================== -->
+
+                <div class="trade-history">
+
+                    <div class="section-heading">
+
+                        <div>
+
+                            <span class="section-label">
+                                ACTIVITY
+                            </span>
+
+                            <h2>Trade History</h2>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="investments-table-wrapper">
+
+                        <table class="investments-table">
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>Trade ID</th>
+
+                                    <th>Asset</th>
+
+                                    <th>Type</th>
+
+                                    <th>Amount</th>
+
+                                    <th>Price</th>
+
+                                    <th>Date</th>
+
+                                </tr>
+
+                            </thead>
+
+
+                            <tbody id="tradeHistoryBody">
+
+                                <!-- JavaScript -->
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+            </section>
+
+
+            <!-- TRANSACTIONS -->
+            <section id="transactions" class="page-section">
+
+                <!-- Header -->
+
+                <div class="transactions-header">
+
+                    <div>
+
+                        <span class="section-label">
+                            ACCOUNT ACTIVITY
+                        </span>
+
+                        <h1>Transactions</h1>
+
+                        <p>
+                            View and manage your deposit and withdrawal history.
+                        </p>
+
+                    </div>
+
+                    <button type="button" class="refresh-transactions" id="refreshTransactions">
+                        <i class="bi bi-arrow-clockwise"></i>
+                        Refresh
+                    </button>
+
+                </div>
+
+
+                <!-- Summary Cards -->
+
+                <div class="transaction-summary">
+
+                    <div class="transaction-summary-card">
+
+                        <div>
+                            <span>Total Transactions</span>
+
+                            <strong id="totalTransactions">
+                                0
+                            </strong>
+                        </div>
+
+                        <i class="bi bi-receipt"></i>
+
+                    </div>
+
+
+                    <div class="transaction-summary-card">
+
+                        <div>
+                            <span>Total Deposits</span>
+
+                            <strong id="transactionDeposits">
+                                $0.00
+                            </strong>
+                        </div>
+
+                        <i class="bi bi-arrow-down-circle"></i>
+
+                    </div>
+
+
+                    <div class="transaction-summary-card">
+
+                        <div>
+                            <span>Total Withdrawals</span>
+
+                            <strong id="transactionWithdrawals">
+                                $0.00
+                            </strong>
+                        </div>
+
+                        <i class="bi bi-arrow-up-circle"></i>
+
+                    </div>
+
+
+                    <div class="transaction-summary-card">
+
+                        <div>
+                            <span>Pending</span>
+
+                            <strong id="pendingTransactions">
+                                0
+                            </strong>
+                        </div>
+
+                        <i class="bi bi-clock-history"></i>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Transactions Card -->
+
+                <div class="transactions-card">
+
+                    <!-- Controls -->
+
+                    <div class="transaction-controls">
+
+                        <div class="transaction-search">
+
+                            <i class="bi bi-search"></i>
+
+                            <input type="text" id="transactionSearch" placeholder="Search transaction...">
+
+                        </div>
+
+
+                        <select id="transactionFilter">
+
+                            <option value="all">
+                                All Transactions
+                            </option>
+
+                            <option value="deposit">
+                                Deposits
+                            </option>
+
+                            <option value="withdrawal">
+                                Withdrawals
+                            </option>
+
+                            <option value="pending">
+                                Pending
+                            </option>
+
+                            <option value="approved">
+                                Approved
+                            </option>
+
+                            <option value="rejected">
+                                Rejected
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- Desktop Table -->
+
+                    <div class="transactions-table-wrapper">
+
+                        <table class="transactions-table">
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>Transaction</th>
+
+                                    <th>Type</th>
+
+                                    <th>Method</th>
+
+                                    <th>Amount</th>
+
+                                    <th>Date</th>
+
+                                    <th>Status</th>
+
+                                </tr>
+
+                            </thead>
+
+                            <tbody id="transactionsBody">
+
+                                <!-- JavaScript will insert transactions here -->
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+
+                    <!-- Empty State -->
+
+                    <div class="transactions-empty" id="transactionsEmpty">
+
+                        <i class="bi bi-receipt"></i>
+
+                        <h3>
+                            No transactions found
+                        </h3>
+
+                        <p>
+                            Your deposits and withdrawals will appear here.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+            </section>
+
+
+            <!-- REFERRAL -->
+            <section id="referral" class="page-section">
+
+                <!-- Referral Header -->
+                <div class="referral-header">
+
+                    <div>
+                        <span class="section-label">
+                            REFERRAL PROGRAM
+                        </span>
+
+                        <h1>Referral Center</h1>
+
+                        <p>
+                            Invite friends and earn rewards when they join
+                            Finrise Asset through your referral link.
+                        </p>
+                    </div>
+
+                    <div class="referral-badge">
+                        <i class="bi bi-people-fill"></i>
+                        Referral Program
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+         REFERRAL STATISTICS
+    ================================================== -->
+
+                <div class="referral-stats">
+
+                    <!-- Referral Balance -->
+
+                    <div class="referral-stat-card">
+
+                        <div class="referral-stat-icon">
+                            <i class="bi bi-wallet-fill"></i>
+                        </div>
+
+                        <div>
+
+                            <span>
+                                Referral Balance
+                            </span>
+
+                            <h2 id="referralBalance">
+                                $0.00
+                            </h2>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Total Referrals -->
+
+                    <div class="referral-stat-card">
+
+                        <div class="referral-stat-icon">
+                            <i class="bi bi-people-fill"></i>
+                        </div>
+
+                        <div>
+
+                            <span>
+                                Total Referrals
+                            </span>
+
+                            <h2 id="totalReferrals">
+                                0
+                            </h2>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Active Referrals -->
+
+                    <div class="referral-stat-card">
+
+                        <div class="referral-stat-icon">
+                            <i class="bi bi-person-check-fill"></i>
+                        </div>
+
+                        <div>
+
+                            <span>
+                                Active Referrals
+                            </span>
+
+                            <h2 id="activeReferrals">
+                                0
+                            </h2>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Total Earnings -->
+
+                    <div class="referral-stat-card">
+
+                        <div class="referral-stat-icon">
+                            <i class="bi bi-graph-up-arrow"></i>
+                        </div>
+
+                        <div>
+
+                            <span>
+                                Referral Earnings
+                            </span>
+
+                            <h2 id="referralEarnings">
+                                $0.00
+                            </h2>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+         REFERRAL LINK + HOW IT WORKS
+    ================================================== -->
+
+                <div class="referral-main-grid">
+
+
+                    <!-- Referral Link -->
+
+                    <div class="referral-link-card">
+
+                        <div class="referral-card-heading">
+
+                            <div class="referral-heading-icon">
+                                <i class="bi bi-link-45deg"></i>
+                            </div>
+
+                            <div>
+
+                                <h2>
+                                    Your Referral Link
+                                </h2>
+
+                                <p>
+                                    Share this link with your friends.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="referral-link-box">
+
+                            <input type="text" id="referralLink" readonly>
+
+                            <button type="button" id="copyReferralBtn">
+                                <i class="bi bi-copy"></i>
+                                Copy
+                            </button>
+
+                        </div>
+
+
+                        <div class="referral-code">
+
+                            <span>
+                                Referral Code
+                            </span>
+
+                            <strong id="referralCode">
+                                FINRISE000
+                            </strong>
+
+                        </div>
+
+
+                        <!-- Share Buttons -->
+
+                        <div class="share-section">
+
+                            <span>
+                                Share your link
+                            </span>
+
+                            <div class="share-buttons">
+
+                                <button type="button" id="shareWhatsApp" title="Share on WhatsApp">
+                                    <i class="bi bi-whatsapp"></i>
+                                </button>
+
+                                <button type="button" id="shareTelegram" title="Share on Telegram">
+                                    <i class="bi bi-telegram"></i>
+                                </button>
+
+                                <button type="button" id="shareFacebook" title="Share on Facebook">
+                                    <i class="bi bi-facebook"></i>
+                                </button>
+
+                                <button type="button" id="shareTwitter" title="Share on X">
+                                    <i class="bi bi-twitter-x"></i>
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- How It Works -->
+
+                    <div class="how-referral-card">
+
+                        <div class="referral-card-heading">
+
+                            <div class="referral-heading-icon">
+                                <i class="bi bi-lightbulb-fill"></i>
+                            </div>
+
+                            <div>
+
+                                <h2>
+                                    How It Works
+                                </h2>
+
+                                <p>
+                                    Start earning in three simple steps.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="referral-steps">
+
+                            <div class="referral-step">
+
+                                <div class="step-number">
+                                    01
+                                </div>
+
+                                <div>
+
+                                    <h3>
+                                        Share Your Link
+                                    </h3>
+
+                                    <p>
+                                        Send your unique referral link
+                                        to friends and family.
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="referral-step">
+
+                                <div class="step-number">
+                                    02
+                                </div>
+
+                                <div>
+
+                                    <h3>
+                                        They Join
+                                    </h3>
+
+                                    <p>
+                                        Your referral creates an account
+                                        using your referral link.
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="referral-step">
+
+                                <div class="step-number">
+                                    03
+                                </div>
+
+                                <div>
+
+                                    <h3>
+                                        Earn Rewards
+                                    </h3>
+
+                                    <p>
+                                        Earn referral rewards according
+                                        to the applicable program terms.
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+         COMMISSION CARD
+    ================================================== -->
+
+                <div class="commission-card">
+
+                    <div class="commission-content">
+
+                        <div class="commission-icon">
+                            <i class="bi bi-gift-fill"></i>
+                        </div>
+
+                        <div>
+
+                            <span>
+                                REFERRAL REWARD
+                            </span>
+
+                            <h2>
+                                Invite & Earn
+                            </h2>
+
+                            <p>
+                                Build your referral network and earn
+                                rewards from eligible referral activity.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    <div class="commission-value">
+
+                        <strong>
+                            10%
+                        </strong>
+
+                        <span>
+                            Referral Rate
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+         REFERRAL HISTORY
+    ================================================== -->
+
+                <div class="referral-history-card">
+
+                    <div class="referral-card-heading">
+
+                        <div>
+
+                            <span class="section-label">
+                                REFERRALS
+                            </span>
+
+                            <h2>
+                                Referral History
+                            </h2>
+
+                        </div>
+
+                        <span id="referralCountLabel" class="history-count">
+                            0 Referrals
+                        </span>
+
+                    </div>
+
+
+                    <div class="referral-table-container">
+
+                        <table class="referral-table">
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>
+                                        User
+                                    </th>
+
+                                    <th>
+                                        Date Joined
+                                    </th>
+
+                                    <th>
+                                        Status
+                                    </th>
+
+                                    <th>
+                                        Earnings
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+
+                            <tbody id="referralTableBody">
+
+                                <!-- JavaScript will insert referrals here -->
+
+                            </tbody>
+
+                        </table>
+
+
+                        <div id="emptyReferral" class="empty-referral">
+
+                            <i class="bi bi-people"></i>
+
+                            <h3>
+                                No referrals yet
+                            </h3>
+
+                            <p>
+                                Share your referral link to start
+                                building your network.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            </section>
+
+
+            <!-- PROFILE -->
+            <section id="profile" class="page-section">
+
+                <!-- Profile Header -->
+                <div class="profile-page-header">
+
+                    <div>
+                        <span class="section-label">
+                            ACCOUNT
+                        </span>
+
+                        <h1>My Profile</h1>
+
+                        <p>
+                            Manage your personal information and account settings.
+                        </p>
+                    </div>
+
+                    <div class="account-status">
+                        <span class="status-dot"></span>
+                        Account Active
+                    </div>
+
+                </div>
+
+
+                <!-- Profile Layout -->
+                <div class="profile-grid">
+
+                    <!-- =============================================
+             PROFILE CARD
+        ============================================== -->
+
+                    <div class="profile-card">
+
+                        <div class="profile-cover"></div>
+
+                        <div class="profile-picture-container">
+
+                            <img id="profilePageImage" src="https://i.pravatar.cc/150?img=12" alt="Profile Picture">
+
+                            <label for="profileImageInput" class="change-photo" title="Change profile picture">
+                                <i class="bi bi-camera-fill"></i>
+                            </label>
+
+                            <input type="file" id="profileImageInput" accept="image/*" hidden>
+
+                        </div>
+
+
+                        <div class="profile-main-info">
+
+                            <h2 id="profilePageName">
+                                Loading...
+                            </h2>
+
+                            <p id="profilePageEmail">
+                                Loading...
+                            </p>
+
+                            <span class="member-badge">
+                                <i class="bi bi-patch-check-fill"></i>
+                                Verified Member
+                            </span>
+
+                        </div>
+
+
+                        <div class="profile-stats">
+
+                            <div>
+
+                                <strong id="profileAccountId">
+                                    FR-000000
+                                </strong>
+
+                                <span>Account ID</span>
+
+                            </div>
+
+
+                            <div>
+
+                                <strong>
+                                    Active
+                                </strong>
+
+                                <span>Status</span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- =============================================
+             PERSONAL INFORMATION
+        ============================================== -->
+
+                    <div class="profile-form-card">
+
+                        <div class="profile-card-heading">
+
+                            <div>
+
+                                <span class="section-label">
+                                    PERSONAL
+                                </span>
+
+                                <h2>Personal Information</h2>
+
+                            </div>
+
+                            <button type="button" id="editProfileBtn" class="edit-profile-btn">
+                                <i class="bi bi-pencil-fill"></i>
+                                Edit Profile
+                            </button>
+
+                        </div>
+
+
+                        <form id="profileForm">
+
+                            <div class="profile-form-grid">
+
+                                <!-- Full Name -->
+
+                                <div class="profile-field">
+
+                                    <label for="profileFullname">
+                                        Full Name
+                                    </label>
+
+                                    <div class="profile-input">
+
+                                        <i class="bi bi-person-fill"></i>
+
+                                        <input type="text" id="profileFullname" placeholder="Your full name" disabled>
+
+                                    </div>
+
+                                </div>
+
+
+                                <!-- Email -->
+
+                                <div class="profile-field">
+
+                                    <label for="profileEmail">
+                                        Email Address
+                                    </label>
+
+                                    <div class="profile-input">
+
+                                        <i class="bi bi-envelope-fill"></i>
+
+                                        <input type="email" id="profileEmail" placeholder="Your email" disabled>
+
+                                    </div>
+
+                                </div>
+
+
+                                <!-- Phone -->
+
+                                <div class="profile-field">
+
+                                    <label for="profilePhone">
+                                        Phone Number
+                                    </label>
+
+                                    <div class="profile-input">
+
+                                        <i class="bi bi-telephone-fill"></i>
+
+                                        <input type="tel" id="profilePhone" placeholder="+234..." disabled>
+
+                                    </div>
+
+                                </div>
+
+
+                                <!-- Country -->
+
+                                <div class="profile-field">
+
+                                    <label for="profileCountry">
+                                        Country
+                                    </label>
+
+                                    <div class="profile-input">
+
+                                        <i class="bi bi-globe"></i>
+
+                                        <select id="profileCountry" disabled>
+
+                                            <option value="">
+                                                Select Country
+                                            </option>
+
+                                            <option value="Nigeria">
+                                                Nigeria
+                                            </option>
+
+                                            <option value="Ghana">
+                                                Ghana
+                                            </option>
+
+                                            <option value="South Africa">
+                                                South Africa
+                                            </option>
+
+                                            <option value="Kenya">
+                                                Kenya
+                                            </option>
+
+                                            <option value="United Kingdom">
+                                                United Kingdom
+                                            </option>
+
+                                            <option value="United States">
+                                                United States
+                                            </option>
+
+                                            <option value="Canada">
+                                                Canada
+                                            </option>
+
+                                        </select>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="profile-actions">
+
+                                <button type="button" id="cancelProfileBtn" class="cancel-profile-btn"
+                                    style="display:none;">
+                                    Cancel
+                                </button>
+
+                                <button type="submit" id="saveProfileBtn" class="save-profile-btn"
+                                    style="display:none;">
+                                    <i class="bi bi-check-lg"></i>
+                                    Save Changes
+                                </button>
+
+                            </div>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =============================================
+         SECURITY
+    ============================================== -->
+
+                <div class="security-card">
+
+                    <div class="profile-card-heading">
+
+                        <div>
+
+                            <span class="section-label">
+                                SECURITY
+                            </span>
+
+                            <h2>Account Security</h2>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="security-grid">
+
+                        <div class="security-item">
+
+                            <div class="security-icon">
+                                <i class="bi bi-shield-lock-fill"></i>
+                            </div>
+
+                            <div>
+
+                                <h3>Password</h3>
+
+                                <p>
+                                    Keep your account password secure.
+                                </p>
+
+                            </div>
+
+                            <button type="button" id="changePasswordBtn">
+                                Change
+                            </button>
+
+                        </div>
+
+
+                        <div class="security-item">
+
+                            <div class="security-icon">
+                                <i class="bi bi-envelope-check-fill"></i>
+                            </div>
+
+                            <div>
+
+                                <h3>Email Verification</h3>
+
+                                <p>
+                                    Your email is associated with this account.
+                                </p>
+
+                            </div>
+
+                            <span class="verified">
+                                Verified
+                            </span>
+
+                        </div>
+
+
+                        <div class="security-item">
+
+                            <div class="security-icon">
+                                <i class="bi bi-phone-fill"></i>
+                            </div>
+
+                            <div>
+
+                                <h3>Phone Number</h3>
+
+                                <p>
+                                    Add a phone number for additional security.
+                                </p>
+
+                            </div>
+
+                            <span class="phone-status" id="phoneStatus">
+                                Not Added
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =============================================
+         ACCOUNT INFORMATION
+    ============================================== -->
+
+                <div class="account-info-card">
+
+                    <div class="profile-card-heading">
+
+                        <div>
+
+                            <span class="section-label">
+                                ACCOUNT
+                            </span>
+
+                            <h2>Account Information</h2>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="account-info-grid">
+
+                        <div>
+
+                            <span>Account ID</span>
+
+                            <strong id="accountInfoId">
+                                FR-000000
+                            </strong>
+
+                        </div>
+
+
+                        <div>
+
+                            <span>Account Type</span>
+
+                            <strong>
+                                Standard
+                            </strong>
+
+                        </div>
+
+
+                        <div>
+
+                            <span>Account Status</span>
+
+                            <strong class="active-text">
+                                Active
+                            </strong>
+
+                        </div>
+
+
+                        <div>
+
+                            <span>Member Since</span>
+
+                            <strong id="memberSince">
+                                --
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            </section>
+
+
+            <!-- SETTINGS -->
+            <section id="settings" class="page-section">
+
+                <div class="section-header">
+                    <div>
+                        <span class="section-label">ACCOUNT</span>
+                        <h2>Settings</h2>
+                        <p>Manage your account, security and preferences.</p>
+                    </div>
+                </div>
+
+                <div class="settings-layout">
+
+                    <!-- SETTINGS SIDEBAR -->
+                    <div class="settings-nav">
+
+                        <button class="settings-nav-item active" data-settings="general">
+                            <i class="fas fa-user"></i>
+                            <span>General</span>
+                        </button>
+
+                        <button class="settings-nav-item" data-settings="security">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>Security</span>
+                        </button>
+
+                        <button class="settings-nav-item" data-settings="notifications">
+                            <i class="fas fa-bell"></i>
+                            <span>Notifications</span>
+                        </button>
+
+                        <button class="settings-nav-item" data-settings="preferences">
+                            <i class="fas fa-sliders-h"></i>
+                            <span>Preferences</span>
+                        </button>
+
+                    </div>
+
+
+                    <!-- SETTINGS CONTENT -->
+                    <div class="settings-content">
+
+                        <!-- =========================
+                 GENERAL SETTINGS
+            ========================== -->
+                        <div class="settings-panel active" id="general">
+
+                            <div class="settings-panel-header">
+                                <div>
+                                    <h3>General Information</h3>
+                                    <p>Update your personal account information.</p>
+                                </div>
+                            </div>
+
+                            <!-- PROFILE PREVIEW -->
+                            <div class="profile-preview">
+
+                                <div class="profile-avatar">
+                                    <span id="settingsAvatar">U</span>
+                                </div>
+
+                                <div>
+                                    <h4 id="settingsUserName">User Account</h4>
+                                    <p id="settingsUserEmail">user@example.com</p>
+                                </div>
+
+                                <button class="change-photo-btn">
+                                    <i class="fas fa-camera"></i>
+                                    Change
+                                </button>
+
+                            </div>
+
+
+                            <div class="settings-form-grid">
+
+                                <div class="form-group">
+                                    <label>First Name</label>
+                                    <input type="text" id="settingsFirstName" placeholder="Enter first name">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Last Name</label>
+                                    <input type="text" id="settingsLastName" placeholder="Enter last name">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Email Address</label>
+                                    <input type="email" id="settingsEmail" placeholder="Enter email" readonly>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Phone Number</label>
+                                    <input type="tel" id="settingsPhone" placeholder="+234 XXX XXX XXXX">
+                                </div>
+
+                                <div class="form-group full-width">
+                                    <label>Country</label>
+
+                                    <select id="settingsCountry">
+                                        <option value="">Select country</option>
+                                        <option value="Nigeria">Nigeria</option>
+                                        <option value="Ghana">Ghana</option>
+                                        <option value="South Africa">South Africa</option>
+                                        <option value="United Kingdom">United Kingdom</option>
+                                        <option value="United States">United States</option>
+                                    </select>
+                                </div>
+
+                            </div>
+
+                            <div class="settings-actions">
+                                <button class="save-settings-btn" onclick="saveGeneralSettings()">
+                                    <i class="fas fa-save"></i>
+                                    Save Changes
+                                </button>
+                            </div>
+
+                        </div>
+
+
+                        <!-- =========================
+                 SECURITY
+            ========================== -->
+                        <div class="settings-panel" id="security">
+
+                            <div class="settings-panel-header">
+                                <div>
+                                    <h3>Security</h3>
+                                    <p>Protect your account and manage your login security.</p>
+                                </div>
+                            </div>
+
+
+                            <!-- CHANGE PASSWORD -->
+                            <div class="security-card">
+
+                                <div class="security-card-info">
+
+                                    <div class="security-icon">
+                                        <i class="fas fa-lock"></i>
+                                    </div>
+
+                                    <div>
+                                        <h4>Password</h4>
+                                        <p>
+                                            Change your account password regularly
+                                            to keep your account secure.
+                                        </p>
+                                    </div>
+
+                                </div>
+
+                                <button class="outline-btn" onclick="openPasswordModal()">
+                                    Change Password
+                                </button>
+
+                            </div>
+
+
+                            <!-- 2FA -->
+                            <div class="security-card">
+
+                                <div class="security-card-info">
+
+                                    <div class="security-icon">
+                                        <i class="fas fa-mobile-alt"></i>
+                                    </div>
+
+                                    <div>
+                                        <h4>Two-Factor Authentication</h4>
+                                        <p>
+                                            Add an extra layer of protection to your account.
+                                        </p>
+                                    </div>
+
+                                </div>
+
+                                <label class="switch">
+
+                                    <input type="checkbox" id="twoFactorToggle" onchange="toggleTwoFactor()">
+
+                                    <span class="slider"></span>
+
+                                </label>
+
+                            </div>
+
+
+                            <!-- LOGIN ALERT -->
+                            <div class="security-card">
+
+                                <div class="security-card-info">
+
+                                    <div class="security-icon">
+                                        <i class="fas fa-sign-in-alt"></i>
+                                    </div>
+
+                                    <div>
+                                        <h4>Login Alerts</h4>
+                                        <p>
+                                            Receive an alert when a new device logs into your account.
+                                        </p>
+                                    </div>
+
+                                </div>
+
+                                <label class="switch">
+
+                                    <input type="checkbox" id="loginAlertToggle" checked>
+
+                                    <span class="slider"></span>
+
+                                </label>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- =========================
+                 NOTIFICATIONS
+            ========================== -->
+                        <div class="settings-panel" id="notifications">
+
+                            <div class="settings-panel-header">
+                                <div>
+                                    <h3>Notifications</h3>
+                                    <p>Choose the notifications you want to receive.</p>
+                                </div>
+                            </div>
+
+
+                            <div class="notification-option">
+
+                                <div>
+                                    <h4>Transaction Notifications</h4>
+                                    <p>Get notified when a transaction is completed.</p>
+                                </div>
+
+                                <label class="switch">
+                                    <input type="checkbox" id="transactionNotification" checked>
+                                    <span class="slider"></span>
+                                </label>
+
+                            </div>
+
+
+                            <div class="notification-option">
+
+                                <div>
+                                    <h4>Deposit Notifications</h4>
+                                    <p>Receive alerts when your deposit is confirmed.</p>
+                                </div>
+
+                                <label class="switch">
+                                    <input type="checkbox" id="depositNotification" checked>
+                                    <span class="slider"></span>
+                                </label>
+
+                            </div>
+
+
+                            <div class="notification-option">
+
+                                <div>
+                                    <h4>Withdrawal Notifications</h4>
+                                    <p>Receive alerts whenever a withdrawal is processed.</p>
+                                </div>
+
+                                <label class="switch">
+                                    <input type="checkbox" id="withdrawalNotification" checked>
+                                    <span class="slider"></span>
+                                </label>
+
+                            </div>
+
+
+                            <div class="notification-option">
+
+                                <div>
+                                    <h4>Investment Updates</h4>
+                                    <p>Get updates about your investment plans.</p>
+                                </div>
+
+                                <label class="switch">
+                                    <input type="checkbox" id="investmentNotification" checked>
+                                    <span class="slider"></span>
+                                </label>
+
+                            </div>
+
+
+                            <div class="notification-option">
+
+                                <div>
+                                    <h4>Promotional Messages</h4>
+                                    <p>Receive news, offers and promotional information.</p>
+                                </div>
+
+                                <label class="switch">
+                                    <input type="checkbox" id="promoNotification">
+                                    <span class="slider"></span>
+                                </label>
+
+                            </div>
+
+                            <div class="settings-actions">
+
+                                <button class="save-settings-btn" onclick="saveNotificationSettings()">
+                                    <i class="fas fa-save"></i>
+                                    Save Preferences
+                                </button>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- =========================
+                 PREFERENCES
+            ========================== -->
+                        <div class="settings-panel" id="preferences">
+
+                            <div class="settings-panel-header">
+                                <div>
+                                    <h3>Preferences</h3>
+                                    <p>Customize your Finrise Asset experience.</p>
+                                </div>
+                            </div>
+
+
+                            <div class="preference-row">
+
+                                <div>
+                                    <h4>Theme</h4>
+                                    <p>Choose how your dashboard looks.</p>
+                                </div>
+
+                                <select id="themeSelect" onchange="changeDashboardTheme()">
+                                    <option value="dark">Dark</option>
+                                    <option value="light">Light</option>
+                                    <option value="system">System Default</option>
+                                </select>
+
+                            </div>
+
+
+                            <div class="preference-row">
+
+                                <div>
+                                    <h4>Language</h4>
+                                    <p>Select your preferred language.</p>
+                                </div>
+
+                                <select id="languageSelect">
+                                    <option value="en">English</option>
+                                    <option value="fr">French</option>
+                                    <option value="es">Spanish</option>
+                                    <option value="pt">Portuguese</option>
+                                </select>
+
+                            </div>
+
+
+                            <div class="preference-row">
+
+                                <div>
+                                    <h4>Currency</h4>
+                                    <p>Select your preferred display currency.</p>
+                                </div>
+
+                                <select id="currencySelect">
+                                    <option value="USD">USD - US Dollar</option>
+                                    <option value="NGN">NGN - Nigerian Naira</option>
+                                    <option value="EUR">EUR - Euro</option>
+                                    <option value="GBP">GBP - British Pound</option>
+                                </select>
+
+                            </div>
+
+
+                            <!-- DANGER ZONE -->
+                            <div class="danger-zone">
+
+                                <div>
+                                    <h4>Logout</h4>
+                                    <p>
+                                        Sign out of your Finrise Asset account.
+                                    </p>
+                                </div>
+
+                                <button class="logout-settings-btn" onclick="logoutUser()">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                    Logout
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- ==========================================
+     CHANGE PASSWORD MODAL
+========================================== -->
+            <div class="password-modal" id="passwordModal">
+
+                <div class="password-modal-box">
+
+                    <button class="close-password-modal" onclick="closePasswordModal()">
+                        &times;
+                    </button>
+
+                    <div class="modal-icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+
+                    <h3>Change Password</h3>
+                    <p>Enter your current and new password.</p>
+
+                    <div class="form-group">
+                        <label>Current Password</label>
+                        <input type="password" id="currentPassword" placeholder="Current password">
+                    </div>
+
+                    <div class="form-group">
+                        <label>New Password</label>
+                        <input type="password" id="newPassword" placeholder="New password">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Confirm Password</label>
+                        <input type="password" id="confirmPassword" placeholder="Confirm new password">
+                    </div>
+
+                    <button class="save-password-btn" onclick="changePassword()">
+                        Update Password
+                    </button>
+
+                </div>
+
+            </div>
+
+
+        </main>
+
+
+
+    <!-- ==================================================
+         JAVASCRIPT
+    ================================================== -->
+
+    <script src="dashboardScript.js"></script>
+
+    <script src="withdraw.js"></script>
+
+    <script src="deposit.js"></script>
+
+    <script src="transcation.js"></script>
+
+    <script src="trading.js"></script>
+
+    <script src="profile.js"></script>
+
+    <script src="referral.js"></script>
+
+    <script src="setting.js"></script>
+
+
+</body>
+
+</html>

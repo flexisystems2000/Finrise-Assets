@@ -1,0 +1,908 @@
+/* =========================================================
+   FINRISE ASSET DASHBOARD
+   UNIFIED BLACK + GOLD THEME
+========================================================= */
+html body {
+    min-width: 1200px;
+    overflow: auto;
+}
+
+body {
+    overflow: auto;
+}
+
+:root {
+    --bg: #080808;
+    --card: #111111;
+    --card-2: #151515;
+    --input: #0D0D0D;
+
+    --gold: #D4AF37;
+    --gold-light: #E5C45C;
+
+    --white: #FFFFFF;
+    --text: #E8E8E8;
+    --muted: #A0A0A0;
+    --dark-muted: #707070;
+
+    --border: rgba(255, 255, 255, 0.07);
+    --gold-border: rgba(212, 175, 55, 0.18);
+
+    --green: #22C55E;
+    --red: #EF4444;
+
+    --shadow:
+        0 20px 60px rgba(0, 0, 0, 0.35);
+}
+
+
+/* =========================================================
+   RESET
+========================================================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+body {
+    min-height: 100vh;
+
+    background: var(--bg);
+
+    color: var(--text);
+
+    font-family: "Poppins", sans-serif;
+}
+
+
+/* =========================================================
+   DASHBOARD
+========================================================= */
+
+.dashboard {
+    display: flex;
+
+    min-height: 100vh;
+
+    width: 100%;
+
+    background: var(--bg);
+}
+
+
+/* =========================================================
+   SIDEBAR
+========================================================= */
+
+.sidebar {
+    position: fixed;
+
+    top: 0;
+    left: 0;
+
+    width: 250px;
+
+    height: 100vh;
+
+    padding: 25px 15px;
+
+    background: var(--card);
+
+    border-right:
+        1px solid var(--border);
+
+    z-index: 1000;
+
+    overflow-y: auto;
+}
+
+
+/* =========================================================
+   LOGO
+========================================================= */
+
+.logo {
+    padding: 10px 15px 30px;
+}
+
+
+.logo h2 {
+    color: var(--white);
+
+    font-size: 23px;
+
+    font-weight: 700;
+}
+
+
+.logo span {
+    color: var(--gold);
+}
+
+
+/* =========================================================
+   SIDEBAR LIST
+========================================================= */
+
+.sidebar ul {
+    list-style: none;
+}
+
+
+.sidebar ul li {
+    display: flex;
+
+    align-items: center;
+
+    gap: 14px;
+
+    width: 100%;
+
+    margin-bottom: 7px;
+
+    padding: 14px 15px;
+
+    border-radius: 11px;
+
+    color: var(--muted);
+
+    font-size: 13px;
+
+    cursor: pointer;
+
+    transition:
+        background 0.25s ease,
+        color 0.25s ease,
+        transform 0.25s ease;
+}
+
+
+.sidebar ul li i {
+    width: 20px;
+
+    color: var(--dark-muted);
+
+    font-size: 17px;
+
+    transition: color 0.25s ease;
+}
+
+
+.sidebar ul li:hover {
+    background:
+        rgba(212, 175, 55, 0.06);
+
+    color: var(--white);
+
+    transform: translateX(3px);
+}
+
+
+.sidebar ul li:hover i {
+    color: var(--gold);
+}
+
+
+/* ACTIVE SIDEBAR */
+
+.sidebar ul li.active {
+    background:
+        linear-gradient(90deg,
+            rgba(212, 175, 55, 0.15),
+            rgba(212, 175, 55, 0.04));
+
+    color: var(--gold);
+
+    border-left:
+        3px solid var(--gold);
+}
+
+
+.sidebar ul li.active i {
+    color: var(--gold);
+}
+
+
+/* LOGOUT */
+
+.sidebar ul li:last-child {
+    margin-top: 25px;
+
+    color: #888888;
+}
+
+
+.sidebar ul li:last-child:hover {
+    color: var(--red);
+
+    background:
+        rgba(239, 68, 68, 0.06);
+}
+
+
+.sidebar ul li:last-child:hover i {
+    color: var(--red);
+}
+
+
+/* =========================================================
+   MAIN
+========================================================= */
+
+.main {
+    width: calc(100% - 250px);
+
+    min-height: 100vh;
+
+    margin-left: 250px;
+
+    padding: 25px 30px;
+
+    background: var(--bg);
+}
+
+
+/* =========================================================
+   NAVBAR
+========================================================= */
+
+.navbar {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 20px;
+
+    min-height: 65px;
+
+    margin-bottom: 25px;
+
+    padding: 12px 18px;
+
+    background: var(--card);
+
+    border:
+        1px solid var(--border);
+
+    border-radius: 15px;
+
+    box-shadow:
+        0 10px 35px rgba(0, 0, 0, 0.2);
+}
+
+/* =========================================================
+   FINRISE ASSET
+   RESPONSIVE SIDEBAR
+========================================================= */
+
+/* -----------------------------------------
+   MENU BUTTON
+----------------------------------------- */
+
+.menu-btn {
+    display: none;
+    width: 42px;
+    height: 42px;
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    color: #d4af37;
+    font-size: 22px;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    transition: 0.3s ease;
+}
+
+.menu-btn:hover {
+    background: rgba(212, 175, 55, 0.12);
+}
+
+
+/* =====================================================
+   TABLET / MOBILE
+===================================================== */
+
+@media (max-width: none) {
+
+    /* -----------------------------------------
+       SHOW MENU BUTTON
+    ----------------------------------------- */
+
+    .menu-btn {
+        display: flex;
+    }
+
+
+    /* -----------------------------------------
+       SIDEBAR
+    ----------------------------------------- */
+
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+
+        width: 260px;
+        height: 100vh;
+
+        z-index: 9999;
+
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+
+        overflow-y: auto;
+    }
+
+
+    /* -----------------------------------------
+       SHOW SIDEBAR
+    ----------------------------------------- */
+
+    .sidebar.show {
+        transform: translateX(0);
+    }
+
+
+    /* -----------------------------------------
+       MAIN CONTENT
+    ----------------------------------------- */
+
+    .main-content {
+        margin-left: 0 !important;
+        width: 100%;
+    }
+
+
+    /* -----------------------------------------
+       HEADER
+    ----------------------------------------- */
+
+    .topbar,
+    .header,
+    .dashboard-header {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+
+}
+
+
+/* =====================================================
+   SMALL PHONES
+========================================================= */
+
+@media (max-width: none) {
+
+    .sidebar {
+        width: 240px;
+    }
+
+    .menu-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+    }
+
+}
+
+/* =========================================================
+   CLOCK
+========================================================= */
+
+#clock {
+    color: var(--muted);
+
+    font-size: 11px;
+
+    line-height: 1.6;
+
+    text-align: center;
+}
+
+
+/* =========================================================
+   PROFILE
+========================================================= */
+
+.profile {
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+}
+
+
+.notification {
+    color: var(--gold);
+
+    font-size: 17px;
+
+    cursor: pointer;
+
+    transition:
+        transform 0.2s ease;
+}
+
+
+.notification:hover {
+    transform: scale(1.1);
+
+    color: var(--gold-light);
+}
+
+
+.profile img {
+    width: 42px;
+    height: 42px;
+
+    border:
+        2px solid var(--gold);
+
+    border-radius: 50%;
+
+    object-fit: cover;
+}
+
+
+.profile-info h4 {
+    margin-bottom: 2px;
+
+    color: var(--white);
+
+    font-size: 12px;
+}
+
+
+.profile-info small {
+    color: var(--dark-muted);
+
+    font-size: 9px;
+}
+
+
+/* =========================================================
+   WELCOME
+========================================================= */
+
+.welcome {
+    margin: 25px 0 30px;
+}
+
+
+.welcome h1 {
+    margin-bottom: 7px;
+
+    color: var(--white);
+
+    font-size: 29px;
+
+    font-weight: 700;
+}
+
+
+.welcome h1::first-letter {
+    color: var(--white);
+}
+
+
+.welcome p {
+    color: var(--muted);
+
+    font-size: 13px;
+}
+
+
+.welcome strong {
+    color: var(--gold);
+}
+
+
+/* =========================================================
+   CARDS
+========================================================= */
+
+.cards {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, 1fr);
+
+    gap: 18px;
+
+    margin-bottom: 25px;
+}
+
+
+.card {
+    position: relative;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    min-height: 145px;
+
+    padding: 22px;
+
+    overflow: hidden;
+
+    background: var(--card);
+
+    border:
+        1px solid var(--border);
+
+    border-radius: 17px;
+
+    box-shadow: var(--shadow);
+
+    transition:
+        transform 0.3s ease,
+        border-color 0.3s ease,
+        box-shadow 0.3s ease;
+}
+
+
+.card::before {
+    content: "";
+
+    position: absolute;
+
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 2px;
+
+    background:
+        linear-gradient(90deg,
+            transparent,
+            var(--gold),
+            transparent);
+
+    opacity: 0.5;
+}
+
+
+.card:hover,
+.card.card-hover {
+    transform: translateY(-5px);
+
+    border-color:
+        var(--gold-border);
+
+    box-shadow:
+        0 18px 45px rgba(212, 175, 55, 0.10);
+}
+
+
+.card h4 {
+    margin-bottom: 10px;
+
+    color: var(--muted);
+
+    font-size: 11px;
+
+    font-weight: 500;
+}
+
+
+.card h2 {
+    color: var(--white);
+
+    font-size: 22px;
+
+    font-weight: 700;
+}
+
+
+.card>i {
+    width: 47px;
+    height: 47px;
+
+    display: grid;
+
+    place-items: center;
+
+    border-radius: 13px;
+
+    background:
+        rgba(212, 175, 55, 0.09);
+
+    color: var(--gold);
+
+    font-size: 21px;
+}
+
+
+/* =========================================================
+   DIFFERENT CARD ICONS
+========================================================= */
+
+.card:nth-child(3)>i {
+    color: var(--green);
+
+    background:
+        rgba(34, 197, 94, 0.08);
+}
+
+
+.card:nth-child(4)>i {
+    color: var(--gold);
+
+    background:
+        rgba(212, 175, 55, 0.08);
+}
+
+
+/* =========================================================
+   CHART
+========================================================= */
+
+.chart {
+    width: 100%;
+
+    padding: 25px;
+
+    background: var(--card);
+
+    border:
+        1px solid var(--border);
+
+    border-radius: 18px;
+
+    box-shadow: var(--shadow);
+}
+
+
+.chart h2 {
+    margin-bottom: 20px;
+
+    color: var(--white);
+
+    font-size: 18px;
+}
+
+
+.tradingview-widget-container {
+    width: 100%;
+
+    overflow: hidden;
+
+    border-radius: 12px;
+
+    background: #0B0B0B;
+}
+
+
+/* =========================================================
+   SCROLLBAR
+========================================================= */
+
+::-webkit-scrollbar {
+    width: 7px;
+}
+
+
+::-webkit-scrollbar-track {
+    background: var(--bg);
+}
+
+
+::-webkit-scrollbar-thumb {
+    background: #292929;
+
+    border-radius: 10px;
+}
+
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--gold);
+}
+
+
+/* =========================================================
+   PAGE SECTIONS
+========================================================= */
+
+.page-section {
+    display: none;
+}
+
+
+.page-section.active {
+    display: block;
+}
+
+
+/* =========================================================
+   MOBILE SIDEBAR
+========================================================= */
+
+@media (max-width: 900px) {
+
+    .sidebar {
+        left: 0;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+    }
+
+    .sidebar.show {
+        transform: translateX(0);
+    }
+
+    .main {
+        width: 100%;
+        margin-left: 0;
+        padding: 20px;
+    }
+
+    .menu-btn {
+        display: grid;
+        place-items: center;
+    }
+
+    .cards {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+}
+
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 650px) {
+
+    .navbar {
+        padding: 10px 12px;
+    }
+
+
+    #clock {
+        display: none;
+    }
+
+
+    .profile-info {
+        display: none;
+    }
+
+
+    .welcome h1 {
+        font-size: 24px;
+    }
+
+
+    .cards {
+        grid-template-columns: 1fr;
+    }
+
+
+    .card {
+        min-height: 120px;
+    }
+
+
+    .chart {
+        padding: 17px;
+    }
+
+
+    .chart h2 {
+        font-size: 16px;
+    }
+
+}
+
+
+/* =========================================================
+   SMALL PHONES
+========================================================= */
+
+@media (max-width: 400px) {
+
+    .main {
+        padding: 15px 10px;
+    }
+
+
+    .welcome {
+        margin-top: 18px;
+    }
+
+
+    .welcome h1 {
+        font-size: 21px;
+    }
+
+
+    .welcome p {
+        font-size: 11px;
+    }
+
+
+    .card {
+        padding: 18px;
+    }
+
+
+    .card h2 {
+        font-size: 19px;
+    }
+
+
+    .profile img {
+        width: 37px;
+        height: 37px;
+    }
+
+}
+
+
+/* =========================================================
+   PAGE NAVIGATION
+========================================================= */
+
+.page-section {
+    display: none;
+    width: 100%;
+}
+
+.page-section.active {
+    display: block;
+}
+
+/* =========================================================
+   SIDEBAR NAVIGATION
+========================================================= */
+
+.sidebar ul li {
+    cursor: pointer;
+    user-select: none;
+}
+
+.sidebar ul li.active {
+    background:
+        linear-gradient(90deg,
+            rgba(212, 175, 55, 0.15),
+            rgba(212, 175, 55, 0.04));
+    color: var(--gold);
+    border-left: 3px solid var(--gold);
+}
+
+.sidebar ul li.active i {
+    color: var(--gold);
+}
+
+/* Keep logout visually separate from normal navigation */
+#logout {
+    margin-top: 25px;
+}
+
+#logout:hover {
+    color: var(--red);
+    background: rgba(239, 68, 68, 0.06);
+}
+
+#logout:hover i {
+    color: var(--red);
+}
+
+
+.page-section {
+    display: none;
+}
+
+.page-section.active {
+    display: block;
+}

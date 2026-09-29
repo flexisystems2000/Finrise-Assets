@@ -1,0 +1,434 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+
+    background: #0b0f19;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    height: 100vh;
+
+}
+
+.container {
+
+    width: 100%;
+
+    display: flex;
+
+    justify-content: center;
+
+    padding: 20px;
+
+}
+
+.box {
+
+    display: flex;
+    width: 50%;
+    background: #121827;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, .5);
+    margin-top: 100px auto;
+
+}
+
+/* .left {
+
+    width: 50%;
+
+    background: linear-gradient(135deg, #c89b3c, #f6d365);
+
+    padding: 40px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: center;
+
+    color: white;
+
+}
+
+.left h1 {
+
+    font-size: 40px;
+
+    margin-bottom: 20px;
+
+}
+
+.left p {
+
+    font-size: 20px;
+
+    margin-bottom: 30px;
+
+}
+
+.left img {
+
+    width: 100%;
+
+    border-radius: 20px;
+
+} */
+
+.right {
+    width: 100%;
+    padding: 40px;
+    background: #1a2238;
+    position: relative;
+    margin-top: 100px;
+}
+
+.buttons {
+    display: flex;
+    margin-bottom: 30px;
+}
+
+.buttons button {
+
+    flex: 1;
+
+    padding: 14px;
+
+    border: none;
+
+    cursor: pointer;
+
+    background: #2b3553;
+
+    color: white;
+
+    font-size: 17px;
+
+}
+
+.buttons button.active {
+
+    background: #c89b3c;
+
+}
+
+form {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 18px;
+
+}
+
+#registerForm {
+
+    display: none;
+
+}
+
+h2 {
+
+    color: white;
+
+    margin-bottom: 10px;
+
+}
+
+.inputBox {
+
+    display: flex;
+
+    margin-top: 12px;
+
+    align-items: center;
+
+    background: #2b3553;
+
+    padding: 14px;
+
+    border-radius: 10px;
+
+}
+
+.inputBox i {
+
+    color: #c89b3c;
+
+    margin-right: 10px;
+
+}
+
+.inputBox input, .inputBox select {
+
+    background: none;
+
+    border: none;
+
+    outline: none;
+
+    color: white;
+
+    width: 100%;
+
+    font-size: 16px;
+    
+}
+
+small {
+    color: red;
+    display: block;
+    margin-top: 5px;
+
+}
+
+.terms {
+
+    display: flex;
+    gap: 10px;
+    color: white;
+    margin-bottom: 20px;
+
+}
+
+.togglePassword {
+
+    cursor: pointer;
+
+    color: white;
+
+}
+
+.options {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    font-size: 14px;
+
+    color: white;
+
+}
+
+.options a {
+
+    color: #c89b3c;
+
+    text-decoration: none;
+
+}
+
+.submitBtn {
+    width: 100%;
+
+    padding: 15px;
+
+    border: none;
+
+    background: #c89b3c;
+
+    color: white;
+
+    font-size: 18px;
+
+    cursor: pointer;
+
+    border-radius: 10px;
+
+    transition: .3s;
+    margin-top: 15px;
+    margin-bottom: 15px;
+
+}
+
+.submitBtn:hover {
+
+    background: #e0b24d;
+
+}
+
+p {
+
+    text-align: center;
+
+    color: white;
+
+}
+
+span {
+
+    color: #c89b3c;
+
+    cursor: pointer;
+
+    font-weight: bold;
+
+}
+
+/* ===============================
+   RESPONSIVE DESIGN
+================================ */
+
+/* TABLET */
+@media (max-width: 900px) {
+
+    body {
+        min-height: 100vh;
+        padding: 20px;
+        align-items: center;
+    }
+
+    .container {
+        width: 100%;
+        padding: 10px;
+    }
+
+    .box {
+        width: 100%;
+        max-width: 650px;
+        flex-direction: column;
+        margin: 0 auto;
+    }
+
+    .left {
+        display: none;
+    }
+
+    .right {
+        width: 100%;
+        padding: 35px;
+        margin-top: 0;
+    }
+}
+
+
+/* MOBILE */
+@media (max-width: 600px) {
+
+    body {
+        min-height: 100vh;
+        padding: 15px 10px;
+    }
+
+    .container {
+        padding: 5px;
+    }
+
+    .box {
+        width: 100%;
+        max-width: 100%;
+        border-radius: 15px;
+    }
+
+    .right {
+        width: 100%;
+        padding: 25px 18px;
+        margin-top: 0;
+    }
+
+    .buttons {
+        width: 100%;
+        margin-bottom: 25px;
+    }
+
+    .buttons button {
+        padding: 12px 8px;
+        font-size: 15px;
+    }
+
+    h2 {
+        font-size: 24px;
+    }
+
+    form {
+        gap: 15px;
+    }
+
+    .inputBox {
+        width: 100%;
+        padding: 13px;
+    }
+
+    .inputBox input,
+    .inputBox select {
+        font-size: 15px;
+    }
+
+    .submitBtn {
+        width: 100%;
+        padding: 14px;
+        font-size: 16px;
+    }
+
+    .options {
+        flex-wrap: wrap;
+        gap: 10px;
+        font-size: 13px;
+    }
+
+    .terms {
+        font-size: 13px;
+        gap: 8px;
+    }
+}
+
+
+/* SMALL PHONES */
+@media (max-width: 400px) {
+
+    body {
+        padding: 10px 5px;
+    }
+
+    .container {
+        padding: 3px;
+    }
+
+    .box {
+        border-radius: 12px;
+    }
+
+    .right {
+        padding: 20px 14px;
+    }
+
+    .buttons button {
+        padding: 11px 5px;
+        font-size: 14px;
+    }
+
+    h2 {
+        font-size: 21px;
+    }
+
+    .inputBox {
+        padding: 12px;
+    }
+
+    .inputBox input,
+    .inputBox select {
+        font-size: 14px;
+    }
+
+    .submitBtn {
+        padding: 13px;
+        font-size: 15px;
+    }
+
+    .options {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}

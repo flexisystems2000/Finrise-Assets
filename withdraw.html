@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Withdraw</title>
+    <link rel="stylesheet" href="withdraw.css">
+</head>
+
+<body>
+    <section class="withdraw-section" id="withdraw">
+        <div class="withdraw-header">
+            <div>
+                <span class="section-label">FINRISE ASSET</span>
+                <h1>Withdraw Funds</h1>
+                <p>Transfer your available balance securely.</p>
+            </div>
+
+            <div class="balance-card">
+                <span>Available Balance</span>
+                <strong>$12,450.00</strong>
+                <small>≈ ₦18,675,000</small>
+            </div>
+        </div>
+
+        <div class="withdraw-grid">
+
+            <!-- Withdrawal Form -->
+            <div class="withdraw-card">
+
+                <div class="card-title">
+                    <div class="title-icon">↗</div>
+                    <div>
+                        <h2>Request Withdrawal</h2>
+                        <p>Choose your preferred withdrawal method.</p>
+                    </div>
+                </div>
+
+                <!-- Methods -->
+                <div class="method-title">Withdrawal Method</div>
+
+                <div class="methods">
+
+                    <button class="method active" data-method="crypto">
+                        <span class="method-icon">₿</span>
+                        <span>
+                            <strong>Crypto Wallet</strong>
+                            <small>BTC, ETH, USDT</small>
+                        </span>
+                        <span class="radio"></span>
+                    </button>
+
+                    <button class="method" data-method="bank">
+                        <span class="method-icon">₦</span>
+                        <span>
+                            <strong>Bank Transfer</strong>
+                            <small>Local bank account</small>
+                        </span>
+                        <span class="radio"></span>
+                    </button>
+
+                    <button class="method" data-method="usdt">
+                        <span class="method-icon">₮</span>
+                        <span>
+                            <strong>USDT</strong>
+                            <small>TRC20 / ERC20</small>
+                        </span>
+                        <span class="radio"></span>
+                    </button>
+
+                </div>
+
+                <!-- Dynamic Details -->
+                <div class="form-group">
+                    <label id="destinationLabel">Wallet Address</label>
+
+                    <div class="input-box">
+                        <input type="text" id="destination" placeholder="Enter wallet address" />
+                        <span class="input-icon">⌁</span>
+                    </div>
+
+                    <small class="input-help" id="destinationHelp">
+                        Make sure the wallet address is correct.
+                    </small>
+                </div>
+
+                <!-- Network -->
+                <div class="form-group" id="networkGroup">
+
+                    <label>Network</label>
+
+                    <div class="select-box">
+                        <select id="network">
+                            <option value="">Select network</option>
+                            <option value="TRC20">USDT - TRC20</option>
+                            <option value="ERC20">USDT - ERC20</option>
+                            <option value="BEP20">USDT - BEP20</option>
+                            <option value="BTC">Bitcoin Network</option>
+                            <option value="ETH">Ethereum Network</option>
+                        </select>
+                    </div>
+
+                </div>
+
+                <!-- Amount -->
+                <div class="form-group">
+
+                    <div class="label-row">
+                        <label>Amount</label>
+                        <button id="maxBtn" class="max-btn">MAX</button>
+                    </div>
+
+                    <div class="amount-input">
+
+                        <span class="currency">$</span>
+
+                        <input type="number" id="amount" placeholder="0.00" min="0" step="0.01" />
+
+                        <span class="usd">USD</span>
+
+                    </div>
+
+                    <div class="amount-limit">
+                        Minimum withdrawal: <strong>$20.00</strong>
+                    </div>
+
+                </div>
+
+                <!-- Summary -->
+                <div class="withdraw-summary">
+
+                    <div>
+                        <span>Withdrawal Fee</span>
+                        <strong id="fee">$5.00</strong>
+                    </div>
+
+                    <div>
+                        <span>Processing Time</span>
+                        <strong>5–30 Minutes</strong>
+                    </div>
+
+                    <div class="receive-row">
+                        <span>You Receive</span>
+                        <strong id="receive">$0.00</strong>
+                    </div>
+
+                </div>
+
+                <!-- Security -->
+                <div class="security-notice">
+                    <span>🔐</span>
+                    <div>
+                        <strong>Secure Withdrawal</strong>
+                        <p>
+                            Please verify your withdrawal details before submitting.
+                            Incorrect payment information may cause delays.
+                        </p>
+                    </div>
+                </div>
+
+                <button class="withdraw-btn" id="withdrawBtn">
+                    <span>🔒</span>
+                    Request Withdrawal
+                </button>
+
+            </div>
+
+
+            <!-- Right Side -->
+            <div class="withdraw-side">
+
+                <!-- Quick Info -->
+                <div class="info-card">
+
+                    <div class="info-icon">✓</div>
+
+                    <h3>Fast & Secure</h3>
+
+                    <p>
+                        Your withdrawal request will be securely reviewed
+                        before processing.
+                    </p>
+
+                    <div class="info-line">
+                        <span>Processing</span>
+                        <strong>5–30 min</strong>
+                    </div>
+
+                    <div class="info-line">
+                        <span>Minimum</span>
+                        <strong>$20</strong>
+                    </div>
+
+                    <div class="info-line">
+                        <span>Maximum</span>
+                        <strong>$10,000</strong>
+                    </div>
+
+                </div>
+
+
+                <!-- Recent Transactions -->
+                <div class="history-card">
+
+                    <div class="history-header">
+                        <div>
+                            <h3>Recent Withdrawals</h3>
+                            <p>Your latest withdrawal requests</p>
+                        </div>
+
+                        <button>View All</button>
+                    </div>
+
+                    <div id="historyList">
+
+                        <div class="transaction">
+                            <div class="transaction-icon">₮</div>
+
+                            <div class="transaction-info">
+                                <strong>USDT Withdrawal</strong>
+                                <small>Today, 12:45 PM</small>
+                            </div>
+
+                            <div class="transaction-right">
+                                <strong>-$500.00</strong>
+                                <span class="status pending">Pending</span>
+                            </div>
+                        </div>
+
+
+                        <div class="transaction">
+                            <div class="transaction-icon">₿</div>
+
+                            <div class="transaction-info">
+                                <strong>BTC Withdrawal</strong>
+                                <small>Yesterday, 08:20 PM</small>
+                            </div>
+
+                            <div class="transaction-right">
+                                <strong>-$250.00</strong>
+                                <span class="status completed">Completed</span>
+                            </div>
+                        </div>
+
+
+                        <div class="transaction">
+                            <div class="transaction-icon">₦</div>
+
+                            <div class="transaction-info">
+                                <strong>Bank Transfer</strong>
+                                <small>Aug 22, 2026</small>
+                            </div>
+
+                            <div class="transaction-right">
+                                <strong>-$1,200.00</strong>
+                                <span class="status completed">Completed</span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+
+
+    <!-- Confirmation Modal -->
+    <div class="modal-overlay" id="withdrawModal">
+
+        <div class="withdraw-modal">
+
+            <button class="close-modal" id="closeModal">×</button>
+
+            <div class="modal-icon">✓</div>
+
+            <h2>Confirm Withdrawal</h2>
+
+            <p>
+                Please review your withdrawal details before continuing.
+            </p>
+
+            <div class="modal-details">
+
+                <div>
+                    <span>Method</span>
+                    <strong id="confirmMethod">Crypto Wallet</strong>
+                </div>
+
+                <div>
+                    <span>Amount</span>
+                    <strong id="confirmAmount">$0.00</strong>
+                </div>
+
+                <div>
+                    <span>Fee</span>
+                    <strong>$5.00</strong>
+                </div>
+
+                <div>
+                    <span>You Receive</span>
+                    <strong id="confirmReceive">$0.00</strong>
+                </div>
+
+            </div>
+
+            <div class="modal-actions">
+
+                <button class="cancel-btn" id="cancelBtn">
+                    Cancel
+                </button>
+
+                <button class="confirm-btn" id="confirmBtn">
+                    Confirm Withdrawal
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <script src="withdraw.js"></script>
+</body>
+
+</html>

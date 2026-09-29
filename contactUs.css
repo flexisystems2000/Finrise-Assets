@@ -1,0 +1,144 @@
+body {
+    background: #fff;
+
+}
+
+.contact {
+    display: flex;
+    gap: 50px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    padding: 60px 6%;
+}
+
+.contact-info {
+    flex: 1;
+    min-width: 320px;
+}
+
+.contact-info h1 {
+    font-size: 48px;
+    color: #0A2E73;
+    margin-bottom: 20px;
+}
+
+.contact-info p {
+    color: #011844;
+    line-height: 1.5;
+    margin-bottom: 35px;
+}
+
+.info-box {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 20px;
+}
+
+.info-box i {
+    width: 65px;
+    height: 65px;
+    background: #EEF5FF;
+    color: #0A2E73;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    font-size: 26px;
+    margin-right: 20px;
+}
+
+.info-box h3 {
+    color: #0A2E73;
+    margin-bottom: 8px;
+}
+
+.contact-form {
+    flex: 1;
+    min-width: 350px;
+    background: #EEF6FF;
+    padding: 35px;
+    overflow: hidden;
+    border-radius: 12px;
+}
+
+.contact-form h2 {
+    font-size: 40px;
+    color: #0A2E73;
+    margin-bottom: 10px;
+}
+
+.contact-form p {
+    margin-bottom: 15px;
+    color: #666;
+}
+
+textarea {
+    width: 100%;
+    height: 180px;
+    padding: 15px;
+    border: none;
+    outline: none;
+    border-radius: 8px;
+    /* resize: none; */
+    margin-bottom: 20px;
+    font-size: 16px;
+}
+
+.rowmm {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.rowmm input {
+    padding: 15px;
+    border: none;
+    border-radius: 8px;
+    outline: none;
+    font-size: 16px;
+}
+
+.checkmm {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 25px;
+    color: #555;
+}
+
+button {
+    background: #F5A623;
+    color: #fff;
+    padding: 15px 35px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 17px;
+    font-weight: bold;
+    transition: .3s;
+}
+
+button:hover {
+    background: #0A2E73;
+}
+
+@media(max-width:900px) {
+
+    .contact {
+        flex-direction: column;
+    }
+
+    .rowmm {
+        grid-template-columns: 1fr;
+    }
+
+    .contact-info h1 {
+        font-size: 36px;
+    }
+
+    .contact-form h2 {
+        font-size: 30px;
+    }
+
+}
