@@ -15,12 +15,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     const SUPABASE_KEY =
         "sb_publishable_C1cHus8zHeSRzWEnQn0kiA_c4m45QH9";
 
+    const EMAIL_REDIRECT_URL =
+        "https://finrise-assets.vercel.app/verify.html";
+
 
     /* =====================================================
-       LOAD SUPABASE
+       LOAD SUPABASE CLIENT
     ===================================================== */
 
     function loadSupabase() {
+
         return new Promise((resolve, reject) => {
 
             if (window.supabase) {
@@ -45,11 +49,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             document.head.appendChild(script);
         });
+
     }
 
 
     try {
+
         await loadSupabase();
+
     } catch (error) {
 
         console.error(
@@ -66,7 +73,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
     /* =====================================================
-       SUPABASE CLIENT
+       CREATE SUPABASE CLIENT
     ===================================================== */
 
     const supabaseClient =
@@ -172,10 +179,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     function showLogin() {
 
         loginForm.style.display = "block";
+
         registerForm.style.display = "none";
 
         loginBtn.classList.add("active");
+
         registerBtn.classList.remove("active");
+
     }
 
 
@@ -186,10 +196,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     function showRegister() {
 
         loginForm.style.display = "none";
+
         registerForm.style.display = "block";
 
         registerBtn.classList.add("active");
+
         loginBtn.classList.remove("active");
+
     }
 
 
@@ -209,18 +222,22 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
     if (goRegister) {
+
         goRegister.addEventListener(
             "click",
             showRegister
         );
+
     }
 
 
     if (goLogin) {
+
         goLogin.addEventListener(
             "click",
             showLogin
         );
+
     }
 
 
@@ -228,7 +245,10 @@ document.addEventListener("DOMContentLoaded", async () => {
        PASSWORD TOGGLE
     ===================================================== */
 
-    function passwordToggle(toggleId, inputId) {
+    function passwordToggle(
+        toggleId,
+        inputId
+    ) {
 
         const toggle =
             document.getElementById(toggleId);
@@ -244,7 +264,10 @@ document.addEventListener("DOMContentLoaded", async () => {
             "click",
             () => {
 
-                if (input.type === "password") {
+                if (
+                    input.type ===
+                    "password"
+                ) {
 
                     input.type = "text";
 
@@ -253,13 +276,17 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                 } else {
 
-                    input.type = "password";
+                    input.type =
+                        "password";
 
                     toggle.innerHTML =
-                        '<i class="fa fa-eye"></i>';
+                        '<i class="fa fa-eye"></i>";
+
                 }
+
             }
         );
+
     }
 
 
@@ -283,7 +310,10 @@ document.addEventListener("DOMContentLoaded", async () => {
        SHOW ERROR
     ===================================================== */
 
-    function showError(input, message) {
+    function showError(
+        input,
+        message
+    ) {
 
         if (!input) {
             return;
@@ -300,11 +330,18 @@ document.addEventListener("DOMContentLoaded", async () => {
             inputBox.querySelector("small");
 
         if (small) {
-            small.textContent = message;
-            small.style.color = "red";
+
+            small.textContent =
+                message;
+
+            small.style.color =
+                "red";
+
         }
 
-        input.style.borderColor = "red";
+        input.style.borderColor =
+            "red";
+
     }
 
 
@@ -329,10 +366,15 @@ document.addEventListener("DOMContentLoaded", async () => {
             inputBox.querySelector("small");
 
         if (small) {
-            small.textContent = "";
+
+            small.textContent =
+                "";
+
         }
 
-        input.style.borderColor = "";
+        input.style.borderColor =
+            "";
+
     }
 
 
@@ -349,6 +391,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         clearError(country);
         clearError(password);
         clearError(confirmPassword);
+
     }
 
 
@@ -366,7 +409,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
             /* ---------------------------------------------
-               VALUES
+               GET VALUES
             --------------------------------------------- */
 
             const fullNameValue =
@@ -395,7 +438,10 @@ document.addEventListener("DOMContentLoaded", async () => {
                VALIDATION
             --------------------------------------------- */
 
-            if (fullNameValue.length < 2) {
+            if (
+                fullNameValue.length <
+                2
+            ) {
 
                 showError(
                     fullname,
@@ -406,7 +452,10 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
 
 
-            if (usernameValue.length < 3) {
+            if (
+                usernameValue.length <
+                3
+            ) {
 
                 showError(
                     username,
@@ -421,7 +470,11 @@ document.addEventListener("DOMContentLoaded", async () => {
                 /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 
-            if (!emailPattern.test(emailValue)) {
+            if (
+                !emailPattern.test(
+                    emailValue
+                )
+            ) {
 
                 showError(
                     email,
@@ -436,7 +489,11 @@ document.addEventListener("DOMContentLoaded", async () => {
                 /^\+?[0-9]{7,15}$/;
 
 
-            if (!phonePattern.test(phoneValue)) {
+            if (
+                !phonePattern.test(
+                    phoneValue
+                )
+            ) {
 
                 showError(
                     phone,
@@ -458,7 +515,10 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
 
 
-            if (passwordValue.length < 6) {
+            if (
+                passwordValue.length <
+                6
+            ) {
 
                 showError(
                     password,
@@ -497,7 +557,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
             /* ---------------------------------------------
-               BUTTON
+               DISABLE REGISTER BUTTON
             --------------------------------------------- */
 
             const submitButton =
@@ -513,10 +573,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             if (submitButton) {
 
-                submitButton.disabled = true;
+                submitButton.disabled =
+                    true;
 
                 submitButton.textContent =
                     "Creating Account...";
+
             }
 
 
@@ -548,6 +610,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     );
 
                     throw usernameError;
+
                 }
 
 
@@ -559,11 +622,12 @@ document.addEventListener("DOMContentLoaded", async () => {
                     );
 
                     return;
+
                 }
 
 
                 /* -----------------------------------------
-                   CREATE SUPABASE ACCOUNT
+                   CREATE SUPABASE AUTH ACCOUNT
                 ----------------------------------------- */
 
                 const {
@@ -580,6 +644,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                         options: {
 
+                            emailRedirectTo:
+                                EMAIL_REDIRECT_URL,
+
                             data: {
 
                                 full_name:
@@ -593,8 +660,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                                 country:
                                     countryValue
+
                             }
+
                         }
+
                     });
 
 
@@ -624,27 +694,33 @@ document.addEventListener("DOMContentLoaded", async () => {
                         );
 
                         return;
+
                     }
 
 
                     throw error;
+
                 }
 
 
-                if (!data || !data.user) {
+                if (
+                    !data ||
+                    !data.user
+                ) {
 
                     throw new Error(
                         "Account could not be created."
                     );
+
                 }
 
 
                 /* -----------------------------------------
-                   EMAIL CONFIRMATION
+                   EMAIL CONFIRMATION MESSAGE
                 ----------------------------------------- */
 
                 alert(
-                    "Registration successful! Please check your email and confirm your account before logging in."
+                    "Registration successful! Please check your email and confirm your account."
                 );
 
 
@@ -654,13 +730,18 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
                 if (loginEmail) {
+
                     loginEmail.value =
                         emailValue;
+
                 }
 
 
                 if (loginPassword) {
-                    loginPassword.value = "";
+
+                    loginPassword.value =
+                        "";
+
                 }
 
 
@@ -670,6 +751,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     "Registration failed:",
                     error
                 );
+
 
                 alert(
                     error.message ||
@@ -681,12 +763,16 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                 if (submitButton) {
 
-                    submitButton.disabled = false;
+                    submitButton.disabled =
+                        false;
 
                     submitButton.textContent =
                         originalButtonText;
+
                 }
+
             }
+
         }
     );
 
@@ -715,14 +801,18 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
             /* ---------------------------------------------
-               VALIDATION
+               VALIDATE LOGIN EMAIL
             --------------------------------------------- */
 
             const emailPattern =
                 /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 
-            if (!emailPattern.test(enteredEmail)) {
+            if (
+                !emailPattern.test(
+                    enteredEmail
+                )
+            ) {
 
                 showError(
                     loginEmail,
@@ -730,6 +820,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 );
 
                 return;
+
             }
 
 
@@ -741,11 +832,12 @@ document.addEventListener("DOMContentLoaded", async () => {
                 );
 
                 return;
+
             }
 
 
             /* ---------------------------------------------
-               BUTTON
+               DISABLE LOGIN BUTTON
             --------------------------------------------- */
 
             const submitButton =
@@ -761,17 +853,19 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             if (submitButton) {
 
-                submitButton.disabled = true;
+                submitButton.disabled =
+                    true;
 
                 submitButton.textContent =
                     "Logging in...";
+
             }
 
 
             try {
 
                 /* -----------------------------------------
-                   AUTHENTICATE
+                   SUPABASE LOGIN
                 ----------------------------------------- */
 
                 const {
@@ -786,6 +880,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                             password:
                                 enteredPassword
+
                         });
 
 
@@ -796,9 +891,15 @@ document.addEventListener("DOMContentLoaded", async () => {
                         error
                     );
 
-                    const message =
-                        error.message.toLowerCase();
 
+                    const message =
+                        error.message
+                            .toLowerCase();
+
+
+                    /* -------------------------------------
+                       EMAIL NOT CONFIRMED
+                    ------------------------------------- */
 
                     if (
                         message.includes(
@@ -811,8 +912,13 @@ document.addEventListener("DOMContentLoaded", async () => {
                         );
 
                         return;
+
                     }
 
+
+                    /* -------------------------------------
+                       INVALID CREDENTIALS
+                    ------------------------------------- */
 
                     if (
                         message.includes(
@@ -825,10 +931,12 @@ document.addEventListener("DOMContentLoaded", async () => {
                         );
 
                         return;
+
                     }
 
 
                     throw error;
+
                 }
 
 
@@ -840,6 +948,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     throw new Error(
                         "Login failed. Please try again."
                     );
+
                 }
 
 
@@ -852,14 +961,16 @@ document.addEventListener("DOMContentLoaded", async () => {
                 ----------------------------------------- */
 
                 const metadata =
-                    user.user_metadata || {};
+                    user.user_metadata ||
+                    {};
 
 
                 /* -----------------------------------------
-                   GET PROFILE
+                   FETCH PROFILE
                 ----------------------------------------- */
 
-                let profile = null;
+                let profile =
+                    null;
 
 
                 const {
@@ -889,18 +1000,20 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                     profile =
                         profileData;
+
                 }
 
 
                 /* -----------------------------------------
-                   CREATE PROFILE IF MISSING
+                   CREATE PROFILE IF IT DOESN'T EXIST
                 ----------------------------------------- */
 
                 if (!profile) {
 
                     const {
                         data: newProfile,
-                        error: createProfileError
+                        error:
+                            createProfileError
                     } =
                         await supabaseClient
                             .from("profiles")
@@ -910,16 +1023,21 @@ document.addEventListener("DOMContentLoaded", async () => {
                                     user.id,
 
                                 full_name:
-                                    metadata.full_name || "",
+                                    metadata.full_name ||
+                                    "",
 
                                 username:
-                                    metadata.username || "",
+                                    metadata.username ||
+                                    "",
 
                                 phone:
-                                    metadata.phone || "",
+                                    metadata.phone ||
+                                    "",
 
                                 country:
-                                    metadata.country || ""
+                                    metadata.country ||
+                                    ""
+
                             })
                             .select()
                             .single();
@@ -936,14 +1054,17 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                         profile =
                             newProfile;
+
                     }
+
                 }
 
 
                 /* -----------------------------------------
-                   CURRENT USER OBJECT
+                   CURRENT USER
                    
-                   NO PASSWORD IS STORED.
+                   IMPORTANT:
+                   PASSWORD IS NEVER STORED.
                 ----------------------------------------- */
 
                 const currentUser = {
@@ -974,14 +1095,12 @@ document.addEventListener("DOMContentLoaded", async () => {
                         profile?.country ||
                         metadata.country ||
                         ""
+
                 };
 
 
                 /* -----------------------------------------
-                   EXISTING FINRISE DASHBOARD DATA
-                   
-                   These values are NOT authentication
-                   credentials.
+                   EXISTING FINRISE VALUES
                 ----------------------------------------- */
 
                 if (
@@ -994,6 +1113,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                         "finriseBalance",
                         "0"
                     );
+
                 }
 
 
@@ -1007,6 +1127,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                         "finriseTotalDeposit",
                         "0"
                     );
+
                 }
 
 
@@ -1020,6 +1141,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                         "finriseTotalEarning",
                         "0"
                     );
+
                 }
 
 
@@ -1033,14 +1155,14 @@ document.addEventListener("DOMContentLoaded", async () => {
                         "finriseReferralBonus",
                         "0"
                     );
+
                 }
 
 
                 /* -----------------------------------------
-                   COMPATIBILITY VALUES
+                   COMPATIBILITY DATA
                    
-                   IMPORTANT:
-                   No password is saved.
+                   No password is stored.
                 ----------------------------------------- */
 
                 localStorage.setItem(
@@ -1066,7 +1188,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
                 /* -----------------------------------------
-                   DASHBOARD
+                   GO TO DASHBOARD
                 ----------------------------------------- */
 
                 window.location.href =
@@ -1080,6 +1202,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     error
                 );
 
+
                 alert(
                     error.message ||
                     "Login failed. Please try again."
@@ -1090,18 +1213,22 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                 if (submitButton) {
 
-                    submitButton.disabled = false;
+                    submitButton.disabled =
+                        false;
 
                     submitButton.textContent =
                         originalButtonText;
+
                 }
+
             }
+
         }
     );
 
 
     /* =====================================================
-       EXISTING SESSION
+       CHECK EXISTING SUPABASE SESSION
     ===================================================== */
 
     try {
@@ -1110,7 +1237,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             data,
             error
         } =
-            await supabaseClient.auth.getSession();
+            await supabaseClient.auth
+                .getSession();
 
 
         if (error) {
@@ -1128,6 +1256,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             console.log(
                 "Existing Supabase session detected."
             );
+
         }
 
     } catch (error) {
@@ -1136,6 +1265,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             "Session check failed:",
             error
         );
+
     }
 
 
