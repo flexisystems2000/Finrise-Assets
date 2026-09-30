@@ -1,11 +1,26 @@
+/* =====================================================
+   FINRISE ASSET - DESKTOP + MOBILE BASE
+   ===================================================== */
+
+/* Preserve the original 1200px desktop composition */
 html,
 body {
-    min-width: 0;
+    min-width: 1200px;
     width: 100%;
 }
 
-body {
-    overflow: auto;
+/* =====================================================
+   MOBILE RESPONSIVE OVERRIDE
+   ===================================================== */
+
+@media (max-width: 767px) {
+    html,
+    body {
+        min-width: 0;
+        width: 100%;
+        max-width: 100%;
+        overflow-x: hidden;
+    }
 }
 
 * {
