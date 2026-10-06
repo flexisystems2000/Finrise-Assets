@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         "sb_publishable_C1cHus8zHeSRzWEnQn0kiA_c4m45QH9";
 
     const EMAIL_REDIRECT_URL =
-        "https://finrise-assets.vercel.app/verify.html";
+        "https://www.finriseasset.com/verify.html";
 
 
     /* =====================================================
