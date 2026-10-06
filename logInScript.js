@@ -280,7 +280,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                         "password";
 
                     toggle.innerHTML =
-                        '<i class="fa fa-eye"></i>";
+                        '<i class="fa fa-eye"></i>';
 
                 }
 
