@@ -63,7 +63,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
         historyList.innerHTML = withdrawals.map(item => `
             <div class="withdraw-history-item">
-                <div><strong>${money(item.amount)}</strong><small>${escape(item.method)}</small></div>
+                <div><strong>${money(item.amount)}</strong><small>${escape(item.method)} · Fee ${money(item.fee || 0)} · Net ${money(item.net_amount ?? (Number(item.amount || 0) - Number(item.fee || 0)))}</small></div>
                 <div><strong>${escape(item.status)}</strong><small>${new Date(item.created_at).toLocaleString()}</small></div>
             </div>
         `).join("");
@@ -81,7 +81,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const amount = Number(amountInput?.value);
         const dest = destination?.value.trim();
         if (!Number.isFinite(amount) || amount < 20) return alert("Minimum withdrawal is ₦20.");
-        if (amount + fee > balance) return alert("Insufficient available balance for this withdrawal and fee.");
+        if (amount > balance) return alert("Insufficient available balance.");
         if (!dest) return alert("Enter a withdrawal destination.");
 
         pendingRequest = { amount, destination: dest, method: selectedMethod, network: network?.value || null, fee };

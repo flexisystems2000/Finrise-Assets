@@ -10,6 +10,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const registerForm = document.getElementById("registerForm");
     const goRegister = document.getElementById("goRegister");
     const goLogin = document.getElementById("goLogin");
+    const referralCode = new URLSearchParams(window.location.search).get("ref")?.trim() || "";
 
     const showLogin = () => {
         loginForm.style.display = "block";
@@ -130,7 +131,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                         full_name: fullname,
                         username,
                         phone,
-                        country
+                        country,
+                        referral_code: referralCode || null
                     }
                 }
             });
@@ -156,5 +158,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     });
 
-    showLogin();
+    if (referralCode) showRegister();
+    else showLogin();
 });

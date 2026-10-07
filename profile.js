@@ -136,16 +136,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     });
 
-    /*
-      The existing database schema has no profile-image column and no
-      confirmed storage bucket. Therefore this file deliberately does
-      NOT store image data in localStorage.
-
-      The selected image is shown immediately as a preview. If the
-      backend later gets an approved Storage bucket/URL field, the
-      upload can be connected without changing the profile form.
-    */
-    imageInput?.addEventListener("change", event => {
+    imageInput?.addEventListener("change", async event => {
         const file = event.target.files?.[0];
         if (!file || !file.type.startsWith("image/")) return;
 
@@ -155,11 +146,34 @@ document.addEventListener("DOMContentLoaded", async () => {
             return;
         }
 
-        const reader = new FileReader();
-        reader.onload = () => {
-            if (profileImage) profileImage.src = String(reader.result);
-        };
-        reader.readAsDataURL(file);
+        const oldText = imageInput.parentElement?.title || "Change profile picture";
+        try {
+            const client = await getSupabase();
+            const extension = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
+            const path = `${authUser.id}/avatar.${extension}`;
+
+            const { error: uploadError } = await client.storage
+                .from("finrise-avatars")
+                .upload(path, file, { upsert: true, contentType: file.type, cacheControl: "3600" });
+            if (uploadError) throw uploadError;
+
+            const { data: publicData } = client.storage.from("finrise-avatars").getPublicUrl(path);
+            const avatarUrl = `${publicData.publicUrl}?v=${Date.now()}`;
+
+            const { data: updatedUser, error: updateError } = await client.auth.updateUser({
+                data: { avatar_url: avatarUrl }
+            });
+            if (updateError) throw updateError;
+
+            authUser = updatedUser?.user || authUser;
+            if (profileImage) profileImage.src = avatarUrl;
+            alert("Profile picture updated successfully.");
+        } catch (error) {
+            console.error("Profile image upload failed:", error);
+            alert(error.message || "Unable to update profile picture.");
+        } finally {
+            event.target.value = "";
+        }
     });
 
     try {

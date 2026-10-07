@@ -5,6 +5,11 @@
 
 document.addEventListener("DOMContentLoaded", async () => {
     const section = document.getElementById("deposit");
+    const PAYMENT_CONFIG = {
+        crypto: { configured: false, address: "" },
+        usdt: { configured: false, address: "", network: "" },
+        bank: { configured: false, bankName: "", accountName: "", accountNumber: "" }
+    };
     if (!section) return;
 
     const amountInput = document.getElementById("depositAmount");
@@ -20,6 +25,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     }).format(Number(value) || 0);
 
     const escape = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[c]));
+
+    function applyPaymentConfig() {
+        const wallet = document.getElementById("walletAddress");
+        const bankName = document.getElementById("bankName");
+        const bankAccountName = document.getElementById("bankAccountName");
+        const bankAccountNumber = document.getElementById("bankAccountNumber");
+        if (wallet) wallet.value = PAYMENT_CONFIG.crypto.address || "Payment address not configured";
+        if (bankName) bankName.textContent = PAYMENT_CONFIG.bank.bankName || "Bank payment details not configured";
+        if (bankAccountName) bankAccountName.textContent = PAYMENT_CONFIG.bank.accountName || "Not configured";
+        if (bankAccountNumber) bankAccountNumber.textContent = PAYMENT_CONFIG.bank.accountNumber || "Not configured";
+    }
 
     function selectMethod(method) {
         selectedMethod = method;
@@ -62,6 +78,11 @@ document.addEventListener("DOMContentLoaded", async () => {
             return;
         }
 
+        if (!PAYMENT_CONFIG[selectedMethod]?.configured) {
+            alert("This deposit method is not configured yet. No payment address or bank account has been published, so do not send funds to any unofficial address.");
+            return;
+        }
+
         const oldText = depositBtn.textContent;
         depositBtn.disabled = true;
         depositBtn.textContent = "Submitting...";
@@ -101,6 +122,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     try {
         await getSupabase();
+        applyPaymentConfig();
         selectMethod(selectedMethod);
         await load();
     } catch (error) {

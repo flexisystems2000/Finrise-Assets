@@ -90,6 +90,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         return {
             theme: preferences.theme || "system",
+            language: preferences.language || "en",
+            currency: "NGN",
             notifications: {
                 transactions: preferences.notifications?.transactions !== false,
                 deposits: preferences.notifications?.deposits !== false,
@@ -106,6 +108,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         const next = {
             theme: patch.theme ?? current.theme,
+            language: patch.language ?? current.language,
+            currency: "NGN",
             notifications: {
                 ...current.notifications,
                 ...(patch.notifications || {})
@@ -168,6 +172,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
 
         if ($("themeSelect")) $("themeSelect").value = preferences.theme;
+        if ($("languageSelect")) $("languageSelect").value = "en";
+        if ($("currencySelect")) $("currencySelect").value = "NGN";
         applyTheme(preferences.theme);
     }
 
@@ -352,6 +358,29 @@ document.addEventListener("DOMContentLoaded", async () => {
             applyTheme(previous);
             console.error(error);
             showSettingsMessage(error.message || "Unable to save theme preference.", "error");
+        }
+    });
+
+
+    $("languageSelect")?.addEventListener("change", async event => {
+        if (event.target.value !== "en") { event.target.value = "en"; return; }
+        try {
+            await savePreferences({ language: "en" });
+            showSettingsMessage("Language preference saved.");
+        } catch (error) {
+            console.error(error);
+            showSettingsMessage(error.message || "Unable to save language preference.", "error");
+        }
+    });
+
+    $("currencySelect")?.addEventListener("change", async event => {
+        event.target.value = "NGN";
+        try {
+            await savePreferences({ currency: "NGN" });
+            showSettingsMessage("Wallet currency is NGN and has been saved.");
+        } catch (error) {
+            console.error(error);
+            showSettingsMessage(error.message || "Unable to save currency preference.", "error");
         }
     });
 

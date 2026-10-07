@@ -29,6 +29,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const password = get("password")?.value || "";
         const confirmPassword = get("confirmPassword")?.value || "";
         const terms = get("terms");
+        const referralCode = new URLSearchParams(window.location.search).get("ref")?.trim() || "";
         const button = form.querySelector("button[type='submit']");
 
         if (!fullname || fullname.length < 3) return alert("Enter your full name.");
@@ -53,7 +54,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 password,
                 options: {
                     emailRedirectTo: `${window.location.origin}/verify.html`,
-                    data: { full_name: fullname, username, phone, country }
+                    data: { full_name: fullname, username, phone, country, referral_code: referralCode || null }
                 }
             });
 
