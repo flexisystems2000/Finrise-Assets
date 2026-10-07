@@ -77,6 +77,12 @@ async function getSession() {
     return { session: data?.session || null, error };
 }
 
+async function signOut() {
+    const client = await getSupabase();
+    const { error } = await client.auth.signOut();
+    return { error };
+}
+
 /* =====================================================
    PROFILES
 ===================================================== */
@@ -330,7 +336,7 @@ async function getUserReferralRewards() {
    ADMIN FUNCTIONS
 ===================================================== */
 
-async function adminApprovDeposit(depositId) {
+async function adminApproveDeposit(depositId) {
     const client = await getSupabase();
 
     const { data, error } = await client.rpc("admin_approve_deposit", {
@@ -390,6 +396,39 @@ async function getPendingWithdrawals() {
         .select("*")
         .eq("status", "pending")
         .order("created_at", { ascending: true });
+
+    return { withdrawals: data || [], error };
+}
+
+async function getAllUsers() {
+    const client = await getSupabase();
+
+    const { data, error } = await client
+        .from("profiles")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+    return { users: data || [], error };
+}
+
+async function getAllDeposits() {
+    const client = await getSupabase();
+
+    const { data, error } = await client
+        .from("deposits")
+        .select("*, profiles(full_name, email)")
+        .order("created_at", { ascending: false });
+
+    return { deposits: data || [], error };
+}
+
+async function getAllWithdrawals() {
+    const client = await getSupabase();
+
+    const { data, error } = await client
+        .from("withdrawals")
+        .select("*, profiles(full_name, email)")
+        .order("created_at", { ascending: false });
 
     return { withdrawals: data || [], error };
 }
