@@ -1,1353 +1,389 @@
 /* =========================================================
    FINRISE ASSET
    SETTINGS LOGIC
+   Supabase/Auth is the source of truth.
 ========================================================= */
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+    const settingsSection = document.getElementById("settings");
+    if (!settingsSection) return;
 
-    /* =====================================================
-       SETTINGS SECTION
-    ===================================================== */
+    const $ = id => document.getElementById(id);
 
-    const settingsSection =
-        document.getElementById("settings");
-
-    if (!settingsSection) {
-        return;
-    }
-
-
-    /* =====================================================
-       SAFE LOCAL STORAGE HELPERS
-    ===================================================== */
-
-    function getStorage(key, fallback = null) {
-
-        try {
-
-            const value =
-                localStorage.getItem(key);
-
-            return value !== null
-                ? value
-                : fallback;
-
-        } catch (error) {
-
-            console.error(
-                `Unable to read ${key}:`,
-                error
-            );
-
-            return fallback;
-        }
-    }
-
-
-    function setStorage(key, value) {
-
-        try {
-
-            localStorage.setItem(
-                key,
-                value
-            );
-
-            return true;
-
-        } catch (error) {
-
-            console.error(
-                `Unable to save ${key}:`,
-                error
-            );
-
-            return false;
-        }
-    }
-
-
-    function getJSON(key, fallback = null) {
-
-        try {
-
-            const value =
-                localStorage.getItem(key);
-
-            if (!value) {
-                return fallback;
-            }
-
-            return JSON.parse(value);
-
-        } catch (error) {
-
-            console.error(
-                `Unable to parse ${key}:`,
-                error
-            );
-
-            return fallback;
-        }
-    }
-
-
-    /* =====================================================
-       ELEMENT HELPER
-    ===================================================== */
-
-    function getElement(id) {
-        return document.getElementById(id);
-    }
-
-
-    /* =====================================================
-       SETTINGS NAVIGATION
-    ===================================================== */
-
-    const settingsNavItems =
-        settingsSection.querySelectorAll(
-            ".settings-nav-item"
-        );
-
-    const settingsPanels =
-        settingsSection.querySelectorAll(
-            ".settings-panel"
-        );
-
+    const settingsNavItems = settingsSection.querySelectorAll(".settings-nav-item");
+    const settingsPanels = settingsSection.querySelectorAll(".settings-panel");
 
     settingsNavItems.forEach(item => {
+        item.addEventListener("click", () => {
+            const target = item.dataset.settings;
+            if (!target) return;
 
-        item.addEventListener(
-            "click",
-            () => {
+            settingsNavItems.forEach(nav => nav.classList.remove("active"));
+            settingsPanels.forEach(panel => panel.classList.remove("active"));
 
-                const target =
-                    item.dataset.settings;
-
-                if (!target) {
-                    return;
-                }
-
-
-                /* Remove active from navigation */
-
-                settingsNavItems.forEach(nav => {
-
-                    nav.classList.remove(
-                        "active"
-                    );
-
-                });
-
-
-                /* Hide all panels */
-
-                settingsPanels.forEach(panel => {
-
-                    panel.classList.remove(
-                        "active"
-                    );
-
-                });
-
-
-                /* Activate selected item */
-
-                item.classList.add(
-                    "active"
-                );
-
-
-                /* Show selected panel */
-
-                const targetPanel =
-                    getElement(target);
-
-                if (targetPanel) {
-
-                    targetPanel.classList.add(
-                        "active"
-                    );
-                }
-
-            }
-        );
-
+            item.classList.add("active");
+            $(target)?.classList.add("active");
+        });
     });
 
+    let authUser = null;
+    let profile = {};
 
-    /* =====================================================
-       GET USER
-    ===================================================== */
+    const getNameParts = fullName => {
+        const parts = String(fullName || "").trim().split(/\s+/).filter(Boolean);
+        return {
+            firstName: parts[0] || "",
+            lastName: parts.slice(1).join(" ")
+        };
+    };
 
-    let user = {};
+    const getFullName = () => {
+        const first = $("settingsFirstName")?.value.trim() || "";
+        const last = $("settingsLastName")?.value.trim() || "";
+        return `${first} ${last}`.trim();
+    };
 
+    function showSettingsMessage(message, type = "success") {
+        document.querySelector(".settings-toast")?.remove();
 
-    /* =====================================================
-       USER NAME COMPATIBILITY
-    ===================================================== */
+        const toast = document.createElement("div");
+        toast.className = "settings-toast";
+        toast.dataset.type = type;
 
-    /*
-     * Your Profile JS uses:
-     *
-     * user.fullname
-     *
-     * While this Settings page originally expected:
-     *
-     * user.firstName
-     * user.lastName
-     *
-     * This version supports both.
-     */
+        const icon = document.createElement("i");
+        icon.className = type === "success"
+            ? "fas fa-check-circle"
+            : "fas fa-exclamation-circle";
 
-    function getFirstName() {
+        const text = document.createElement("span");
+        text.textContent = message;
 
-        if (user.firstName) {
-            return user.firstName;
-        }
+        toast.append(icon, text);
+        document.body.appendChild(toast);
 
-        if (user.fullname) {
-
-            return user.fullname
-                .trim()
-                .split(/\s+/)[0] || "";
-
-        }
-
-        return "";
+        setTimeout(() => toast.classList.add("hide"), 2700);
+        setTimeout(() => toast.remove(), 3100);
     }
-
-
-    function getLastName() {
-
-        if (user.lastName) {
-            return user.lastName;
-        }
-
-        if (user.fullname) {
-
-            const parts =
-                user.fullname
-                    .trim()
-                    .split(/\s+/);
-
-            return parts.length > 1
-                ? parts.slice(1).join(" ")
-                : "";
-
-        }
-
-        return "";
-    }
-
-
-    function getFullName() {
-
-        const firstName =
-            getFirstName();
-
-        const lastName =
-            getLastName();
-
-
-        const combinedName =
-            `${firstName} ${lastName}`
-                .trim();
-
-
-        return (
-            combinedName ||
-            user.fullname ||
-            user.name ||
-            "User Account"
-        );
-    }
-
-
-    /* =====================================================
-       LOAD USER SETTINGS FROM SUPABASE
-    ===================================================== */
-
-    async function loadSettingsFromSupabase() {
-        try {
-            const { user: authUser, error: authError } = await getCurrentUser();
-            if (authError || !authUser) return;
-
-            const { profile } = await getCurrentProfile();
-            user = {
-                ...(profile || {}),
-                email: authUser.email || "",
-                fullname: profile?.full_name || authUser.user_metadata?.full_name || "",
-                firstName: (profile?.full_name || "").trim().split(/\s+/)[0] || "",
-                lastName: (profile?.full_name || "").trim().split(/\s+/).slice(1).join(" "),
-                phone: profile?.phone || "",
-                country: profile?.country || ""
-            };
-
-            loadSettings();
-        } catch (error) {
-            console.error("Unable to load settings from Supabase:", error);
-        }
-    }
-
-    /* =====================================================
-       LOAD USER SETTINGS
-    ===================================================== */
-
-    function loadSettings() {
-
-        const firstName =
-            getFirstName();
-
-        const lastName =
-            getLastName();
-
-        const fullName =
-            getFullName();
-
-        const email =
-            user.email ||
-            "No email";
-
-
-        const firstNameInput =
-            getElement(
-                "settingsFirstName"
-            );
-
-        const lastNameInput =
-            getElement(
-                "settingsLastName"
-            );
-
-        const emailInput =
-            getElement(
-                "settingsEmail"
-            );
-
-        const phoneInput =
-            getElement(
-                "settingsPhone"
-            );
-
-        const countryInput =
-            getElement(
-                "settingsCountry"
-            );
-
-
-        /* ================================================
-           FORM VALUES
-        ================================================ */
-
-        if (firstNameInput) {
-
-            firstNameInput.value =
-                firstName;
-        }
-
-
-        if (lastNameInput) {
-
-            lastNameInput.value =
-                lastName;
-        }
-
-
-        if (emailInput) {
-
-            emailInput.value =
-                email === "No email"
-                    ? ""
-                    : email;
-        }
-
-
-        if (phoneInput) {
-
-            phoneInput.value =
-                user.phone || "";
-        }
-
-
-        if (countryInput) {
-
-            countryInput.value =
-                user.country || "";
-        }
-
-
-        /* ================================================
-           USER DISPLAY
-        ================================================ */
-
-        const settingsUserName =
-            getElement(
-                "settingsUserName"
-            );
-
-        const settingsUserEmail =
-            getElement(
-                "settingsUserEmail"
-            );
-
-        const settingsAvatar =
-            getElement(
-                "settingsAvatar"
-            );
-
-
-        if (settingsUserName) {
-
-            settingsUserName.textContent =
-                fullName;
-        }
-
-
-        if (settingsUserEmail) {
-
-            settingsUserEmail.textContent =
-                email;
-        }
-
-
-        if (settingsAvatar) {
-
-            settingsAvatar.textContent =
-                (
-                    fullName ||
-                    "U"
-                )
-                .charAt(0)
-                .toUpperCase();
-        }
-
-    }
-
-
-    /* =====================================================
-       SAVE GENERAL SETTINGS
-    ===================================================== */
-
-    window.saveGeneralSettings =
-        function () {
-
-            const firstNameInput =
-                getElement(
-                    "settingsFirstName"
-                );
-
-            const lastNameInput =
-                getElement(
-                    "settingsLastName"
-                );
-
-            const phoneInput =
-                getElement(
-                    "settingsPhone"
-                );
-
-            const countryInput =
-                getElement(
-                    "settingsCountry"
-                );
-
-
-            const firstName =
-                firstNameInput
-                    ? firstNameInput.value.trim()
-                    : "";
-
-
-            const lastName =
-                lastNameInput
-                    ? lastNameInput.value.trim()
-                    : "";
-
-
-            const phone =
-                phoneInput
-                    ? phoneInput.value.trim()
-                    : "";
-
-
-            const country =
-                countryInput
-                    ? countryInput.value
-                    : "";
-
-
-            /* ==============================================
-               VALIDATION
-            ============================================== */
-
-            if (!firstName && !lastName) {
-
-                alert(
-                    "Please enter your name."
-                );
-
-                if (firstNameInput) {
-                    firstNameInput.focus();
-                }
-
-                return;
-            }
-
-
-            /* ==============================================
-               UPDATE USER
-            ============================================== */
-
-            user.firstName =
-                firstName;
-
-            user.lastName =
-                lastName;
-
-            user.phone =
-                phone;
-
-            user.country =
-                country;
-
-
-            const fullName =
-                `${firstName} ${lastName}`
-                    .trim();
-
-
-            /*
-             * Keep fullname synchronized
-             * with the Profile page.
-             */
-
-            user.fullname =
-                fullName;
-
-
-            /* ==============================================
-               SAVE PROFILE IN SUPABASE
-            ============================================== */
-
-            updateProfile({
-                full_name: fullName,
-                phone: phone || null,
-                country: country || null
-            }).then(result => {
-                if (result.error) throw result.error;
-
-                user.fullname = fullName;
-                user.phone = phone;
-                user.country = country;
-
-                showSettingsMessage("Settings saved successfully.");
-            }).catch(error => {
-                console.error("Settings update failed:", error);
-                showSettingsMessage(error.message || "Unable to save your settings.");
-            });
-
-
-            /* ==============================================
-               UPDATE SETTINGS DISPLAY
-            ============================================== */
-
-            const settingsUserName =
-                getElement(
-                    "settingsUserName"
-                );
-
-            const settingsAvatar =
-                getElement(
-                    "settingsAvatar"
-                );
-
-
-            if (settingsUserName) {
-
-                settingsUserName.textContent =
-                    fullName ||
-                    "User Account";
-            }
-
-
-            if (settingsAvatar) {
-
-                settingsAvatar.textContent =
-                    (
-                        fullName ||
-                        "U"
-                    )
-                    .charAt(0)
-                    .toUpperCase();
-            }
-
-
-            /* ==============================================
-               UPDATE DASHBOARD
-            ============================================== */
-
-            const dashboardName =
-                getElement("userName");
-
-            const welcome =
-                getElement("welcome");
-
-            if (dashboardName) {
-
-                dashboardName.textContent =
-                    fullName ||
-                    "User";
-            }
-
-
-            if (welcome) {
-
-                welcome.textContent =
-                    `Welcome, ${
-                        fullName || "User"
-                    }`;
-            }
-
-
-            /* ==============================================
-               UPDATE PROFILE PAGE
-            ============================================== */
-
-            const profileName =
-                getElement(
-                    "profilePageName"
-                );
-
-            const profilePhone =
-                getElement(
-                    "profilePhone"
-                );
-
-
-            if (profileName) {
-
-                profileName.textContent =
-                    fullName ||
-                    "Finrise User";
-            }
-
-
-            if (profilePhone) {
-
-                profilePhone.value =
-                    phone;
-            }
-
-
-            showSettingsMessage(
-                "Your account information has been saved."
-            );
-        };
-
-
-    /* =====================================================
-       PASSWORD MODAL
-    ===================================================== */
-
-    const passwordModal =
-        getElement(
-            "passwordModal"
-        );
-
-
-    window.openPasswordModal =
-        function () {
-
-            if (!passwordModal) {
-                return;
-            }
-
-            passwordModal.classList.add(
-                "active"
-            );
-
-            const currentPassword =
-                getElement(
-                    "currentPassword"
-                );
-
-            if (currentPassword) {
-
-                setTimeout(() => {
-
-                    currentPassword.focus();
-
-                }, 100);
-            }
-
-        };
-
-
-    window.closePasswordModal =
-        function () {
-
-            if (!passwordModal) {
-                return;
-            }
-
-            passwordModal.classList.remove(
-                "active"
-            );
-        };
-
-
-    /* =====================================================
-       CLOSE PASSWORD MODAL OUTSIDE
-    ===================================================== */
-
-    if (passwordModal) {
-
-        passwordModal.addEventListener(
-            "click",
-            event => {
-
-                if (
-                    event.target ===
-                    passwordModal
-                ) {
-
-                    window.closePasswordModal();
-                }
-
-            }
-        );
-    }
-
-
-    /* =====================================================
-       CHANGE PASSWORD
-    ===================================================== */
-
-    window.changePassword =
-        function () {
-
-            const currentPasswordInput =
-                getElement(
-                    "currentPassword"
-                );
-
-            const newPasswordInput =
-                getElement(
-                    "newPassword"
-                );
-
-            const confirmPasswordInput =
-                getElement(
-                    "confirmPassword"
-                );
-
-
-            const currentPassword =
-                currentPasswordInput
-                    ? currentPasswordInput.value
-                    : "";
-
-
-            const newPassword =
-                newPasswordInput
-                    ? newPasswordInput.value
-                    : "";
-
-
-            const confirmPassword =
-                confirmPasswordInput
-                    ? confirmPasswordInput.value
-                    : "";
-
-
-            /* ==============================================
-               VALIDATION
-            ============================================== */
-
-            if (
-                !currentPassword ||
-                !newPassword ||
-                !confirmPassword
-            ) {
-
-                alert(
-                    "Please fill in all password fields."
-                );
-
-                return;
-            }
-
-
-            if (
-                newPassword.length < 8
-            ) {
-
-                alert(
-                    "Your new password must contain at least 8 characters."
-                );
-
-                return;
-            }
-
-
-            if (
-                newPassword !==
-                confirmPassword
-            ) {
-
-                alert(
-                    "New passwords do not match."
-                );
-
-                return;
-            }
-
-
-            /*
-             * IMPORTANT
-             *
-             * Password changes should NOT be handled
-             * by localStorage in the real application.
-             *
-             * The PHP backend will:
-             *
-             * 1. Verify the current password.
-             * 2. Validate the new password.
-             * 3. Hash the new password.
-             * 4. Update MySQL.
-             * 5. Return success/failure.
-             *
-             * Therefore, this frontend does not store
-             * the new password.
-             */
-
-
-            alert(
-                "Password change will be processed securely by the backend."
-            );
-
-
-            /* Clear fields */
-
-            if (currentPasswordInput) {
-
-                currentPasswordInput.value =
-                    "";
-            }
-
-
-            if (newPasswordInput) {
-
-                newPasswordInput.value =
-                    "";
-            }
-
-
-            if (confirmPasswordInput) {
-
-                confirmPasswordInput.value =
-                    "";
-            }
-
-
-            window.closePasswordModal();
-        };
-
-
-    /* =====================================================
-       TWO-FACTOR AUTHENTICATION
-    ===================================================== */
-
-    const twoFactorToggle =
-        getElement(
-            "twoFactorToggle"
-        );
-
-
-    window.toggleTwoFactor =
-        function () {
-
-            if (!twoFactorToggle) {
-                return;
-            }
-
-
-            const enabled =
-                twoFactorToggle.checked;
-
-
-            setStorage(
-                "twoFactorEnabled",
-                String(enabled)
-            );
-
-
-            if (enabled) {
-
-                showSettingsMessage(
-                    "Two-factor authentication enabled."
-                );
-
-            } else {
-
-                showSettingsMessage(
-                    "Two-factor authentication disabled."
-                );
-            }
-
-        };
-
-
-    /* =====================================================
-       NOTIFICATION SETTINGS
-    ===================================================== */
-
-    window.saveNotificationSettings =
-        function () {
-
-            const transactionNotification =
-                getElement(
-                    "transactionNotification"
-                );
-
-            const depositNotification =
-                getElement(
-                    "depositNotification"
-                );
-
-            const withdrawalNotification =
-                getElement(
-                    "withdrawalNotification"
-                );
-
-            const investmentNotification =
-                getElement(
-                    "investmentNotification"
-                );
-
-            const promoNotification =
-                getElement(
-                    "promoNotification"
-                );
-
-
-            const notifications = {
-
-                transactions:
-                    transactionNotification
-                        ? transactionNotification.checked
-                        : false,
-
-                deposits:
-                    depositNotification
-                        ? depositNotification.checked
-                        : false,
-
-                withdrawals:
-                    withdrawalNotification
-                        ? withdrawalNotification.checked
-                        : false,
-
-                investments:
-                    investmentNotification
-                        ? investmentNotification.checked
-                        : false,
-
-                promotions:
-                    promoNotification
-                        ? promoNotification.checked
-                        : false
-            };
-
-
-            const saved =
-                setStorage(
-                    "notificationSettings",
-                    JSON.stringify(
-                        notifications
-                    )
-                );
-
-
-            if (!saved) {
-
-                showSettingsMessage(
-                    "Unable to save notification settings."
-                );
-
-                return;
-            }
-
-
-            showSettingsMessage(
-                "Notification preferences saved."
-            );
-
-        };
-
-
-    /* =====================================================
-       DASHBOARD THEME
-    ===================================================== */
-
-    window.changeDashboardTheme =
-        function () {
-
-            const themeSelect =
-                getElement(
-                    "themeSelect"
-                );
-
-
-            if (!themeSelect) {
-                return;
-            }
-
-
-            const theme =
-                themeSelect.value;
-
-
-            setStorage(
-                "dashboardTheme",
-                theme
-            );
-
-
-            applyTheme(theme);
-
-        };
-
-
-    /* =====================================================
-       APPLY THEME
-    ===================================================== */
 
     function applyTheme(theme) {
+        const mode = theme || "system";
 
-        if (theme === "light") {
-
-            document.body.classList.add(
-                "light-theme"
-            );
-
+        if (mode === "light") {
+            document.body.classList.add("light-theme");
             return;
         }
 
-
-        if (theme === "dark") {
-
-            document.body.classList.remove(
-                "light-theme"
-            );
-
+        if (mode === "dark") {
+            document.body.classList.remove("light-theme");
             return;
         }
-
-
-        /* SYSTEM THEME */
-
-        const prefersLight =
-            window.matchMedia(
-                "(prefers-color-scheme: light)"
-            ).matches;
-
 
         document.body.classList.toggle(
             "light-theme",
-            prefersLight
+            window.matchMedia("(prefers-color-scheme: light)").matches
         );
     }
 
+    function getStoredPreferences() {
+        const metadata = authUser?.user_metadata || {};
+        const preferences = metadata.finrise_settings || {};
 
-    /* =====================================================
-       LOAD SAVED SETTINGS
-    ===================================================== */
-
-    function loadSavedSettings() {
-
-        /* ================================================
-           TWO FACTOR
-        ================================================ */
-
-        const savedTwoFactor =
-            getStorage(
-                "twoFactorEnabled"
-            );
-
-
-        if (twoFactorToggle) {
-
-            twoFactorToggle.checked =
-                savedTwoFactor === "true";
-        }
-
-
-        /* ================================================
-           NOTIFICATIONS
-        ================================================ */
-
-        const savedNotifications =
-            getJSON(
-                "notificationSettings",
-                null
-            );
-
-
-        if (savedNotifications) {
-
-            const transactionNotification =
-                getElement(
-                    "transactionNotification"
-                );
-
-            const depositNotification =
-                getElement(
-                    "depositNotification"
-                );
-
-            const withdrawalNotification =
-                getElement(
-                    "withdrawalNotification"
-                );
-
-            const investmentNotification =
-                getElement(
-                    "investmentNotification"
-                );
-
-            const promoNotification =
-                getElement(
-                    "promoNotification"
-                );
-
-
-            if (transactionNotification) {
-
-                transactionNotification.checked =
-                    Boolean(
-                        savedNotifications.transactions
-                    );
+        return {
+            theme: preferences.theme || "system",
+            notifications: {
+                transactions: preferences.notifications?.transactions !== false,
+                deposits: preferences.notifications?.deposits !== false,
+                withdrawals: preferences.notifications?.withdrawals !== false,
+                investments: preferences.notifications?.investments !== false,
+                promotions: preferences.notifications?.promotions !== false
             }
-
-
-            if (depositNotification) {
-
-                depositNotification.checked =
-                    Boolean(
-                        savedNotifications.deposits
-                    );
-            }
-
-
-            if (withdrawalNotification) {
-
-                withdrawalNotification.checked =
-                    Boolean(
-                        savedNotifications.withdrawals
-                    );
-            }
-
-
-            if (investmentNotification) {
-
-                investmentNotification.checked =
-                    Boolean(
-                        savedNotifications.investments
-                    );
-            }
-
-
-            if (promoNotification) {
-
-                promoNotification.checked =
-                    Boolean(
-                        savedNotifications.promotions
-                    );
-            }
-        }
-
-
-        /* ================================================
-           THEME
-        ================================================ */
-
-        const savedTheme =
-            getStorage(
-                "dashboardTheme",
-                "system"
-            );
-
-
-        const themeSelect =
-            getElement(
-                "themeSelect"
-            );
-
-
-        if (themeSelect) {
-
-            themeSelect.value =
-                savedTheme;
-        }
-
-
-        applyTheme(savedTheme);
-
+        };
     }
 
+    async function savePreferences(patch) {
+        const client = await getSupabase();
+        const current = getStoredPreferences();
 
-    /* =====================================================
-       SYSTEM THEME CHANGE
-    ===================================================== */
-
-    const mediaQuery =
-        window.matchMedia(
-            "(prefers-color-scheme: light)"
-        );
-
-
-    if (mediaQuery.addEventListener) {
-
-        mediaQuery.addEventListener(
-            "change",
-            () => {
-
-                const savedTheme =
-                    getStorage(
-                        "dashboardTheme",
-                        "system"
-                    );
-
-
-                if (
-                    savedTheme ===
-                    "system"
-                ) {
-
-                    applyTheme("system");
-                }
-
-            }
-        );
-
-    }
-
-
-    /* =====================================================
-       SETTINGS MESSAGE / TOAST
-    ===================================================== */
-
-    function showSettingsMessage(message) {
-
-        const oldMessage =
-            document.querySelector(
-                ".settings-toast"
-            );
-
-
-        if (oldMessage) {
-
-            oldMessage.remove();
-        }
-
-
-        const toast =
-            document.createElement(
-                "div"
-            );
-
-
-        toast.className =
-            "settings-toast";
-
-
-        /* Prevent HTML injection */
-
-        const icon =
-            document.createElement(
-                "i"
-            );
-
-        icon.className =
-            "fas fa-check-circle";
-
-
-        const text =
-            document.createElement(
-                "span"
-            );
-
-        text.textContent =
-            message;
-
-
-        toast.appendChild(icon);
-
-        toast.appendChild(text);
-
-
-        document.body.appendChild(
-            toast
-        );
-
-
-        setTimeout(() => {
-
-            toast.classList.add(
-                "hide"
-            );
-
-
-            setTimeout(() => {
-
-                if (toast.parentNode) {
-
-                    toast.remove();
-                }
-
-            }, 300);
-
-        }, 3000);
-
-    }
-
-
-    /* =====================================================
-       LOGOUT
-    ===================================================== */
-
-    window.logoutUser =
-        async function () {
-
-            const confirmLogout =
-                confirm(
-                    "Are you sure you want to logout?"
-                );
-
-            if (!confirmLogout) {
-                return;
-            }
-
-            try {
-                const result = await signOut();
-                if (result.error) throw result.error;
-                window.location.href = "logIn_Page.html";
-            } catch (error) {
-                console.error("Logout error:", error);
-                alert(error.message || "Unable to logout. Please try again.");
+        const next = {
+            theme: patch.theme ?? current.theme,
+            notifications: {
+                ...current.notifications,
+                ...(patch.notifications || {})
             }
         };
 
+        const { data, error } = await client.auth.updateUser({
+            data: {
+                finrise_settings: next
+            }
+        });
 
-    /* =====================================================
-       INITIALIZE
-    ===================================================== */
+        if (error) throw error;
 
-    loadSettingsFromSupabase();
+        authUser = data?.user || authUser;
+        applyTheme(next.theme);
+        return next;
+    }
 
-    loadSavedSettings();
+    function renderUser() {
+        const fullName = profile.full_name || authUser?.user_metadata?.full_name || authUser?.email || "User Account";
+        const parts = getNameParts(fullName);
+        const email = authUser?.email || "";
 
+        if ($("settingsFirstName")) $("settingsFirstName").value = parts.firstName;
+        if ($("settingsLastName")) $("settingsLastName").value = parts.lastName;
+        if ($("settingsEmail")) $("settingsEmail").value = email;
+        if ($("settingsPhone")) $("settingsPhone").value = profile.phone || authUser?.user_metadata?.phone || "";
+        if ($("settingsCountry")) $("settingsCountry").value = profile.country || authUser?.user_metadata?.country || "";
+
+        if ($("settingsUserName")) $("settingsUserName").textContent = fullName;
+        if ($("settingsUserEmail")) $("settingsUserEmail").textContent = email;
+        if ($("settingsAvatar")) $("settingsAvatar").textContent = fullName.charAt(0).toUpperCase();
+
+        if ($("userName")) $("userName").textContent = fullName;
+        if ($("welcome")) $("welcome").textContent = `Welcome, ${fullName}`;
+        if ($("profilePageName")) $("profilePageName").textContent = fullName;
+        if ($("profilePhone")) $("profilePhone").value = profile.phone || "";
+    }
+
+    function renderPreferences() {
+        const preferences = getStoredPreferences();
+
+        if ($("twoFactorToggle")) {
+            $("twoFactorToggle").checked = false;
+            $("twoFactorToggle").disabled = true;
+            $("twoFactorToggle").title = "Two-factor authentication requires backend 2FA configuration.";
+        }
+
+        const map = {
+            transactionNotification: preferences.notifications.transactions,
+            depositNotification: preferences.notifications.deposits,
+            withdrawalNotification: preferences.notifications.withdrawals,
+            investmentNotification: preferences.notifications.investments,
+            promoNotification: preferences.notifications.promotions
+        };
+
+        Object.entries(map).forEach(([id, value]) => {
+            if ($(id)) $(id).checked = Boolean(value);
+        });
+
+        if ($("themeSelect")) $("themeSelect").value = preferences.theme;
+        applyTheme(preferences.theme);
+    }
+
+    async function loadSettingsFromSupabase() {
+        const { user, error: userError } = await getCurrentUser();
+
+        if (userError || !user) {
+            window.location.href = "logIn_Page.html";
+            return;
+        }
+
+        authUser = user;
+
+        const { profile: loadedProfile, error: profileError } = await getCurrentProfile();
+        if (profileError) console.error("Profile load error:", profileError);
+
+        profile = loadedProfile || {};
+        renderUser();
+        renderPreferences();
+    }
+
+    window.saveGeneralSettings = async function () {
+        const firstName = $("settingsFirstName")?.value.trim() || "";
+        const lastName = $("settingsLastName")?.value.trim() || "";
+        const phone = $("settingsPhone")?.value.trim() || "";
+        const country = $("settingsCountry")?.value.trim() || "";
+        const fullName = `${firstName} ${lastName}`.trim();
+
+        if (!fullName) {
+            alert("Please enter your name.");
+            $("settingsFirstName")?.focus();
+            return;
+        }
+
+        try {
+            const result = await updateProfile({
+                full_name: fullName,
+                phone: phone || null,
+                country: country || null
+            });
+
+            if (result.error) throw result.error;
+
+            profile = result.data || {
+                ...profile,
+                full_name: fullName,
+                phone: phone || null,
+                country: country || null
+            };
+
+            if (authUser) {
+                const client = await getSupabase();
+                const metadataResult = await client.auth.updateUser({
+                    data: {
+                        full_name: fullName,
+                        phone: phone || null,
+                        country: country || null
+                    }
+                });
+
+                if (!metadataResult.error && metadataResult.data?.user) {
+                    authUser = metadataResult.data.user;
+                }
+            }
+
+            renderUser();
+            showSettingsMessage("Your account information has been saved.");
+        } catch (error) {
+            console.error("Settings update failed:", error);
+            showSettingsMessage(error.message || "Unable to save your settings.", "error");
+        }
+    };
+
+    const passwordModal = $("passwordModal");
+
+    window.openPasswordModal = function () {
+        if (!passwordModal) return;
+        passwordModal.classList.add("active");
+        setTimeout(() => $("currentPassword")?.focus(), 100);
+    };
+
+    window.closePasswordModal = function () {
+        passwordModal?.classList.remove("active");
+    };
+
+    passwordModal?.addEventListener("click", event => {
+        if (event.target === passwordModal) window.closePasswordModal();
+    });
+
+    window.changePassword = async function () {
+        const currentPassword = $("currentPassword")?.value || "";
+        const newPassword = $("newPassword")?.value || "";
+        const confirmPassword = $("confirmPassword")?.value || "";
+
+        if (!currentPassword || !newPassword || !confirmPassword) {
+            alert("Please fill in all password fields.");
+            return;
+        }
+
+        if (newPassword.length < 8) {
+            alert("Your new password must contain at least 8 characters.");
+            return;
+        }
+
+        if (newPassword !== confirmPassword) {
+            alert("New passwords do not match.");
+            return;
+        }
+
+        if (!authUser?.email) {
+            alert("Your authenticated email could not be found.");
+            return;
+        }
+
+        try {
+            const client = await getSupabase();
+
+            // Re-authenticate with the current password first.
+            const { error: verifyError } = await client.auth.signInWithPassword({
+                email: authUser.email,
+                password: currentPassword
+            });
+
+            if (verifyError) throw new Error("Current password is incorrect.");
+
+            const { error: updateError } = await client.auth.updateUser({
+                password: newPassword
+            });
+
+            if (updateError) throw updateError;
+
+            ["currentPassword", "newPassword", "confirmPassword"].forEach(id => {
+                if ($(id)) $(id).value = "";
+            });
+
+            window.closePasswordModal();
+            showSettingsMessage("Password changed successfully.");
+        } catch (error) {
+            console.error("Password change failed:", error);
+            alert(error.message || "Unable to change your password.");
+        }
+    };
+
+    window.toggleTwoFactor = function () {
+        const toggle = $("twoFactorToggle");
+        if (toggle) toggle.checked = false;
+        alert("Two-factor authentication is not enabled on the current Finrise backend yet.");
+    };
+
+    const notificationMap = {
+        transactionNotification: "transactions",
+        depositNotification: "deposits",
+        withdrawalNotification: "withdrawals",
+        investmentNotification: "investments",
+        promoNotification: "promotions"
+    };
+
+    Object.entries(notificationMap).forEach(([id, key]) => {
+        $(id)?.addEventListener("change", async event => {
+            try {
+                await savePreferences({
+                    notifications: { [key]: event.target.checked }
+                });
+                showSettingsMessage("Notification preference saved.");
+            } catch (error) {
+                event.target.checked = !event.target.checked;
+                console.error(error);
+                showSettingsMessage(error.message || "Unable to save notification preference.", "error");
+            }
+        });
+    });
+
+    $("themeSelect")?.addEventListener("change", async event => {
+        const previous = getStoredPreferences().theme;
+        applyTheme(event.target.value);
+
+        try {
+            await savePreferences({ theme: event.target.value });
+            showSettingsMessage("Theme preference saved.");
+        } catch (error) {
+            event.target.value = previous;
+            applyTheme(previous);
+            console.error(error);
+            showSettingsMessage(error.message || "Unable to save theme preference.", "error");
+        }
+    });
+
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: light)");
+    const onSystemThemeChange = () => {
+        if (getStoredPreferences().theme === "system") applyTheme("system");
+    };
+
+    if (mediaQuery.addEventListener) {
+        mediaQuery.addEventListener("change", onSystemThemeChange);
+    } else if (mediaQuery.addListener) {
+        mediaQuery.addListener(onSystemThemeChange);
+    }
+
+    window.logoutUser = async function () {
+        if (!confirm("Are you sure you want to logout?")) return;
+
+        try {
+            const { error } = await signOut();
+            if (error) throw error;
+            window.location.href = "logIn_Page.html";
+        } catch (error) {
+            console.error("Logout error:", error);
+            alert(error.message || "Unable to logout. Please try again.");
+        }
+    };
+
+    try {
+        await getSupabase();
+        await loadSettingsFromSupabase();
+    } catch (error) {
+        console.error("Unable to initialize settings:", error);
+        showSettingsMessage(error.message || "Unable to load settings.", "error");
+    }
 });
