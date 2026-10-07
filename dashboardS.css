@@ -1,15 +1,8 @@
 /* =========================================================
    FINRISE ASSET DASHBOARD
    UNIFIED BLACK + GOLD THEME
+   RESPONSIVE / MOBILE SIDEBAR FIX
 ========================================================= */
-html body {
-    min-width: 1200px;
-    overflow: auto;
-}
-
-body {
-    overflow: auto;
-}
 
 :root {
     --bg: #080808;
@@ -47,7 +40,15 @@ body {
 }
 
 
+html {
+    width: 100%;
+    min-width: 0;
+}
+
+
 body {
+    width: 100%;
+    min-width: 0;
     min-height: 100vh;
 
     background: var(--bg);
@@ -55,6 +56,8 @@ body {
     color: var(--text);
 
     font-family: "Poppins", sans-serif;
+
+    overflow-x: hidden;
 }
 
 
@@ -97,6 +100,10 @@ body {
     z-index: 1000;
 
     overflow-y: auto;
+
+    transition:
+        transform 0.3s ease,
+        box-shadow 0.3s ease;
 }
 
 
@@ -153,6 +160,8 @@ body {
 
     cursor: pointer;
 
+    user-select: none;
+
     transition:
         background 0.25s ease,
         color 0.25s ease,
@@ -167,7 +176,8 @@ body {
 
     font-size: 17px;
 
-    transition: color 0.25s ease;
+    transition:
+        color 0.25s ease;
 }
 
 
@@ -186,13 +196,17 @@ body {
 }
 
 
-/* ACTIVE SIDEBAR */
+/* =========================================================
+   ACTIVE SIDEBAR ITEM
+========================================================= */
 
 .sidebar ul li.active {
     background:
-        linear-gradient(90deg,
+        linear-gradient(
+            90deg,
             rgba(212, 175, 55, 0.15),
-            rgba(212, 175, 55, 0.04));
+            rgba(212, 175, 55, 0.04)
+        );
 
     color: var(--gold);
 
@@ -206,7 +220,9 @@ body {
 }
 
 
-/* LOGOUT */
+/* =========================================================
+   LOGOUT
+========================================================= */
 
 .sidebar ul li:last-child {
     margin-top: 25px;
@@ -224,6 +240,24 @@ body {
 
 
 .sidebar ul li:last-child:hover i {
+    color: var(--red);
+}
+
+
+#logout {
+    margin-top: 25px;
+}
+
+
+#logout:hover {
+    color: var(--red);
+
+    background:
+        rgba(239, 68, 68, 0.06);
+}
+
+
+#logout:hover i {
     color: var(--red);
 }
 
@@ -275,121 +309,52 @@ body {
         0 10px 35px rgba(0, 0, 0, 0.2);
 }
 
-/* =========================================================
-   FINRISE ASSET
-   RESPONSIVE SIDEBAR
-========================================================= */
 
-/* -----------------------------------------
+/* =========================================================
    MENU BUTTON
------------------------------------------ */
+========================================================= */
 
 .menu-btn {
     display: none;
+
     width: 42px;
     height: 42px;
-    border: 1px solid rgba(212, 175, 55, 0.3);
+
+    flex-shrink: 0;
+
+    border:
+        1px solid rgba(212, 175, 55, 0.3);
+
     border-radius: 10px;
-    background: rgba(255, 255, 255, 0.05);
-    color: #d4af37;
+
+    background:
+        rgba(255, 255, 255, 0.05);
+
+    color: var(--gold);
+
     font-size: 22px;
+
     cursor: pointer;
+
     align-items: center;
     justify-content: center;
-    transition: 0.3s ease;
+
+    transition:
+        background 0.3s ease,
+        transform 0.2s ease;
 }
+
 
 .menu-btn:hover {
-    background: rgba(212, 175, 55, 0.12);
+    background:
+        rgba(212, 175, 55, 0.12);
 }
 
 
-/* =====================================================
-   TABLET / MOBILE
-===================================================== */
-
-@media (max-width: none) {
-
-    /* -----------------------------------------
-       SHOW MENU BUTTON
-    ----------------------------------------- */
-
-    .menu-btn {
-        display: flex;
-    }
-
-
-    /* -----------------------------------------
-       SIDEBAR
-    ----------------------------------------- */
-
-    .sidebar {
-        position: fixed;
-        top: 0;
-        left: 0;
-
-        width: 260px;
-        height: 100vh;
-
-        z-index: 9999;
-
-        transform: translateX(-100%);
-        transition: transform 0.3s ease;
-
-        overflow-y: auto;
-    }
-
-
-    /* -----------------------------------------
-       SHOW SIDEBAR
-    ----------------------------------------- */
-
-    .sidebar.show {
-        transform: translateX(0);
-    }
-
-
-    /* -----------------------------------------
-       MAIN CONTENT
-    ----------------------------------------- */
-
-    .main-content {
-        margin-left: 0 !important;
-        width: 100%;
-    }
-
-
-    /* -----------------------------------------
-       HEADER
-    ----------------------------------------- */
-
-    .topbar,
-    .header,
-    .dashboard-header {
-        padding-left: 15px;
-        padding-right: 15px;
-    }
-
+.menu-btn:active {
+    transform: scale(0.95);
 }
 
-
-/* =====================================================
-   SMALL PHONES
-========================================================= */
-
-@media (max-width: none) {
-
-    .sidebar {
-        width: 240px;
-    }
-
-    .menu-btn {
-        width: 40px;
-        height: 40px;
-        font-size: 20px;
-    }
-
-}
 
 /* =========================================================
    CLOCK
@@ -563,10 +528,12 @@ body {
     height: 2px;
 
     background:
-        linear-gradient(90deg,
+        linear-gradient(
+            90deg,
             transparent,
             var(--gold),
-            transparent);
+            transparent
+        );
 
     opacity: 0.5;
 }
@@ -604,13 +571,15 @@ body {
 }
 
 
-.card>i {
+.card > i {
     width: 47px;
     height: 47px;
 
     display: grid;
 
     place-items: center;
+
+    flex-shrink: 0;
 
     border-radius: 13px;
 
@@ -627,7 +596,7 @@ body {
    DIFFERENT CARD ICONS
 ========================================================= */
 
-.card:nth-child(3)>i {
+.card:nth-child(3) > i {
     color: var(--green);
 
     background:
@@ -635,7 +604,7 @@ body {
 }
 
 
-.card:nth-child(4)>i {
+.card:nth-child(4) > i {
     color: var(--gold);
 
     background:
@@ -715,6 +684,8 @@ body {
 
 .page-section {
     display: none;
+
+    width: 100%;
 }
 
 
@@ -724,47 +695,112 @@ body {
 
 
 /* =========================================================
-   MOBILE SIDEBAR
+   MOBILE OVERLAY
+   Works with dashboardScript.js if an overlay exists.
+========================================================= */
+
+.sidebar-overlay {
+    display: none;
+
+    position: fixed;
+
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    background:
+        rgba(0, 0, 0, 0.65);
+
+    z-index: 9998;
+
+    cursor: pointer;
+}
+
+
+.sidebar-overlay.active {
+    display: block;
+}
+
+
+/* =========================================================
+   TABLET / MOBILE
 ========================================================= */
 
 @media (max-width: 900px) {
 
     .sidebar {
-        left: 0;
-        transform: translateX(-100%);
-        transition: transform 0.3s ease;
+        width: 260px;
+
+        z-index: 9999;
+
+        transform:
+            translateX(-100%);
+
+        transition:
+            transform 0.3s ease,
+            box-shadow 0.3s ease;
     }
 
-    .sidebar.show {
-        transform: translateX(0);
+
+    /*
+       IMPORTANT:
+       dashboardScript.js uses .active,
+       so the CSS must also use .active.
+    */
+
+    .sidebar.active {
+        transform:
+            translateX(0);
+
+        box-shadow:
+            10px 0 40px rgba(0, 0, 0, 0.45);
     }
+
 
     .main {
         width: 100%;
+
         margin-left: 0;
+
         padding: 20px;
     }
 
+
     .menu-btn {
-        display: grid;
-        place-items: center;
+        display: flex;
     }
+
 
     .cards {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns:
+            repeat(2, 1fr);
     }
 
+
+    .navbar {
+        position: relative;
+    }
 }
 
 
 /* =========================================================
-   TABLET
+   TABLET / SMALLER DEVICES
 ========================================================= */
 
 @media (max-width: 650px) {
 
+    .main {
+        padding: 15px;
+    }
+
+
     .navbar {
+        min-height: 60px;
+
         padding: 10px 12px;
+
+        gap: 10px;
     }
 
 
@@ -778,18 +814,33 @@ body {
     }
 
 
+    .welcome {
+        margin:
+            20px 0 25px;
+    }
+
+
     .welcome h1 {
         font-size: 24px;
     }
 
 
+    .welcome p {
+        font-size: 12px;
+    }
+
+
     .cards {
         grid-template-columns: 1fr;
+
+        gap: 14px;
     }
 
 
     .card {
         min-height: 120px;
+
+        padding: 20px;
     }
 
 
@@ -802,6 +853,10 @@ body {
         font-size: 16px;
     }
 
+
+    .sidebar {
+        width: 250px;
+    }
 }
 
 
@@ -812,7 +867,16 @@ body {
 @media (max-width: 400px) {
 
     .main {
-        padding: 15px 10px;
+        padding:
+            12px 10px;
+    }
+
+
+    .menu-btn {
+        width: 40px;
+        height: 40px;
+
+        font-size: 20px;
     }
 
 
@@ -841,67 +905,97 @@ body {
     }
 
 
+    .card h4 {
+        font-size: 10px;
+    }
+
+
+    .card > i {
+        width: 42px;
+        height: 42px;
+
+        font-size: 19px;
+    }
+
+
     .profile img {
         width: 37px;
         height: 37px;
     }
 
+
+    .sidebar {
+        width: 235px;
+    }
 }
 
 
 /* =========================================================
-   PAGE NAVIGATION
+   VERY SMALL PHONES
 ========================================================= */
 
-.page-section {
-    display: none;
-    width: 100%;
+@media (max-width: 330px) {
+
+    .sidebar {
+        width: 220px;
+    }
+
+
+    .sidebar ul li {
+        padding:
+            12px 11px;
+
+        font-size: 12px;
+    }
+
+
+    .logo h2 {
+        font-size: 20px;
+    }
+
+
+    .card {
+        padding: 15px;
+    }
+
+
+    .card h2 {
+        font-size: 17px;
+    }
 }
 
-.page-section.active {
-    display: block;
-}
 
 /* =========================================================
-   SIDEBAR NAVIGATION
+   ACCESSIBILITY / TOUCH
 ========================================================= */
 
-.sidebar ul li {
-    cursor: pointer;
-    user-select: none;
+.menu-btn:focus-visible,
+.sidebar ul li:focus-visible {
+    outline:
+        2px solid var(--gold);
+
+    outline-offset:
+        2px;
 }
 
-.sidebar ul li.active {
-    background:
-        linear-gradient(90deg,
-            rgba(212, 175, 55, 0.15),
-            rgba(212, 175, 55, 0.04));
-    color: var(--gold);
-    border-left: 3px solid var(--gold);
+
+/* Prevent accidental horizontal page movement */
+.dashboard,
+.main,
+.navbar,
+.page-section {
+    max-width: 100%;
 }
 
-.sidebar ul li.active i {
-    color: var(--gold);
-}
 
-/* Keep logout visually separate from normal navigation */
-#logout {
-    margin-top: 25px;
-}
-
-#logout:hover {
-    color: var(--red);
-    background: rgba(239, 68, 68, 0.06);
-}
-
-#logout:hover i {
-    color: var(--red);
-}
-
+/* =========================================================
+   FINAL PAGE NAVIGATION RULES
+========================================================= */
 
 .page-section {
     display: none;
 }
+
 
 .page-section.active {
     display: block;
