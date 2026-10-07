@@ -1,1278 +1,160 @@
 /* =========================================================
    FINRISE ASSET
-   SUPABASE LOGIN & REGISTER
+   SUPABASE AUTHENTICATION
 ========================================================= */
 
 document.addEventListener("DOMContentLoaded", async () => {
+    const loginBtn = document.getElementById("loginBtn");
+    const registerBtn = document.getElementById("registerBtn");
+    const loginForm = document.getElementById("loginForm");
+    const registerForm = document.getElementById("registerForm");
+    const goRegister = document.getElementById("goRegister");
+    const goLogin = document.getElementById("goLogin");
 
-    /* =====================================================
-       SUPABASE CONFIGURATION
-    ===================================================== */
-
-    const SUPABASE_URL =
-        "https://jdcqczgrgnlqfzfgnsog.supabase.co";
-
-    const SUPABASE_KEY =
-        "sb_publishable_C1cHus8zHeSRzWEnQn0kiA_c4m45QH9";
-
-    const EMAIL_REDIRECT_URL =
-        "https://www.finriseasset.com/verify.html";
-
-
-    /* =====================================================
-       LOAD SUPABASE CLIENT
-    ===================================================== */
-
-    function loadSupabase() {
-
-        return new Promise((resolve, reject) => {
-
-            if (window.supabase) {
-                resolve();
-                return;
-            }
-
-            const script = document.createElement("script");
-
-            script.src =
-                "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
-
-            script.onload = resolve;
-
-            script.onerror = () => {
-                reject(
-                    new Error(
-                        "Unable to load Supabase."
-                    )
-                );
-            };
-
-            document.head.appendChild(script);
-        });
-
-    }
-
-
-    try {
-
-        await loadSupabase();
-
-    } catch (error) {
-
-        console.error(
-            "Supabase loading error:",
-            error
-        );
-
-        alert(
-            "Unable to connect to the authentication service. Please check your internet connection."
-        );
-
-        return;
-    }
-
-
-    /* =====================================================
-       CREATE SUPABASE CLIENT
-    ===================================================== */
-
-    const supabaseClient =
-        window.supabase.createClient(
-            SUPABASE_URL,
-            SUPABASE_KEY,
-            {
-                auth: {
-                    autoRefreshToken: true,
-                    persistSession: true,
-                    detectSessionInUrl: true
-                }
-            }
-        );
-
-
-    /* =====================================================
-       FORMS / BUTTONS
-    ===================================================== */
-
-    const loginBtn =
-        document.getElementById("loginBtn");
-
-    const registerBtn =
-        document.getElementById("registerBtn");
-
-    const loginForm =
-        document.getElementById("loginForm");
-
-    const registerForm =
-        document.getElementById("registerForm");
-
-    const goRegister =
-        document.getElementById("goRegister");
-
-    const goLogin =
-        document.getElementById("goLogin");
-
-
-    /* =====================================================
-       REGISTER INPUTS
-    ===================================================== */
-
-    const fullname =
-        document.getElementById("fullname");
-
-    const username =
-        document.getElementById("username");
-
-    const email =
-        document.getElementById("email");
-
-    const phone =
-        document.getElementById("phone");
-
-    const country =
-        document.getElementById("country");
-
-    const password =
-        document.getElementById("password");
-
-    const confirmPassword =
-        document.getElementById("confirmPassword");
-
-    const terms =
-        document.getElementById("terms");
-
-
-    /* =====================================================
-       LOGIN INPUTS
-    ===================================================== */
-
-    const loginEmail =
-        document.getElementById("loginEmail");
-
-    const loginPassword =
-        document.getElementById("loginPassword");
-
-
-    /* =====================================================
-       REQUIRED ELEMENT CHECK
-    ===================================================== */
-
-    if (
-        !loginBtn ||
-        !registerBtn ||
-        !loginForm ||
-        !registerForm
-    ) {
-
-        console.error(
-            "Login/Register elements were not found."
-        );
-
-        return;
-    }
-
-
-    /* =====================================================
-       SHOW LOGIN
-    ===================================================== */
-
-    function showLogin() {
-
+    const showLogin = () => {
         loginForm.style.display = "block";
-
         registerForm.style.display = "none";
+        loginBtn?.classList.add("active");
+        registerBtn?.classList.remove("active");
+    };
 
-        loginBtn.classList.add("active");
-
-        registerBtn.classList.remove("active");
-
-    }
-
-
-    /* =====================================================
-       SHOW REGISTER
-    ===================================================== */
-
-    function showRegister() {
-
+    const showRegister = () => {
         loginForm.style.display = "none";
-
         registerForm.style.display = "block";
+        registerBtn?.classList.add("active");
+        loginBtn?.classList.remove("active");
+    };
 
-        registerBtn.classList.add("active");
+    loginBtn?.addEventListener("click", showLogin);
+    registerBtn?.addEventListener("click", showRegister);
+    goRegister?.addEventListener("click", showRegister);
+    goLogin?.addEventListener("click", showLogin);
 
-        loginBtn.classList.remove("active");
-
+    function togglePassword(toggleId, inputId) {
+        const toggle = document.getElementById(toggleId);
+        const input = document.getElementById(inputId);
+        toggle?.addEventListener("click", () => {
+            if (!input) return;
+            input.type = input.type === "password" ? "text" : "password";
+            const icon = toggle.querySelector("i");
+            icon?.classList.toggle("fa-eye");
+            icon?.classList.toggle("fa-eye-slash");
+        });
     }
 
-
-    /* =====================================================
-       SWITCH BUTTONS
-    ===================================================== */
-
-    loginBtn.addEventListener(
-        "click",
-        showLogin
-    );
-
-    registerBtn.addEventListener(
-        "click",
-        showRegister
-    );
-
-
-    if (goRegister) {
-
-        goRegister.addEventListener(
-            "click",
-            showRegister
-        );
-
-    }
-
-
-    if (goLogin) {
-
-        goLogin.addEventListener(
-            "click",
-            showLogin
-        );
-
-    }
-
-
-    /* =====================================================
-       PASSWORD TOGGLE
-    ===================================================== */
-
-    function passwordToggle(
-        toggleId,
-        inputId
-    ) {
-
-        const toggle =
-            document.getElementById(toggleId);
-
-        const input =
-            document.getElementById(inputId);
-
-        if (!toggle || !input) {
-            return;
-        }
-
-        toggle.addEventListener(
-            "click",
-            () => {
-
-                if (
-                    input.type ===
-                    "password"
-                ) {
-
-                    input.type = "text";
-
-                    toggle.innerHTML =
-                        '<i class="fa fa-eye-slash"></i>';
-
-                } else {
-
-                    input.type =
-                        "password";
-
-                    toggle.innerHTML =
-                        '<i class="fa fa-eye"></i>';
-
-                }
-
-            }
-        );
-
-    }
-
-
-    passwordToggle(
-        "toggle1",
-        "password"
-    );
-
-    passwordToggle(
-        "toggle2",
-        "confirmPassword"
-    );
-
-    passwordToggle(
-        "toggle3",
-        "loginPassword"
-    );
-
-
-    /* =====================================================
-       SHOW ERROR
-    ===================================================== */
-
-    function showError(
-        input,
-        message
-    ) {
-
-        if (!input) {
-            return;
-        }
-
-        const inputBox =
-            input.closest(".inputBox");
-
-        if (!inputBox) {
-            return;
-        }
-
-        const small =
-            inputBox.querySelector("small");
-
-        if (small) {
-
-            small.textContent =
-                message;
-
-            small.style.color =
-                "red";
-
-        }
-
-        input.style.borderColor =
-            "red";
-
-    }
-
-
-    /* =====================================================
-       CLEAR ERROR
-    ===================================================== */
-
-    function clearError(input) {
-
-        if (!input) {
-            return;
-        }
-
-        const inputBox =
-            input.closest(".inputBox");
-
-        if (!inputBox) {
-            return;
-        }
-
-        const small =
-            inputBox.querySelector("small");
-
-        if (small) {
-
-            small.textContent =
-                "";
-
-        }
-
-        input.style.borderColor =
-            "";
-
-    }
-
-
-    /* =====================================================
-       CLEAR REGISTER ERRORS
-    ===================================================== */
-
-    function clearRegisterErrors() {
-
-        clearError(fullname);
-        clearError(username);
-        clearError(email);
-        clearError(phone);
-        clearError(country);
-        clearError(password);
-        clearError(confirmPassword);
-
-    }
-
-
-    /* =====================================================
-       REGISTER
-    ===================================================== */
-
-    registerForm.addEventListener(
-        "submit",
-        async (event) => {
-
-            event.preventDefault();
-
-            clearRegisterErrors();
-
-
-            /* ---------------------------------------------
-               GET VALUES
-            --------------------------------------------- */
-
-            const fullNameValue =
-                fullname.value.trim();
-
-            const usernameValue =
-                username.value.trim();
-
-            const emailValue =
-                email.value.trim().toLowerCase();
-
-            const phoneValue =
-                phone.value.trim();
-
-            const countryValue =
-                country.value;
-
-            const passwordValue =
-                password.value;
-
-            const confirmPasswordValue =
-                confirmPassword.value;
-
-
-            /* ---------------------------------------------
-               VALIDATION
-            --------------------------------------------- */
-
-            if (
-                fullNameValue.length <
-                2
-            ) {
-
-                showError(
-                    fullname,
-                    "Please enter your full name."
-                );
-
-                return;
-            }
-
-
-            if (
-                usernameValue.length <
-                3
-            ) {
-
-                showError(
-                    username,
-                    "Username must be at least 3 characters."
-                );
-
-                return;
-            }
-
-
-            const emailPattern =
-                /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-
-            if (
-                !emailPattern.test(
-                    emailValue
-                )
-            ) {
-
-                showError(
-                    email,
-                    "Please enter a valid email address."
-                );
-
-                return;
-            }
-
-
-            const phonePattern =
-                /^\+?[0-9]{7,15}$/;
-
-
-            if (
-                !phonePattern.test(
-                    phoneValue
-                )
-            ) {
-
-                showError(
-                    phone,
-                    "Please enter a valid phone number."
-                );
-
-                return;
-            }
-
-
-            if (!countryValue) {
-
-                showError(
-                    country,
-                    "Please select your country."
-                );
-
-                return;
-            }
-
-
-            if (
-                passwordValue.length <
-                6
-            ) {
-
-                showError(
-                    password,
-                    "Password must be at least 6 characters."
-                );
-
-                return;
-            }
-
-
-            if (
-                passwordValue !==
-                confirmPasswordValue
-            ) {
-
-                showError(
-                    confirmPassword,
-                    "Passwords do not match."
-                );
-
-                return;
-            }
-
-
-            if (
-                !terms ||
-                !terms.checked
-            ) {
-
-                alert(
-                    "Please agree to the Terms & Conditions."
-                );
-
-                return;
-            }
-
-
-            /* ---------------------------------------------
-               DISABLE REGISTER BUTTON
-            --------------------------------------------- */
-
-            const submitButton =
-                registerForm.querySelector(
-                    'button[type="submit"]'
-                );
-
-            const originalButtonText =
-                submitButton
-                    ? submitButton.textContent
-                    : "";
-
-
-            if (submitButton) {
-
-                submitButton.disabled =
-                    true;
-
-                submitButton.textContent =
-                    "Creating Account...";
-
-            }
-
-
-            try {
-
-                /* -----------------------------------------
-                   CHECK USERNAME
-                ----------------------------------------- */
-
-                const {
-                    data: usernameData,
-                    error: usernameError
-                } =
-                    await supabaseClient
-                        .from("profiles")
-                        .select("id")
-                        .eq(
-                            "username",
-                            usernameValue
-                        )
-                        .maybeSingle();
-
-
-                if (usernameError) {
-
-                    console.error(
-                        "Username check error:",
-                        usernameError
-                    );
-
-                    throw usernameError;
-
-                }
-
-
-                if (usernameData) {
-
-                    showError(
-                        username,
-                        "This username is already taken."
-                    );
-
-                    return;
-
-                }
-
-
-                /* -----------------------------------------
-                   CREATE SUPABASE AUTH ACCOUNT
-                ----------------------------------------- */
-
-                const {
-                    data,
-                    error
-                } =
-                    await supabaseClient.auth.signUp({
-
-                        email:
-                            emailValue,
-
-                        password:
-                            passwordValue,
-
-                        options: {
-
-                            emailRedirectTo:
-                                EMAIL_REDIRECT_URL,
-
-                            data: {
-
-                                full_name:
-                                    fullNameValue,
-
-                                username:
-                                    usernameValue,
-
-                                phone:
-                                    phoneValue,
-
-                                country:
-                                    countryValue
-
-                            }
-
-                        }
-
-                    });
-
-
-                if (error) {
-
-                    console.error(
-                        "Registration error:",
-                        error
-                    );
-
-                    const message =
-                        error.message.toLowerCase();
-
-
-                    if (
-                        message.includes(
-                            "already registered"
-                        ) ||
-                        message.includes(
-                            "already exists"
-                        )
-                    ) {
-
-                        showError(
-                            email,
-                            "This email is already registered."
-                        );
-
-                        return;
-
-                    }
-
-
-                    throw error;
-
-                }
-
-
-                if (
-                    !data ||
-                    !data.user
-                ) {
-
-                    throw new Error(
-                        "Account could not be created."
-                    );
-
-                }
-
-
-                /* -----------------------------------------
-                   EMAIL CONFIRMATION MESSAGE
-                ----------------------------------------- */
-
-                alert(
-                    "Registration successful! Please check your email and confirm your account."
-                );
-
-
-                registerForm.reset();
-
-                showLogin();
-
-
-                if (loginEmail) {
-
-                    loginEmail.value =
-                        emailValue;
-
-                }
-
-
-                if (loginPassword) {
-
-                    loginPassword.value =
-                        "";
-
-                }
-
-
-            } catch (error) {
-
-                console.error(
-                    "Registration failed:",
-                    error
-                );
-
-
-                alert(
-                    error.message ||
-                    "Registration failed. Please try again."
-                );
-
-
-            } finally {
-
-                if (submitButton) {
-
-                    submitButton.disabled =
-                        false;
-
-                    submitButton.textContent =
-                        originalButtonText;
-
-                }
-
-            }
-
-        }
-    );
-
-
-    /* =====================================================
-       LOGIN
-    ===================================================== */
-
-    loginForm.addEventListener(
-        "submit",
-        async (event) => {
-
-            event.preventDefault();
-
-            clearError(loginEmail);
-            clearError(loginPassword);
-
-
-            const enteredEmail =
-                loginEmail.value
-                    .trim()
-                    .toLowerCase();
-
-            const enteredPassword =
-                loginPassword.value;
-
-
-            /* ---------------------------------------------
-               VALIDATE LOGIN EMAIL
-            --------------------------------------------- */
-
-            const emailPattern =
-                /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-
-            if (
-                !emailPattern.test(
-                    enteredEmail
-                )
-            ) {
-
-                showError(
-                    loginEmail,
-                    "Please enter a valid email address."
-                );
-
-                return;
-
-            }
-
-
-            if (!enteredPassword) {
-
-                showError(
-                    loginPassword,
-                    "Please enter your password."
-                );
-
-                return;
-
-            }
-
-
-            /* ---------------------------------------------
-               DISABLE LOGIN BUTTON
-            --------------------------------------------- */
-
-            const submitButton =
-                loginForm.querySelector(
-                    'button[type="submit"]'
-                );
-
-            const originalButtonText =
-                submitButton
-                    ? submitButton.textContent
-                    : "";
-
-
-            if (submitButton) {
-
-                submitButton.disabled =
-                    true;
-
-                submitButton.textContent =
-                    "Logging in...";
-
-            }
-
-
-            try {
-
-                /* -----------------------------------------
-                   SUPABASE LOGIN
-                ----------------------------------------- */
-
-                const {
-                    data,
-                    error
-                } =
-                    await supabaseClient.auth
-                        .signInWithPassword({
-
-                            email:
-                                enteredEmail,
-
-                            password:
-                                enteredPassword
-
-                        });
-
-
-                if (error) {
-
-                    console.error(
-                        "Login error:",
-                        error
-                    );
-
-
-                    const message =
-                        error.message
-                            .toLowerCase();
-
-
-                    /* -------------------------------------
-                       EMAIL NOT CONFIRMED
-                    ------------------------------------- */
-
-                    if (
-                        message.includes(
-                            "email not confirmed"
-                        )
-                    ) {
-
-                        alert(
-                            "Please confirm your email address before logging in."
-                        );
-
-                        return;
-
-                    }
-
-
-                    /* -------------------------------------
-                       INVALID CREDENTIALS
-                    ------------------------------------- */
-
-                    if (
-                        message.includes(
-                            "invalid login credentials"
-                        )
-                    ) {
-
-                        alert(
-                            "Email/username not found or password is incorrect. Please check your details or register first."
-                        );
-
-                        return;
-
-                    }
-
-
-                    throw error;
-
-                }
-
-
-                if (
-                    !data ||
-                    !data.user
-                ) {
-
-                    throw new Error(
-                        "Login failed. Please try again."
-                    );
-
-                }
-
-
-                const user =
-                    data.user;
-
-
-                /* -----------------------------------------
-                   USER METADATA
-                ----------------------------------------- */
-
-                const metadata =
-                    user.user_metadata ||
-                    {};
-
-
-                /* -----------------------------------------
-                   FETCH PROFILE
-                ----------------------------------------- */
-
-                let profile =
-                    null;
-
-
-                const {
-                    data: profileData,
-                    error: profileError
-                } =
-                    await supabaseClient
-                        .from("profiles")
-                        .select(
-                            "id, full_name, username, phone, country, created_at"
-                        )
-                        .eq(
-                            "id",
-                            user.id
-                        )
-                        .maybeSingle();
-
-
-                if (profileError) {
-
-                    console.error(
-                        "Profile fetch error:",
-                        profileError
-                    );
-
-                } else {
-
-                    profile =
-                        profileData;
-
-                }
-
-
-                /* -----------------------------------------
-                   CREATE PROFILE IF IT DOESN'T EXIST
-                ----------------------------------------- */
-
-                if (!profile) {
-
-                    const {
-                        data: newProfile,
-                        error:
-                            createProfileError
-                    } =
-                        await supabaseClient
-                            .from("profiles")
-                            .insert({
-
-                                id:
-                                    user.id,
-
-                                full_name:
-                                    metadata.full_name ||
-                                    "",
-
-                                username:
-                                    metadata.username ||
-                                    "",
-
-                                phone:
-                                    metadata.phone ||
-                                    "",
-
-                                country:
-                                    metadata.country ||
-                                    ""
-
-                            })
-                            .select()
-                            .single();
-
-
-                    if (createProfileError) {
-
-                        console.error(
-                            "Profile creation error:",
-                            createProfileError
-                        );
-
-                    } else {
-
-                        profile =
-                            newProfile;
-
-                    }
-
-                }
-
-
-                /* -----------------------------------------
-                   CURRENT USER
-                   
-                   IMPORTANT:
-                   PASSWORD IS NEVER STORED.
-                ----------------------------------------- */
-
-                const currentUser = {
-
-                    id:
-                        user.id,
-
-                    fullname:
-                        profile?.full_name ||
-                        metadata.full_name ||
-                        "",
-
-                    username:
-                        profile?.username ||
-                        metadata.username ||
-                        "",
-
-                    email:
-                        user.email ||
-                        enteredEmail,
-
-                    phone:
-                        profile?.phone ||
-                        metadata.phone ||
-                        "",
-
-                    country:
-                        profile?.country ||
-                        metadata.country ||
-                        ""
-
-                };
-
-
-                /* -----------------------------------------
-                   EXISTING FINRISE VALUES
-                ----------------------------------------- */
-
-                if (
-                    localStorage.getItem(
-                        "finriseBalance"
-                    ) === null
-                ) {
-
-                    localStorage.setItem(
-                        "finriseBalance",
-                        "0"
-                    );
-
-                }
-
-
-                if (
-                    localStorage.getItem(
-                        "finriseTotalDeposit"
-                    ) === null
-                ) {
-
-                    localStorage.setItem(
-                        "finriseTotalDeposit",
-                        "0"
-                    );
-
-                }
-
-
-                if (
-                    localStorage.getItem(
-                        "finriseTotalEarning"
-                    ) === null
-                ) {
-
-                    localStorage.setItem(
-                        "finriseTotalEarning",
-                        "0"
-                    );
-
-                }
-
-
-                if (
-                    localStorage.getItem(
-                        "finriseReferralBonus"
-                    ) === null
-                ) {
-
-                    localStorage.setItem(
-                        "finriseReferralBonus",
-                        "0"
-                    );
-
-                }
-
-
-                /* -----------------------------------------
-                   COMPATIBILITY DATA
-                   
-                   No password is stored.
-                ----------------------------------------- */
-
-                localStorage.setItem(
-                    "loggedIn",
-                    "true"
-                );
-
-
-                localStorage.setItem(
-                    "currentUser",
-                    JSON.stringify(
-                        currentUser
-                    )
-                );
-
-
-                localStorage.setItem(
-                    "user",
-                    JSON.stringify(
-                        currentUser
-                    )
-                );
-
-
-                /* -----------------------------------------
-                   GO TO DASHBOARD
-                ----------------------------------------- */
-
-                window.location.href =
-                    "dashboard.html";
-
-
-            } catch (error) {
-
-                console.error(
-                    "Login failed:",
-                    error
-                );
-
-
-                alert(
-                    error.message ||
-                    "Login failed. Please try again."
-                );
-
-
-            } finally {
-
-                if (submitButton) {
-
-                    submitButton.disabled =
-                        false;
-
-                    submitButton.textContent =
-                        originalButtonText;
-
-                }
-
-            }
-
-        }
-    );
-
-
-    /* =====================================================
-       CHECK EXISTING SUPABASE SESSION
-    ===================================================== */
+    togglePassword("toggle3", "loginPassword");
+    togglePassword("toggle1", "password");
+    togglePassword("toggle2", "confirmPassword");
 
     try {
-
-        const {
-            data,
-            error
-        } =
-            await supabaseClient.auth
-                .getSession();
-
-
-        if (error) {
-
-            console.error(
-                "Session check error:",
-                error
-            );
-
-        } else if (
-            data &&
-            data.session
-        ) {
-
-            console.log(
-                "Existing Supabase session detected."
-            );
-
-        }
-
+        await getSupabase();
     } catch (error) {
-
-        console.error(
-            "Session check failed:",
-            error
-        );
-
+        console.error(error);
+        alert("Unable to connect to the authentication service. Please check your internet connection.");
+        return;
     }
 
+    const client = await getSupabase();
 
-    /* =====================================================
-       DEFAULT SCREEN
-    ===================================================== */
+    const { session } = await getSession();
+    if (session?.user) {
+        window.location.href = "dashboard.html";
+        return;
+    }
+
+    loginForm?.addEventListener("submit", async event => {
+        event.preventDefault();
+        const email = document.getElementById("loginEmail")?.value.trim().toLowerCase();
+        const password = document.getElementById("loginPassword")?.value || "";
+        const button = loginForm.querySelector("button[type='submit']");
+
+        if (!email || !password) return;
+
+        const originalText = button?.textContent;
+        if (button) {
+            button.disabled = true;
+            button.textContent = "Logging in...";
+        }
+
+        try {
+            const { error } = await client.auth.signInWithPassword({ email, password });
+            if (error) throw error;
+            window.location.href = "dashboard.html";
+        } catch (error) {
+            console.error("Login error:", error);
+            alert(error.message || "Login failed. Please check your email and password.");
+        } finally {
+            if (button) {
+                button.disabled = false;
+                button.textContent = originalText || "Login";
+            }
+        }
+    });
+
+    registerForm?.addEventListener("submit", async event => {
+        event.preventDefault();
+
+        const fullname = document.getElementById("fullname")?.value.trim();
+        const username = document.getElementById("username")?.value.trim();
+        const email = document.getElementById("email")?.value.trim().toLowerCase();
+        const phone = document.getElementById("phone")?.value.trim();
+        const country = document.getElementById("country")?.value;
+        const password = document.getElementById("password")?.value || "";
+        const confirmPassword = document.getElementById("confirmPassword")?.value || "";
+        const terms = document.getElementById("terms");
+        const button = registerForm.querySelector("button[type='submit']");
+
+        if (!fullname || fullname.length < 3) return alert("Enter your full name.");
+        if (!username || username.length < 3) return alert("Username must be at least 3 characters.");
+        if (!email || !/^\S+@\S+\.\S+$/.test(email)) return alert("Enter a valid email address.");
+        if (!phone || phone.length < 7) return alert("Enter a valid phone number.");
+        if (!country) return alert("Select your country.");
+        if (password.length < 8) return alert("Password must contain at least 8 characters.");
+        if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password)) return alert("Password must contain an uppercase letter, lowercase letter and number.");
+        if (password !== confirmPassword) return alert("Passwords do not match.");
+        if (!terms?.checked) return alert("Accept the Terms & Conditions.");
+
+        const originalText = button?.textContent;
+        if (button) {
+            button.disabled = true;
+            button.textContent = "Creating account...";
+        }
+
+        try {
+            const { data, error } = await client.auth.signUp({
+                email,
+                password,
+                options: {
+                    emailRedirectTo: `${window.location.origin}/verify.html`,
+                    data: {
+                        full_name: fullname,
+                        username,
+                        phone,
+                        country
+                    }
+                }
+            });
+
+            if (error) throw error;
+
+            if (data.session) {
+                window.location.href = "dashboard.html";
+                return;
+            }
+
+            alert("Account created successfully. Please check your email to verify your account, then login.");
+            showLogin();
+            document.getElementById("loginEmail").value = email;
+        } catch (error) {
+            console.error("Registration error:", error);
+            alert(error.message || "Registration failed. Please try again.");
+        } finally {
+            if (button) {
+                button.disabled = false;
+                button.textContent = originalText || "Register";
+            }
+        }
+    });
 
     showLogin();
-
 });

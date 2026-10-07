@@ -1,193 +1,79 @@
-// const form = document.getElementById("registerForm");
+/* =========================================================
+   FINRISE ASSET
+   STANDALONE REGISTRATION
+========================================================= */
 
-// form.addEventListener("submit", function(e){
+document.addEventListener("DOMContentLoaded", async () => {
+    const form = document.getElementById("registerForm");
+    if (!form) return;
 
-//     e.preventDefault();
-
-//     const name = document.getElementById("name").value;
-//     const email = document.getElementById("email").value;
-//     const password = document.getElementById("password").value;
-//     const confirmPassword = document.getElementById("confirmPassword").value;
-
-//     if(password !== confirmPassword){
-//         alert("Passwords do not match");
-//         return;
-//     }
-
-//     const user = {
-//         name,
-//         email,
-//         password
-//     };
-
-//     localStorage.setItem("user", JSON.stringify(user));
-
-//     alert("Registration Successful");
-
-//     window.location.href = "logIn_Page.html";
-
-// });
-
-const form = document.getElementById("registerForm");
-const fullname = document.getElementById("fullname");
-const username = document.getElementById("username");
-const email = document.getElementById("email");
-const phone = document.getElementById("phone");
-const country = document.getElementById("country");
-const password = document.getElementById("password");
-const confirmPassword = document.getElementById("confirmPassword");
-const terms = document.getElementById("terms");
-
-function error(input, msg) {
-
-    input.parentElement.querySelector("small").innerText = msg;
-
-}
-
-function success(input) {
-
-    input.parentElement.querySelector("small").innerText = "";
-
-}
-
-form.addEventListener("submit", (e) => {
-
-    e.preventDefault();
-
-    let valid = true;
-
-    if (fullname.value.trim().length < 3) {
-
-        error(fullname, "Enter Full Name");
-
-        valid = false;
-
-    } else {
-
-        success(fullname);
-
+    try {
+        const { session } = await getSession();
+        if (session?.user) {
+            window.location.href = "dashboard.html";
+            return;
+        }
+    } catch (error) {
+        console.error(error);
     }
 
-    if (username.value.trim().length < 4) {
+    form.addEventListener("submit", async event => {
+        event.preventDefault();
 
-        error(username, "Minimum 4 characters");
+        const get = id => document.getElementById(id);
+        const fullname = get("fullname")?.value.trim();
+        const username = get("username")?.value.trim();
+        const email = get("email")?.value.trim().toLowerCase();
+        const phone = get("phone")?.value.trim();
+        const country = get("country")?.value;
+        const password = get("password")?.value || "";
+        const confirmPassword = get("confirmPassword")?.value || "";
+        const terms = get("terms");
+        const button = form.querySelector("button[type='submit']");
 
-        valid = false;
+        if (!fullname || fullname.length < 3) return alert("Enter your full name.");
+        if (!username || username.length < 3) return alert("Username must be at least 3 characters.");
+        if (!email || !/^\S+@\S+\.\S+$/.test(email)) return alert("Enter a valid email address.");
+        if (!phone || phone.length < 7) return alert("Enter a valid phone number.");
+        if (!country) return alert("Select your country.");
+        if (password.length < 8 || !/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password)) return alert("Use at least 8 characters with uppercase, lowercase and number.");
+        if (password !== confirmPassword) return alert("Passwords do not match.");
+        if (!terms?.checked) return alert("Accept the Terms & Conditions.");
 
-    } else {
-
-        success(username);
-
-    }
-
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    if (!emailPattern.test(email.value)) {
-
-        error(email, "Invalid Email");
-
-        valid = false;
-
-    } else {
-
-        success(email);
-
-    }
-
-    const phonePattern = /^[0-9]{10,15}$/;
-
-    if (!phonePattern.test(phone.value)) {
-
-        error(phone, "Invalid Phone");
-
-        valid = false;
-
-    } else {
-
-        success(phone);
-
-    }
-
-    if (country.value == "") {
-
-        error(country, "Select Country");
-
-        valid = false;
-
-    } else {
-
-        success(country);
-
-    }
-
-    const strong = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
-
-    if (!strong.test(password.value)) {
-
-        error(password, "8+ chars, uppercase & number");
-
-        valid = false;
-
-    } else {
-
-        success(password);
-
-    }
-
-    if (confirmPassword.value !== password.value) {
-
-        error(confirmPassword, "Passwords don't match");
-
-        valid = false;
-
-    } else {
-
-        success(confirmPassword);
-
-    }
-
-    if (!terms.checked) {
-
-        alert("Accept Terms & Conditions");
-
-        valid = false;
-
-    }
-
-    if (valid) {
-
-        alert("Registration Successful!");
-
-        window.location.href = "dashboard.html";
-
-    }
-
-});
-
-function toggle(inputId, icon) {
-
-    const input = document.getElementById(inputId);
-
-    icon.onclick = () => {
-
-        if (input.type === "password") {
-
-            input.type = "text";
-
-            icon.innerHTML = '<i class="fa fa-eye-slash"></i>';
-
-        } else {
-
-            input.type = "password";
-
-            icon.innerHTML = '<i class="fa fa-eye"></i>';
-
+        const oldText = button?.textContent;
+        if (button) {
+            button.disabled = true;
+            button.textContent = "Creating account...";
         }
 
-    }
+        try {
+            const client = await getSupabase();
+            const { data, error } = await client.auth.signUp({
+                email,
+                password,
+                options: {
+                    emailRedirectTo: `${window.location.origin}/verify.html`,
+                    data: { full_name: fullname, username, phone, country }
+                }
+            });
 
-}
+            if (error) throw error;
 
-toggle("password", document.getElementById("toggle1"));
+            if (data.session) {
+                window.location.href = "dashboard.html";
+                return;
+            }
 
-toggle("confirmPassword", document.getElementById("toggle2"));
+            alert("Account created successfully. Please verify your email before logging in.");
+            window.location.href = "logIn_Page.html";
+        } catch (error) {
+            console.error(error);
+            alert(error.message || "Registration failed.");
+        } finally {
+            if (button) {
+                button.disabled = false;
+                button.textContent = oldText || "Register";
+            }
+        }
+    });
+});

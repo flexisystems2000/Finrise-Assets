@@ -181,18 +181,7 @@ document.addEventListener("DOMContentLoaded", () => {
        GET USER
     ===================================================== */
 
-    let user =
-        getJSON("user", {});
-
-
-    if (
-        !user ||
-        typeof user !== "object"
-    ) {
-
-        user = {};
-
-    }
+    let user = {};
 
 
     /* =====================================================
@@ -275,6 +264,32 @@ document.addEventListener("DOMContentLoaded", () => {
         );
     }
 
+
+    /* =====================================================
+       LOAD USER SETTINGS FROM SUPABASE
+    ===================================================== */
+
+    async function loadSettingsFromSupabase() {
+        try {
+            const { user: authUser, error: authError } = await getCurrentUser();
+            if (authError || !authUser) return;
+
+            const { profile } = await getCurrentProfile();
+            user = {
+                ...(profile || {}),
+                email: authUser.email || "",
+                fullname: profile?.full_name || authUser.user_metadata?.full_name || "",
+                firstName: (profile?.full_name || "").trim().split(/\s+/)[0] || "",
+                lastName: (profile?.full_name || "").trim().split(/\s+/).slice(1).join(" "),
+                phone: profile?.phone || "",
+                country: profile?.country || ""
+            };
+
+            loadSettings();
+        } catch (error) {
+            console.error("Unable to load settings from Supabase:", error);
+        }
+    }
 
     /* =====================================================
        LOAD USER SETTINGS
@@ -513,24 +528,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
             /* ==============================================
-               SAVE USER
+               SAVE PROFILE IN SUPABASE
             ============================================== */
 
-            const saved =
-                setStorage(
-                    "user",
-                    JSON.stringify(user)
-                );
+            updateProfile({
+                full_name: fullName,
+                phone: phone || null,
+                country: country || null
+            }).then(result => {
+                if (result.error) throw result.error;
 
+                user.fullname = fullName;
+                user.phone = phone;
+                user.country = country;
 
-            if (!saved) {
-
-                showSettingsMessage(
-                    "Unable to save your settings."
-                );
-
-                return;
-            }
+                showSettingsMessage("Settings saved successfully.");
+            }).catch(error => {
+                console.error("Settings update failed:", error);
+                showSettingsMessage(error.message || "Unable to save your settings.");
+            });
 
 
             /* ==============================================
@@ -1304,37 +1320,25 @@ document.addEventListener("DOMContentLoaded", () => {
     ===================================================== */
 
     window.logoutUser =
-        function () {
+        async function () {
 
             const confirmLogout =
                 confirm(
                     "Are you sure you want to logout?"
                 );
 
-
             if (!confirmLogout) {
                 return;
             }
 
-
-            localStorage.removeItem(
-                "loggedIn"
-            );
-
-
-            /*
-             * IMPORTANT:
-             *
-             * Your dashboardScript.js currently
-             * redirects to:
-             *
-             * logIn_Page.html
-             *
-             * Keep the filename consistent.
-             */
-
-            window.location.href =
-                "logIn_Page.html";
+            try {
+                const result = await signOut();
+                if (result.error) throw result.error;
+                window.location.href = "logIn_Page.html";
+            } catch (error) {
+                console.error("Logout error:", error);
+                alert(error.message || "Unable to logout. Please try again.");
+            }
         };
 
 
@@ -1342,7 +1346,7 @@ document.addEventListener("DOMContentLoaded", () => {
        INITIALIZE
     ===================================================== */
 
-    loadSettings();
+    loadSettingsFromSupabase();
 
     loadSavedSettings();
 
