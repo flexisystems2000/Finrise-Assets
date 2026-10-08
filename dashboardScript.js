@@ -23,9 +23,209 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     window.showPage = showPage;
 
-    navItems.forEach(item => item.addEventListener("click", () => showPage(item.dataset.page)));
+    /* =========================================================
+       MOBILE SIDEBAR CONTROLS
+    ========================================================= */
 
-    menuButton?.addEventListener("click", () => sidebar?.classList.toggle("active"));
+    let menuOverlay = document.querySelector(".sidebar-overlay");
+
+    if (!menuOverlay) {
+        menuOverlay = document.createElement("div");
+        menuOverlay.className = "sidebar-overlay";
+        document.body.appendChild(menuOverlay);
+    }
+
+    let sidebarCloseButton = sidebar?.querySelector(".sidebar-close-btn");
+
+    if (sidebar && !sidebarCloseButton) {
+        sidebarCloseButton = document.createElement("button");
+        sidebarCloseButton.type = "button";
+        sidebarCloseButton.className = "sidebar-close-btn";
+        sidebarCloseButton.setAttribute("aria-label", "Close menu");
+        sidebarCloseButton.innerHTML = '<i class="bi bi-x-lg"></i>';
+        sidebar.insertBefore(sidebarCloseButton, sidebar.firstElementChild);
+    }
+
+    function closeMobileMenu() {
+        sidebar?.classList.remove("active");
+        menuOverlay?.classList.remove("active");
+
+        if (menuButton) {
+            menuButton.innerHTML = '<i class="bi bi-list"></i>';
+            menuButton.setAttribute("aria-label", "Open menu");
+        }
+    }
+
+    function openMobileMenu() {
+        sidebar?.classList.add("active");
+        menuOverlay?.classList.add("active");
+
+        if (menuButton) {
+            menuButton.innerHTML = '<i class="bi bi-x-lg"></i>';
+            menuButton.setAttribute("aria-label", "Close menu");
+        }
+    }
+
+    navItems.forEach(item => item.addEventListener("click", () => {
+        showPage(item.dataset.page);
+        closeMobileMenu();
+    }));
+
+    menuButton?.setAttribute("aria-label", "Open menu");
+    menuButton?.addEventListener("click", () => {
+        if (sidebar?.classList.contains("active")) {
+            closeMobileMenu();
+        } else {
+            openMobileMenu();
+        }
+    });
+
+    sidebarCloseButton?.addEventListener("click", closeMobileMenu);
+    menuOverlay?.addEventListener("click", closeMobileMenu);
+
+    /* =========================================================
+       NOTIFICATIONS
+    ========================================================= */
+
+    const notificationButton = document.querySelector(".notification");
+    let notificationPanel = null;
+
+    function closeNotifications() {
+        notificationPanel?.classList.remove("active");
+    }
+
+    function ensureNotificationPanel() {
+        if (notificationPanel) return notificationPanel;
+
+        notificationPanel = document.createElement("div");
+        notificationPanel.className = "notification-panel";
+        notificationPanel.setAttribute("role", "dialog");
+        notificationPanel.setAttribute("aria-label", "Notifications");
+        notificationPanel.innerHTML = `
+            <div class="notification-panel-header">
+                <div>
+                    <strong>Notifications</strong>
+                    <small id="notificationSummary">Your latest account updates</small>
+                </div>
+                <button type="button" class="notification-close" aria-label="Close notifications">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <div class="notification-list" id="notificationList">
+                <div class="notification-empty">
+                    <i class="bi bi-bell-slash"></i>
+                    <span>No new notifications</span>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(notificationPanel);
+        notificationPanel.querySelector(".notification-close")?.addEventListener("click", closeNotifications);
+
+        return notificationPanel;
+    }
+
+    function renderNotifications(data = {}) {
+        const panel = ensureNotificationPanel();
+        const list = panel.querySelector("#notificationList");
+        const summary = panel.querySelector("#notificationSummary");
+
+        const deposits = data.deposits || [];
+        const withdrawals = data.withdrawals || [];
+        const investments = data.investments || [];
+        const items = [];
+
+        const pendingDeposits = deposits.filter(x => String(x.status || "").toLowerCase() === "pending");
+        const pendingWithdrawals = withdrawals.filter(x => String(x.status || "").toLowerCase() === "pending");
+        const activeInvestments = investments.filter(x => String(x.status || "").toLowerCase() === "active");
+        const completedInvestments = investments.filter(x => String(x.status || "").toLowerCase() === "completed");
+
+        if (pendingDeposits.length) {
+            items.push({
+                icon: "bi-hourglass-split",
+                title: "Deposit pending",
+                text: `${pendingDeposits.length} deposit request${pendingDeposits.length === 1 ? "" : "s"} awaiting review.`,
+                type: "pending"
+            });
+        }
+
+        if (pendingWithdrawals.length) {
+            items.push({
+                icon: "bi-clock-history",
+                title: "Withdrawal pending",
+                text: `${pendingWithdrawals.length} withdrawal request${pendingWithdrawals.length === 1 ? "" : "s"} awaiting processing.`,
+                type: "pending"
+            });
+        }
+
+        if (activeInvestments.length) {
+            items.push({
+                icon: "bi-graph-up-arrow",
+                title: "Investment active",
+                text: `${activeInvestments.length} active investment${activeInvestments.length === 1 ? "" : "s"} currently running.`,
+                type: "active"
+            });
+        }
+
+        if (completedInvestments.length) {
+            items.push({
+                icon: "bi-check-circle",
+                title: "Investment completed",
+                text: `${completedInvestments.length} completed investment${completedInvestments.length === 1 ? "" : "s"} with returns recorded.`,
+                type: "success"
+            });
+        }
+
+        summary.textContent = items.length
+            ? `${items.length} account update${items.length === 1 ? "" : "s"}`
+            : "You're all caught up";
+
+        if (!items.length) {
+            list.innerHTML = `
+                <div class="notification-empty">
+                    <i class="bi bi-bell-slash"></i>
+                    <span>No new notifications</span>
+                </div>
+            `;
+            return;
+        }
+
+        list.innerHTML = items.map(item => `
+            <div class="notification-item ${item.type}">
+                <div class="notification-item-icon"><i class="bi ${item.icon}"></i></div>
+                <div>
+                    <strong>${item.title}</strong>
+                    <p>${item.text}</p>
+                </div>
+            </div>
+        `).join("");
+    }
+
+    notificationButton?.setAttribute("role", "button");
+    notificationButton?.setAttribute("tabindex", "0");
+    notificationButton?.setAttribute("aria-label", "Open notifications");
+
+    notificationButton?.addEventListener("click", event => {
+        event.stopPropagation();
+        ensureNotificationPanel().classList.toggle("active");
+    });
+
+    notificationButton?.addEventListener("keydown", event => {
+        if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            notificationButton.click();
+        }
+    });
+
+    document.addEventListener("click", event => {
+        if (
+            notificationPanel?.classList.contains("active") &&
+            !notificationPanel.contains(event.target) &&
+            !notificationButton?.contains(event.target)
+        ) {
+            closeNotifications();
+        }
+    });
 
     function updateClock() {
         if (!clock) return;
@@ -63,30 +263,23 @@ document.addEventListener("DOMContentLoaded", async () => {
             return;
         }
 
-        const [{ profile }, { wallet }, { deposits }, { ledger }, { rewards }, { investments }] = await Promise.all([
+        const [{ profile }, { wallet }, { deposits }, { withdrawals }, { investments }, { ledger }, { rewards }] = await Promise.all([
             getCurrentProfile(),
             getCurrentWallet(),
             getUserDeposits(),
+            getUserWithdrawals(),
+            getUserInvestments(),
             getUserLedger(),
-            getUserReferralRewards(),
-            getUserInvestments()
+            getUserReferralRewards()
         ]);
 
         const approvedDeposits = (deposits || [])
             .filter(item => item.status === "approved")
             .reduce((sum, item) => sum + Number(item.amount || 0), 0);
 
-        // Earnings are calculated from completed investment returns plus paid
-        // referral rewards. Principal is not counted as profit.
-        const investmentEarnings = (investments || [])
-            .filter(item => String(item.status || "").toLowerCase() === "completed")
-            .reduce((sum, item) => sum + Math.max(0, Number(item.expected_return || 0)), 0);
-
-        const referralEarnings = (rewards || [])
-            .filter(item => ["approved", "paid"].includes(String(item.status || "").toLowerCase()))
+        const earnings = (ledger || [])
+            .filter(item => ["investment_return", "referral_bonus"].includes(item.entry_type))
             .reduce((sum, item) => sum + Math.max(0, Number(item.amount || 0)), 0);
-
-        const earnings = investmentEarnings + referralEarnings;
 
         const referralBonus = (rewards || [])
             .filter(item => ["approved", "paid"].includes(item.status))
@@ -109,8 +302,19 @@ document.addEventListener("DOMContentLoaded", async () => {
         const image = document.getElementById("profileImage");
         if (image && !image.getAttribute("src")) image.src = "https://i.pravatar.cc/150?img=12";
 
+        renderNotifications({
+            user,
+            profile,
+            wallet,
+            deposits,
+            withdrawals,
+            investments,
+            ledger,
+            rewards
+        });
+
         document.dispatchEvent(new CustomEvent("finrise:datarefresh", {
-            detail: { user, profile, wallet, deposits, ledger, rewards, investments }
+            detail: { user, profile, wallet, deposits, withdrawals, investments, ledger, rewards }
         }));
     }
 
