@@ -91,7 +91,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         return {
             theme: preferences.theme || "system",
             language: preferences.language || "en",
-            currency: "NGN",
+            currency: preferences.currency || "NGN",
             notifications: {
                 transactions: preferences.notifications?.transactions !== false,
                 deposits: preferences.notifications?.deposits !== false,
@@ -109,7 +109,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const next = {
             theme: patch.theme ?? current.theme,
             language: patch.language ?? current.language,
-            currency: "NGN",
+            currency: patch.currency ?? current.currency,
             notifications: {
                 ...current.notifications,
                 ...(patch.notifications || {})
@@ -172,8 +172,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
 
         if ($("themeSelect")) $("themeSelect").value = preferences.theme;
-        if ($("languageSelect")) $("languageSelect").value = "en";
-        if ($("currencySelect")) $("currencySelect").value = "NGN";
+        if ($("languageSelect")) $("languageSelect").value = preferences.language;
+        if ($("currencySelect")) $("currencySelect").value = preferences.currency;
         applyTheme(preferences.theme);
     }
 
@@ -317,6 +317,20 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     };
 
+    window.changeDashboardTheme = function () {
+        const value = $("themeSelect")?.value || "system";
+        const previous = getStoredPreferences().theme;
+        applyTheme(value);
+        savePreferences({ theme: value })
+            .then(() => showSettingsMessage("Theme preference saved."))
+            .catch(error => {
+                applyTheme(previous);
+                if ($("themeSelect")) $("themeSelect").value = previous;
+                console.error(error);
+                showSettingsMessage(error.message || "Unable to save theme preference.", "error");
+            });
+    };
+
     window.toggleTwoFactor = function () {
         const toggle = $("twoFactorToggle");
         if (toggle) toggle.checked = false;
@@ -346,39 +360,28 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     });
 
-    $("themeSelect")?.addEventListener("change", async event => {
-        const previous = getStoredPreferences().theme;
-        applyTheme(event.target.value);
-
-        try {
-            await savePreferences({ theme: event.target.value });
-            showSettingsMessage("Theme preference saved.");
-        } catch (error) {
-            event.target.value = previous;
-            applyTheme(previous);
-            console.error(error);
-            showSettingsMessage(error.message || "Unable to save theme preference.", "error");
-        }
-    });
-
-
     $("languageSelect")?.addEventListener("change", async event => {
-        if (event.target.value !== "en") { event.target.value = "en"; return; }
+        const previous = getStoredPreferences().language;
         try {
-            await savePreferences({ language: "en" });
+            await savePreferences({ language: event.target.value });
             showSettingsMessage("Language preference saved.");
         } catch (error) {
+            event.target.value = previous;
             console.error(error);
             showSettingsMessage(error.message || "Unable to save language preference.", "error");
         }
     });
 
     $("currencySelect")?.addEventListener("change", async event => {
-        event.target.value = "NGN";
+        const previous = getStoredPreferences().currency;
         try {
-            await savePreferences({ currency: "NGN" });
-            showSettingsMessage("Wallet currency is NGN and has been saved.");
+            await savePreferences({ currency: event.target.value });
+            showSettingsMessage("Currency display preference saved.");
+            document.dispatchEvent(new CustomEvent("finrise:currency-changed", {
+                detail: { currency: event.target.value }
+            }));
         } catch (error) {
+            event.target.value = previous;
             console.error(error);
             showSettingsMessage(error.message || "Unable to save currency preference.", "error");
         }

@@ -64,15 +64,18 @@ document.addEventListener("DOMContentLoaded", async () => {
         const referrals = referralsResult.referrals || [];
         const rewards = rewardsResult.rewards || [];
 
-        const base = String(profile.username || user.id.slice(0, 8))
-            .replace(/\s+/g, "")
+        // Referral codes use the same normalization as the database trigger:
+        // remove every non-alphanumeric character from the username.
+        const normalizedUsername = String(profile.username || "")
+            .replace(/[^a-zA-Z0-9]/g, "")
             .toUpperCase();
+        const base = normalizedUsername || user.id.slice(0, 8).toUpperCase();
 
         const codeFromDatabase = referrals.find(ref => ref.referral_code)?.referral_code;
         const code = codeFromDatabase || `FR-${base}`;
 
         referralLink =
-            `${window.location.origin}/logIn_Page.html?ref=${encodeURIComponent(code)}`;
+            `${window.location.origin}/register.html?ref=${encodeURIComponent(code)}`;
 
         const approvedRewards = rewards.filter(reward =>
             ["approved", "paid"].includes(String(reward.status || "").toLowerCase())
