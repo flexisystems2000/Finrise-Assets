@@ -90,8 +90,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         return {
             theme: preferences.theme || "system",
-            language: preferences.language || "en",
-            currency: preferences.currency || "NGN",
+            language: "en",
+            currency: "NGN",
             notifications: {
                 transactions: preferences.notifications?.transactions !== false,
                 deposits: preferences.notifications?.deposits !== false,
@@ -125,6 +125,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (error) throw error;
 
         authUser = data?.user || authUser;
+        document.documentElement.lang = "en";
         applyTheme(next.theme);
         return next;
     }
@@ -174,6 +175,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         if ($("themeSelect")) $("themeSelect").value = preferences.theme;
         if ($("languageSelect")) $("languageSelect").value = preferences.language;
         if ($("currencySelect")) $("currencySelect").value = preferences.currency;
+        document.documentElement.lang = "en";
         applyTheme(preferences.theme);
     }
 
@@ -337,6 +339,24 @@ document.addEventListener("DOMContentLoaded", async () => {
         alert("Two-factor authentication is not enabled on the current Finrise backend yet.");
     };
 
+    window.saveNotificationSettings = async function () {
+        const notifications = {
+            transactions: Boolean($("transactionNotification")?.checked),
+            deposits: Boolean($("depositNotification")?.checked),
+            withdrawals: Boolean($("withdrawalNotification")?.checked),
+            investments: Boolean($("investmentNotification")?.checked),
+            promotions: Boolean($("promoNotification")?.checked)
+        };
+
+        try {
+            await savePreferences({ notifications });
+            showSettingsMessage("Notification preferences saved.");
+        } catch (error) {
+            console.error("Notification settings save failed:", error);
+            showSettingsMessage(error.message || "Unable to save notification preferences.", "error");
+        }
+    };
+
     const notificationMap = {
         transactionNotification: "transactions",
         depositNotification: "deposits",
@@ -361,27 +381,26 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     $("languageSelect")?.addEventListener("change", async event => {
-        const previous = getStoredPreferences().language;
+        event.target.value = "en";
         try {
-            await savePreferences({ language: event.target.value });
-            showSettingsMessage("Language preference saved.");
+            await savePreferences({ language: "en" });
+            document.documentElement.lang = "en";
+            showSettingsMessage("English is the available Finrise language.");
         } catch (error) {
-            event.target.value = previous;
             console.error(error);
             showSettingsMessage(error.message || "Unable to save language preference.", "error");
         }
     });
 
     $("currencySelect")?.addEventListener("change", async event => {
-        const previous = getStoredPreferences().currency;
+        event.target.value = "NGN";
         try {
-            await savePreferences({ currency: event.target.value });
-            showSettingsMessage("Currency display preference saved.");
+            await savePreferences({ currency: "NGN" });
+            showSettingsMessage("NGN is the supported Finrise wallet currency.");
             document.dispatchEvent(new CustomEvent("finrise:currency-changed", {
-                detail: { currency: event.target.value }
+                detail: { currency: "NGN" }
             }));
         } catch (error) {
-            event.target.value = previous;
             console.error(error);
             showSettingsMessage(error.message || "Unable to save currency preference.", "error");
         }
