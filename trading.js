@@ -97,6 +97,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 <td>${money(item.principal)}</td>
                 <td>${money(item.expected_return)}</td>
                 <td>${escape(item.status)}</td>
+                <td>${item.matures_at ? new Date(item.matures_at).toLocaleDateString() : "-"}</td>
                 <td>${item.started_at ? new Date(item.started_at).toLocaleDateString() : "-"}</td>
             </tr>
         `).join("");

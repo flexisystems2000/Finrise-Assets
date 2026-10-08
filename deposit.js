@@ -37,7 +37,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
     let selectedMethod = methods.find(x => x.classList.contains("active"))?.dataset.method || "crypto";
 
-    const money = value => new Intl.NumberFormat("en-US", {
+    const money = value => new Intl.NumberFormat("en-NG", {
         style: "currency", currency: "NGN", minimumFractionDigits: 2
     }).format(Number(value) || 0);
 
@@ -99,10 +99,20 @@ document.addEventListener("DOMContentLoaded", async () => {
             return;
         }
 
-        if (selectedMethod === "usdt" && !String(networkEl?.value || "").trim()) {
-            alert("Please select the USDT network used for your payment.");
+        if (!["crypto", "usdt", "bank"].includes(selectedMethod)) {
+            alert("Please select a valid deposit method.");
+            return;
+        }
+
+        if (selectedMethod === "usdt" &&
+            !["TRC20", "ERC20", "BEP20"].includes(String(networkEl?.value || ""))) {
+            alert("Please select a valid USDT network: TRC20, ERC20 or BEP20.");
             networkEl?.focus();
             return;
+        }
+
+        if (selectedMethod !== "usdt" && networkEl) {
+            networkEl.value = "";
         }
 
         if (!reference || reference.length < 4) {
@@ -132,7 +142,14 @@ document.addEventListener("DOMContentLoaded", async () => {
             document.dispatchEvent(new Event("finrise:refresh-dashboard"));
         } catch (error) {
             console.error("Deposit submission failed:", error);
-            alert(error.message || "Unable to submit deposit.");
+            const message = String(error?.message || "");
+            if (/duplicate|unique|reference/i.test(message)) {
+                alert("That payment reference has already been submitted. Please use the correct unique transaction reference.");
+            } else if (/check constraint|amount|currency|method|network/i.test(message)) {
+                alert(message);
+            } else {
+                alert("Unable to submit deposit. Please verify your payment details and try again.");
+            }
         } finally {
             depositBtn.disabled = false;
             depositBtn.textContent = oldText;

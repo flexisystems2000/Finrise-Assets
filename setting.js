@@ -173,8 +173,18 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
 
         if ($("themeSelect")) $("themeSelect").value = preferences.theme;
-        if ($("languageSelect")) $("languageSelect").value = preferences.language;
-        if ($("currencySelect")) $("currencySelect").value = preferences.currency;
+
+        if ($("languageSelect")) {
+            $("languageSelect").value = "en";
+            $("languageSelect").disabled = true;
+            $("languageSelect").title = "English is currently the supported Finrise language.";
+        }
+
+        if ($("currencySelect")) {
+            $("currencySelect").value = "NGN";
+            $("currencySelect").disabled = true;
+            $("currencySelect").title = "NGN is the supported Finrise wallet currency.";
+        }
         document.documentElement.lang = "en";
         applyTheme(preferences.theme);
     }

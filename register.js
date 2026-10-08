@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const email = get("email")?.value.trim().toLowerCase();
         const phone = get("phone")?.value.trim();
         const country = get("country")?.value;
-        const referralCode = new URLSearchParams(window.location.search).get("ref")?.trim() || "";
+        const referralCode = (new URLSearchParams(window.location.search).get("ref") || "").trim().toUpperCase();
         const password = get("password")?.value || "";
         const confirmPassword = get("confirmPassword")?.value || "";
         const terms = get("terms");
@@ -75,7 +75,12 @@ document.addEventListener("DOMContentLoaded", async () => {
             window.location.href = "logIn_Page.html";
         } catch (error) {
             console.error(error);
-            alert(error.message || "Registration failed.");
+            const message = String(error?.message || "");
+            if (/referral|invalid/i.test(message) && referralCode) {
+                alert("Registration could not complete with this referral link. Please check the link and try again.");
+            } else {
+                alert(message || "Registration failed.");
+            }
         } finally {
             if (button) {
                 button.disabled = false;

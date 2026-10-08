@@ -64,15 +64,14 @@ document.addEventListener("DOMContentLoaded", async () => {
         const referrals = referralsResult.referrals || [];
         const rewards = rewardsResult.rewards || [];
 
-        // Referral codes use the same normalization as the database trigger:
-        // remove every non-alphanumeric character from the username.
-        const normalizedUsername = String(profile.username || "")
-            .replace(/[^a-zA-Z0-9]/g, "")
-            .toUpperCase();
-        const base = normalizedUsername || user.id.slice(0, 8).toUpperCase();
+        // The database now assigns a permanent referral code to every profile.
+        // Never derive a new code from username: username changes must not
+        // invalidate existing referral links.
+        const code = String(profile.referral_code || "").trim().toUpperCase();
 
-        const codeFromDatabase = referrals.find(ref => ref.referral_code)?.referral_code;
-        const code = codeFromDatabase || `FR-${base}`;
+        if (!code) {
+            throw new Error("Your permanent referral code is not available yet. Please refresh your account."); 
+        }
 
         referralLink =
             `${window.location.origin}/register.html?ref=${encodeURIComponent(code)}`;

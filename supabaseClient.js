@@ -79,7 +79,7 @@ async function getCurrentProfile() {
 
     const { data, error } = await client
         .from("profiles")
-        .select("id,full_name,username,phone,country,created_at")
+        .select("id,full_name,username,phone,country,referral_code,created_at")
         .eq("id", user.id)
         .maybeSingle();
 
@@ -105,7 +105,7 @@ async function updateProfile(updates) {
         .from("profiles")
         .update(safeUpdates)
         .eq("id", user.id)
-        .select("id,full_name,username,phone,country,created_at")
+        .select("id,full_name,username,phone,country,referral_code,created_at")
         .single();
 
     return { data, error };
@@ -153,7 +153,7 @@ async function submitDeposit(depositData) {
         currency: depositData.currency || "NGN",
         method: depositData.method || "crypto",
         network: depositData.network || null,
-        reference: depositData.reference || null,
+        reference: String(depositData.reference || "").trim() || null,
         proof_url: depositData.proof_url || null,
         status: "pending"
     };
@@ -192,7 +192,7 @@ async function createWithdrawalRequest(params) {
         p_method: params.method || "crypto",
         p_destination: params.destination,
         p_network: params.network || null,
-        p_fee: Number(params.fee || 0)
+        p_fee: 5
     });
 
     return { data, error };

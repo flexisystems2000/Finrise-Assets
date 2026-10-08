@@ -1,0 +1,25 @@
+FINRISE ASSETS — PHASE 2 FRONTEND/DATABASE ALIGNMENT
+===========================================================
+
+Updated frontend to match the Supabase financial hardening already applied.
+
+Main changes:
+- Withdrawal UI/logic aligned to NGN, minimum ₦20 and fixed ₦5 fee.
+- Withdrawal method/network validation aligned with backend:
+  bank = no network; crypto = BTC/ETH; USDT = TRC20/ERC20/BEP20.
+- Standalone withdraw.html now loads supabaseClient.js before withdraw.js.
+- Deposit UI/logic aligned to ₦50 minimum, NGN and payment-reference validation.
+- Duplicate deposit reference errors are handled cleanly.
+- Permanent profile referral_code is now the frontend source of truth.
+- Registration referral codes are normalized before signup.
+- Dashboard earnings calculation uses completed investment expected_return
+  plus paid referral rewards instead of counting investment principal as profit.
+- Investment displays include maturity information.
+- Transaction implementations were synchronized and investment maturity entries
+  are classified correctly.
+- Settings keeps English and NGN as the supported language/currency.
+- Stale USD withdrawal/deposit labels were corrected where they represented
+  Finrise wallet money. Market symbols such as BTC/USDT and XAU/USD remain intact.
+- Existing UI/design structure was preserved; no admin UI was changed.
+
+This ZIP contains the complete project, not partial snippets.

@@ -47,7 +47,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         if (raw.includes("deposit")) return "deposit";
         if (raw.includes("withdraw")) return "withdrawal";
-        if (raw.includes("invest")) return "investment";
+        if (raw.includes("invest") || raw.includes("maturity")) return "investment";
         if (raw.includes("referral")) return "referral";
 
         return raw || "transaction";

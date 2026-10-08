@@ -1,6 +1,7 @@
 /* =========================================================
    FINRISE ASSET
-   REAL SUPABASE WITHDRAWAL FLOW
+   SUPABASE WITHDRAWAL FLOW
+   Frontend rules mirror the hardened database function.
 ========================================================= */
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -23,100 +24,256 @@ document.addEventListener("DOMContentLoaded", async () => {
     const closeModal = document.getElementById("closeModal");
     const historyList = document.getElementById("historyList");
 
-    const fee = 5;
-    let selectedMethod = methods.find(x => x.classList.contains("active"))?.dataset.method || "crypto";
+    const MIN_WITHDRAWAL = 20;
+    const WITHDRAWAL_FEE = 5;
+    const CURRENCY = "NGN";
+
+    let selectedMethod =
+        methods.find(x => x.classList.contains("active"))?.dataset.method || "crypto";
     let pendingRequest = null;
     let balance = 0;
 
-    const money = value => new Intl.NumberFormat("en-US", {
-        style: "currency", currency: "NGN", minimumFractionDigits: 2
+    const money = value => new Intl.NumberFormat("en-NG", {
+        style: "currency",
+        currency: CURRENCY,
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
     }).format(Number(value) || 0);
 
-    const escape = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[c]));
+    const escape = value => String(value ?? "").replace(
+        /[&<>"']/g,
+        c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[c])
+    );
 
     function updateCalculation() {
         const amount = Number(amountInput?.value) || 0;
-        if (feeEl) feeEl.textContent = money(fee);
-        if (receiveEl) receiveEl.textContent = money(Math.max(0, amount - fee));
+        if (feeEl) feeEl.textContent = money(WITHDRAWAL_FEE);
+        if (receiveEl) {
+            receiveEl.textContent = money(Math.max(0, amount - WITHDRAWAL_FEE));
+        }
+    }
+
+    function updateNetworkOptions(method) {
+        if (!network) return;
+
+        const allowed = method === "usdt"
+            ? ["TRC20", "ERC20", "BEP20"]
+            : method === "crypto"
+                ? ["BTC", "ETH"]
+                : [];
+
+        [...network.options].forEach(option => {
+            if (!option.value) {
+                option.hidden = false;
+                option.disabled = false;
+                return;
+            }
+            option.hidden = !allowed.includes(option.value);
+            option.disabled = !allowed.includes(option.value);
+        });
+
+        if (!allowed.includes(network.value)) network.value = "";
+        network.required = allowed.length > 0;
     }
 
     function selectMethod(method) {
-        selectedMethod = method;
-        methods.forEach(item => item.classList.toggle("active", item.dataset.method === method));
-        const crypto = method === "crypto" || method === "usdt";
-        if (networkGroup) networkGroup.style.display = crypto ? "block" : "none";
+        selectedMethod = ["crypto", "usdt", "bank"].includes(method) ? method : "crypto";
+
+        methods.forEach(item =>
+            item.classList.toggle("active", item.dataset.method === selectedMethod)
+        );
+
+        const needsNetwork = selectedMethod !== "bank";
+        if (networkGroup) networkGroup.style.display = needsNetwork ? "block" : "none";
+
         const label = document.getElementById("destinationLabel");
         const help = document.getElementById("destinationHelp");
-        if (label) label.textContent = method === "bank" ? "Bank Account" : "Wallet Address";
-        if (destination) destination.placeholder = method === "bank" ? "Account number / bank destination" : "Enter wallet address";
-        if (help) help.textContent = method === "bank" ? "Enter your bank account destination." : "Enter the destination wallet address.";
+
+        if (label) {
+            label.textContent =
+                selectedMethod === "bank" ? "Bank Account Destination" : "Wallet Address";
+        }
+
+        if (destination) {
+            destination.placeholder =
+                selectedMethod === "bank"
+                    ? "Enter bank account destination"
+                    : "Enter wallet address";
+        }
+
+        if (help) {
+            help.textContent =
+                selectedMethod === "bank"
+                    ? "Enter the bank destination exactly as required for processing."
+                    : "Make sure the wallet address matches the selected network.";
+        }
+
+        updateNetworkOptions(selectedMethod);
     }
 
     async function load() {
-        const [{ wallet }, { withdrawals }] = await Promise.all([getCurrentWallet(), getUserWithdrawals()]);
+        const [{ wallet, error: walletError }, { withdrawals, error: withdrawalError }] =
+            await Promise.all([getCurrentWallet(), getUserWithdrawals()]);
+
+        if (walletError) console.error("Wallet load error:", walletError);
+        if (withdrawalError) console.error("Withdrawal history error:", withdrawalError);
+
         balance = Number(wallet?.available_balance || 0);
         if (balanceEl) balanceEl.textContent = money(balance);
+
         if (!historyList) return;
+
         if (!withdrawals?.length) {
             historyList.innerHTML = '<div class="empty-state">No withdrawals yet.</div>';
             return;
         }
-        historyList.innerHTML = withdrawals.map(item => `
-            <div class="withdraw-history-item">
-                <div><strong>${money(item.amount)}</strong><small>${escape(item.method)} · Fee ${money(item.fee || 0)} · Net ${money(item.net_amount ?? (Number(item.amount || 0) - Number(item.fee || 0)))}</small></div>
-                <div><strong>${escape(item.status)}</strong><small>${new Date(item.created_at).toLocaleString()}</small></div>
-            </div>
-        `).join("");
+
+        historyList.innerHTML = withdrawals.map(item => {
+            const amount = Number(item.amount || 0);
+            const itemFee = Number(item.fee ?? WITHDRAWAL_FEE);
+            const net = Number(item.net_amount ?? (amount - itemFee));
+
+            return `
+                <div class="withdraw-history-item">
+                    <div>
+                        <strong>${money(amount)}</strong>
+                        <small>
+                            ${escape(item.method || "withdrawal")}
+                            · Fee ${money(itemFee)}
+                            · Net ${money(net)}
+                        </small>
+                    </div>
+                    <div>
+                        <strong>${escape(item.status || "pending")}</strong>
+                        <small>${item.created_at ? new Date(item.created_at).toLocaleString() : "-"}</small>
+                    </div>
+                </div>
+            `;
+        }).join("");
     }
 
-    methods.forEach(item => item.addEventListener("click", () => selectMethod(item.dataset.method || "crypto")));
+    methods.forEach(item =>
+        item.addEventListener("click", () => selectMethod(item.dataset.method || "crypto"))
+    );
+
     amountInput?.addEventListener("input", updateCalculation);
+
     maxBtn?.addEventListener("click", () => {
-        const max = Math.max(0, balance - fee);
+        const max = Math.max(0, balance);
+        if (max < MIN_WITHDRAWAL) {
+            alert(`Your available balance is below the minimum withdrawal of ${money(MIN_WITHDRAWAL)}.`);
+            return;
+        }
+
         if (amountInput) amountInput.value = max.toFixed(2);
         updateCalculation();
     });
 
     function openModal() {
         const amount = Number(amountInput?.value);
-        const dest = destination?.value.trim();
-        if (!Number.isFinite(amount) || amount < 20) return alert("Minimum withdrawal is ₦20.");
-        if (amount > balance) return alert("Insufficient available balance.");
-        if (!dest) return alert("Enter a withdrawal destination.");
+        const dest = destination?.value.trim() || "";
+        const selectedNetwork = network?.value || null;
 
-        pendingRequest = { amount, destination: dest, method: selectedMethod, network: network?.value || null, fee };
-        document.getElementById("confirmMethod")?.replaceChildren(document.createTextNode(selectedMethod));
-        document.getElementById("confirmAmount")?.replaceChildren(document.createTextNode(money(amount)));
-        document.getElementById("confirmFee")?.replaceChildren(document.createTextNode(money(fee)));
-        document.getElementById("confirmReceive")?.replaceChildren(document.createTextNode(money(amount - fee)));
-        if (modal) modal.classList.add("active");
+        if (!Number.isFinite(amount) || amount < MIN_WITHDRAWAL) {
+            alert(`Minimum withdrawal is ${money(MIN_WITHDRAWAL)}.`);
+            return;
+        }
+
+        if (amount > balance) {
+            alert("Insufficient available balance.");
+            return;
+        }
+
+        if (amount <= WITHDRAWAL_FEE) {
+            alert(`Withdrawal amount must be greater than the ${money(WITHDRAWAL_FEE)} fee.`);
+            return;
+        }
+
+        if (!dest) {
+            alert("Enter a withdrawal destination.");
+            destination?.focus();
+            return;
+        }
+
+        if (selectedMethod === "bank" && selectedNetwork) {
+            network.value = "";
+        }
+
+        if (selectedMethod === "usdt" &&
+            !["TRC20", "ERC20", "BEP20"].includes(selectedNetwork)) {
+            alert("Select a valid USDT network: TRC20, ERC20 or BEP20.");
+            network?.focus();
+            return;
+        }
+
+        if (selectedMethod === "crypto" &&
+            !["BTC", "ETH"].includes(selectedNetwork)) {
+            alert("Select BTC or ETH as the crypto network.");
+            network?.focus();
+            return;
+        }
+
+        pendingRequest = {
+            amount,
+            destination: dest,
+            method: selectedMethod,
+            network: selectedMethod === "bank" ? null : selectedNetwork,
+            fee: WITHDRAWAL_FEE,
+            currency: CURRENCY
+        };
+
+        document.getElementById("confirmMethod")
+            ?.replaceChildren(document.createTextNode(selectedMethod.toUpperCase()));
+        document.getElementById("confirmAmount")
+            ?.replaceChildren(document.createTextNode(money(amount)));
+        document.getElementById("confirmFee")
+            ?.replaceChildren(document.createTextNode(money(WITHDRAWAL_FEE)));
+        document.getElementById("confirmReceive")
+            ?.replaceChildren(document.createTextNode(money(amount - WITHDRAWAL_FEE)));
+
+        modal?.classList.add("active");
     }
 
-    function close() { if (modal) modal.classList.remove("active"); }
+    function close() {
+        modal?.classList.remove("active");
+    }
+
     withdrawBtn?.addEventListener("click", openModal);
     cancelBtn?.addEventListener("click", close);
     closeModal?.addEventListener("click", close);
 
     confirmBtn?.addEventListener("click", async () => {
         if (!pendingRequest) return;
+
         const oldText = confirmBtn.textContent;
         confirmBtn.disabled = true;
         confirmBtn.textContent = "Processing...";
+
         try {
-            const { error } = await createWithdrawalRequest({
-                ...pendingRequest,
-                currency: "NGN"
-            });
+            const { error } = await createWithdrawalRequest(pendingRequest);
             if (error) throw error;
+
             close();
             pendingRequest = null;
             if (amountInput) amountInput.value = "";
-            alert("Withdrawal request submitted successfully. Your funds are locked until the request is processed.");
+            updateCalculation();
+
+            alert(
+                "Withdrawal request submitted successfully. " +
+                "Your funds are locked until the request is processed."
+            );
+
             await load();
             document.dispatchEvent(new Event("finrise:refresh-dashboard"));
         } catch (error) {
             console.error("Withdrawal failed:", error);
-            alert(error.message || "Unable to create withdrawal request.");
+
+            const message = String(error?.message || "");
+            if (/fee|minimum|currency|network|method|amount|balance/i.test(message)) {
+                alert(message);
+            } else {
+                alert("Unable to create withdrawal request. Please verify your details and try again.");
+            }
         } finally {
             confirmBtn.disabled = false;
             confirmBtn.textContent = oldText;
@@ -129,6 +286,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         updateCalculation();
         await load();
     } catch (error) {
-        console.error(error);
+        console.error("Withdrawal initialization failed:", error);
+        alert("Unable to load withdrawal information. Please refresh and try again.");
     }
 });

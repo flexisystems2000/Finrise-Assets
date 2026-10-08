@@ -285,8 +285,12 @@ document.addEventListener("DOMContentLoaded", async () => {
                     return `
                         <div class="investment-history-item">
                             <strong>${escape(planName)}</strong>
-                            <span>${money(item.amount)}</span>
-                            <small>${escape(item.status || "active")}</small>
+                            <span>Principal: ${money(item.principal ?? item.amount)}</span>
+                            <small>
+                                ${escape(item.status || "active")}
+                                · Return: ${money(item.expected_return || 0)}
+                                · Matures: ${item.matures_at ? new Date(item.matures_at).toLocaleDateString() : "-"}
+                            </small>
                         </div>
                     `;
                 }).join("");

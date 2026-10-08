@@ -63,21 +63,30 @@ document.addEventListener("DOMContentLoaded", async () => {
             return;
         }
 
-        const [{ profile }, { wallet }, { deposits }, { ledger }, { rewards }] = await Promise.all([
+        const [{ profile }, { wallet }, { deposits }, { ledger }, { rewards }, { investments }] = await Promise.all([
             getCurrentProfile(),
             getCurrentWallet(),
             getUserDeposits(),
             getUserLedger(),
-            getUserReferralRewards()
+            getUserReferralRewards(),
+            getUserInvestments()
         ]);
 
         const approvedDeposits = (deposits || [])
             .filter(item => item.status === "approved")
             .reduce((sum, item) => sum + Number(item.amount || 0), 0);
 
-        const earnings = (ledger || [])
-            .filter(item => ["investment_return", "referral_bonus"].includes(item.entry_type))
+        // Earnings are calculated from completed investment returns plus paid
+        // referral rewards. Principal is not counted as profit.
+        const investmentEarnings = (investments || [])
+            .filter(item => String(item.status || "").toLowerCase() === "completed")
+            .reduce((sum, item) => sum + Math.max(0, Number(item.expected_return || 0)), 0);
+
+        const referralEarnings = (rewards || [])
+            .filter(item => ["approved", "paid"].includes(String(item.status || "").toLowerCase()))
             .reduce((sum, item) => sum + Math.max(0, Number(item.amount || 0)), 0);
+
+        const earnings = investmentEarnings + referralEarnings;
 
         const referralBonus = (rewards || [])
             .filter(item => ["approved", "paid"].includes(item.status))
@@ -101,7 +110,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (image && !image.getAttribute("src")) image.src = "https://i.pravatar.cc/150?img=12";
 
         document.dispatchEvent(new CustomEvent("finrise:datarefresh", {
-            detail: { user, profile, wallet, deposits, ledger, rewards }
+            detail: { user, profile, wallet, deposits, ledger, rewards, investments }
         }));
     }
 
