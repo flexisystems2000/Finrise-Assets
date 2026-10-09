@@ -66,7 +66,18 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
 
         const metadataAvatar = authUser?.user_metadata?.avatar_url;
-        if (metadataAvatar && profileImage) profileImage.src = metadataAvatar;
+        if (profileImage) {
+            if (metadataAvatar) {
+                profileImage.onerror = () => {
+                    profileImage.onerror = null;
+                    profileImage.src = "https://i.pravatar.cc/150?img=12";
+                };
+                profileImage.src = metadataAvatar;
+            } else {
+                profileImage.onerror = null;
+                profileImage.src = "https://i.pravatar.cc/150?img=12";
+            }
+        }
     }
 
     async function load() {
@@ -138,7 +149,20 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     imageInput?.addEventListener("change", async event => {
         const file = event.target.files?.[0];
-        if (!file || !file.type.startsWith("image/")) return;
+        if (!file) return;
+
+        if (!authUser?.id) {
+            alert("Please sign in again before changing your profile picture.");
+            event.target.value = "";
+            return;
+        }
+
+        const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+        if (!allowedTypes.includes(file.type)) {
+            alert("Choose a JPG, PNG, WEBP, or GIF image.");
+            event.target.value = "";
+            return;
+        }
 
         if (file.size > 5 * 1024 * 1024) {
             alert("Please choose an image smaller than 5MB.");
@@ -149,15 +173,26 @@ document.addEventListener("DOMContentLoaded", async () => {
         const oldText = imageInput.parentElement?.title || "Change profile picture";
         try {
             const client = await getSupabase();
-            const extension = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
+            const extensionByType = {
+                "image/jpeg": "jpg",
+                "image/png": "png",
+                "image/webp": "webp",
+                "image/gif": "gif"
+            };
+            const extension = extensionByType[file.type];
             const path = `${authUser.id}/avatar.${extension}`;
 
             const { error: uploadError } = await client.storage
                 .from("finrise-avatars")
-                .upload(path, file, { upsert: true, contentType: file.type, cacheControl: "3600" });
+                .upload(path, file, {
+                    upsert: true,
+                    contentType: file.type,
+                    cacheControl: "3600"
+                });
             if (uploadError) throw uploadError;
 
             const { data: publicData } = client.storage.from("finrise-avatars").getPublicUrl(path);
+            if (!publicData?.publicUrl) throw new Error("Unable to retrieve the uploaded profile picture URL.");
             const avatarUrl = `${publicData.publicUrl}?v=${Date.now()}`;
 
             const { data: updatedUser, error: updateError } = await client.auth.updateUser({
@@ -166,7 +201,11 @@ document.addEventListener("DOMContentLoaded", async () => {
             if (updateError) throw updateError;
 
             authUser = updatedUser?.user || authUser;
-            if (profileImage) profileImage.src = avatarUrl;
+            if (profileImage) {
+                profileImage.onerror = null;
+                profileImage.src = avatarUrl;
+            }
+            document.dispatchEvent(new CustomEvent("finrise:avatar-updated", { detail: { avatarUrl } }));
             alert("Profile picture updated successfully.");
         } catch (error) {
             console.error("Profile image upload failed:", error);

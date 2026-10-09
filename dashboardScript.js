@@ -299,8 +299,17 @@ document.addEventListener("DOMContentLoaded", async () => {
         setText("userEmail", user.email || "");
         setText("welcome", `Welcome, ${name}`);
 
-        const image = document.getElementById("profileImage");
-        if (image && !image.getAttribute("src")) image.src = "https://i.pravatar.cc/150?img=12";
+        const avatarUrl = user?.user_metadata?.avatar_url || profile?.avatar_url || "";
+        const fallbackAvatar = "https://i.pravatar.cc/150?img=12";
+        ["profileImage", "profilePageImage"].forEach(id => {
+            const image = document.getElementById(id);
+            if (!image) return;
+            image.onerror = () => {
+                image.onerror = null;
+                image.src = fallbackAvatar;
+            };
+            image.src = avatarUrl || fallbackAvatar;
+        });
 
         renderNotifications({
             user,
@@ -332,4 +341,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     }));
 
     document.addEventListener("finrise:refresh-dashboard", loadDashboard);
+    document.addEventListener("finrise:avatar-updated", event => {
+        const avatarUrl = event.detail?.avatarUrl;
+        if (!avatarUrl) return;
+        ["profileImage", "profilePageImage"].forEach(id => {
+            const image = document.getElementById(id);
+            if (image) image.src = avatarUrl;
+        });
+    });
 });

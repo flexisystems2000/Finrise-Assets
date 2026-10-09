@@ -428,7 +428,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     window.logoutUser = async function () {
-        if (!confirm("Are you sure you want to logout?")) return;
+        const shouldLogout = window.FinriseNotify
+            ? await window.FinriseNotify.confirm({
+                title: "Log out",
+                message: "Are you sure you want to logout?",
+                confirmText: "Log out",
+                cancelText: "Stay",
+                danger: true
+            })
+            : window.confirm("Are you sure you want to logout?");
+        if (!shouldLogout) return;
 
         try {
             const { error } = await signOut();

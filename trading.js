@@ -106,7 +106,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     async function handleInvestment(button) {
         const planName = button.dataset.plan || "";
         const minimum = Number(button.dataset.min || 0);
-        const amountText = prompt(`Enter amount for ${planName}.\nMinimum: ${money(minimum)}`);
+        const amountText = window.FinriseNotify
+            ? await window.FinriseNotify.prompt({
+                title: `Invest in ${planName}`,
+                message: `Enter the amount to invest. Minimum: ${money(minimum)}`,
+                defaultValue: "",
+                confirmText: "Continue",
+                cancelText: "Cancel"
+            })
+            : window.prompt(`Enter amount for ${planName}.\\nMinimum: ${money(minimum)}`);
         if (amountText === null) return;
         const amount = Number(amountText);
         if (!Number.isFinite(amount) || amount < minimum) return alert(`Minimum investment is ${money(minimum)}.`);

@@ -323,9 +323,15 @@ document.addEventListener("DOMContentLoaded", async () => {
                         return;
                     }
 
-                    if (!confirm(`Invest ${money(amount)} in ${plan.name || "this plan"}?`)) {
-                        return;
-                    }
+                    const confirmed = window.FinriseNotify
+                        ? await window.FinriseNotify.confirm({
+                            title: "Confirm investment",
+                            message: `Invest ${money(amount)} in ${plan.name || "this plan"}?`,
+                            confirmText: "Invest",
+                            cancelText: "Cancel"
+                        })
+                        : window.confirm(`Invest ${money(amount)} in ${plan.name || "this plan"}?`);
+                    if (!confirmed) return;
 
                     button.disabled = true;
                     const oldText = button.textContent;
