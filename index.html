@@ -5820,7 +5820,13 @@
                 }
               }
               function saveUsers(users) {
-                localStorage.setItem(USER_KEY, JSON.stringify(users));
+                // This cache is for non-secret profile display data only. Never store passwords.
+                const safeUsers = (Array.isArray(users) ? users : []).map((user) => {
+                  if (!user || typeof user !== "object") return user;
+                  const { password, ...safeUser } = user;
+                  return safeUser;
+                });
+                localStorage.setItem(USER_KEY, JSON.stringify(safeUsers));
               }
               // Admin-only profile sync: populate the admin list from Supabase instead of
               // relying on this browser's localStorage registration list.
@@ -6335,88 +6341,6 @@
               function setAuthNotice(text) {
                 $("authNotice").textContent = text;
                 $("authNotice").classList.remove("hidden");
-              }
-              function authenticateLocal(email) {
-                const user = getUsers().find(
-                  (u) => u.email.toLowerCase() === email.toLowerCase(),
-                );
-                if (!user) return false;
-                currentUser = { name: user.name, email: user.email };
-                state = loadUserState(currentUser);
-                if (state.isDeactivated) {
-                  currentUser = null;
-                  state = null;
-                  setAuthNotice(
-                    "This account has been deactivated. Please contact the administrator.",
-                  );
-                  return false;
-                }
-                if (!$("rememberMe").checked)
-                  sessionStorage.setItem(SESSION_KEY, JSON.stringify(currentUser));
-                else localStorage.setItem(SESSION_KEY, JSON.stringify(currentUser));
-                enterDashboard();
-                return true;
-              }
-              function registerLocal(
-                name,
-                email,
-                password,
-                username,
-                referralCode,
-                country,
-              ) {
-                if (email.toLowerCase() === "adminfinrise@finrise.com") {
-                  setAuthNotice("That email is reserved.");
-                  return;
-                }
-                const users = getUsers();
-                if (
-                  users.some(
-                    (u) =>
-                      u.email.toLowerCase() === email.toLowerCase() ||
-                      String(u.username || "").toLowerCase() ===
-                        username.toLowerCase(),
-                  )
-                ) {
-                  setAuthNotice(
-                    "That email or username is already registered. Please log in or choose another.",
-                  );
-                  return;
-                }
-                users.push({
-                  name,
-                  email,
-                  password,
-                  username,
-                  country: country || "",
-                  referredBy: referralCode || "",
-                  referralCode:
-                    "ref-" +
-                    username.slice(0, 3).toLowerCase() +
-                    "-" +
-                    Math.random().toString(36).slice(2, 6).toLowerCase(),
-                  createdAt: new Date().toISOString(),
-                });
-                saveUsers(users);
-                addAdminEvent(
-                  "registration",
-                  "New registration",
-                  `${name} (${email}) has registered.`,
-                  email,
-                );
-                currentUser = { name, email };
-                state = loadUserState(currentUser);
-                state.notifications.unshift({
-                  id: uid(),
-                  title: "Welcome to FINRISE ASSETS",
-                  message: "Welcome to FINRISE ASSETS. Build your future with us.",
-                  date: new Date().toISOString(),
-                  read: false,
-                });
-                saveState();
-                localStorage.setItem(SESSION_KEY, JSON.stringify(currentUser));
-                enterDashboard();
-                toast("Account created on this device.");
               }
               async function enterDashboard() {
                 try {
@@ -8074,7 +7998,7 @@
                     return `${heading("Referral Programme", "Track invitations and review recorded referral activity.")}<section class="grid two-col"><div class="card referral-hero"><span class="plan-badge">FINRISE ASSETS PARTNERS</span><h2 class="plan-name">Grow your network.</h2><p class="subtitle">Share your personal referral link with people who may be interested in the platform.</p><div class="ref-commission">10<span>%</span></div><div class="stat-foot">STATED REFERRAL COMMISSION RATE</div><div class="divider"></div><p class="stat-label">Your personal referral link</p><div class="deposit-address" id="refLink">${esc(referralURL)}</div><div class="quick-actions" style="margin-top:13px"><button class="btn btn-primary" id="copyReferral">Copy referral link ↗</button><button class="btn btn-ghost" id="shareReferralWhatsApp" type="button">Share on WhatsApp</button></div></div><div class="card"><div class="stat-top"><span class="stat-label">Available referral balance</span><span class="stat-icon">♧</span></div><div class="stat-value" id="referralBalance">${money(state.referralEarnings || 0)}</div><p class="subtitle">Balance reflects entries recorded in this account.</p><button class="btn btn-primary referral-transfer" id="transferReferral" style="width:100%;margin-top:18px">Transfer to available balance ↓</button><div class="divider"></div><div class="market-row"><span class="muted">Referral sign-ups</span><strong>${(state.referrals || []).length}</strong></div><div class="market-row"><span class="muted">Commission rate</span><strong class="gold">10%</strong></div></div></section><section class="card section"><div class="section-head"><div><h2 style="font-size:17px">Referral history</h2><p>Invitations and commission entries recorded for this account.</p></div></div><div class="table-wrap"><table><thead><tr><th>Date</th><th>Referral</th><th>Activity</th><th>Commission</th><th>Status</th></tr></thead><tbody>${(state.referrals || []).length ? (state.referrals || []).map((r) => `<tr><td>${dateText(r.date || r.createdAt || new Date().toISOString())}</td><td>${esc(r.name || r.email || r.username || "Referral")}</td><td>${esc(r.activity || "Registration")}</td><td>${money(r.commission || 0)}</td><td><span class="status ${r.status === "confirmed" ? "confirmed" : ""}">${esc(r.status || "Recorded")}</span></td></tr>`).join("") : '<tr><td colspan="5"><div class="empty-state">No referral activity has been recorded yet.</div></td></tr>'}</tbody></table></div></section>`;
                   }
                   case "security":
-                    return `${heading("Security", "Important account security information.")}<section class="card form-card"><div class="notice">Account access is currently stored on this device. Secure server authentication is required before this can support live customer accounts.</div><p class="subtitle">Google and Apple sign-in are not connected. No server-side sessions, email verification, password recovery, two-factor authentication, blockchain deposits, or real withdrawals are configured.</p><div class="divider"></div><button class="btn btn-ghost" id="resetData">Reset account data</button></section>`;
+                    return `${heading("Security", "Important account security information.")}<section class="card form-card"><div class="notice">Sign-in and registration use Supabase Auth. Account balances, deposits, withdrawals, investments, and referral commissions must be confirmed by the server and database; browser storage is not proof of a completed financial transaction.</div><p class="subtitle">Google and Apple sign-in and two-factor authentication are not enabled here. Email confirmation and password recovery depend on the Supabase project configuration. Deposit and withdrawal requests require administrator review; submitting a request does not mean funds have been received or paid. Keep your password private and sign out on shared devices.</p><div class="divider"></div><button class="btn btn-ghost" id="resetData">Clear local display cache</button></section>`;
                   default:
                     return dashboardPage();
                 }
@@ -8657,42 +8581,54 @@
                   };
                 const pw = $("changePassword");
                 if (pw)
-                  pw.onclick = () => {
-                    const old = $("currentPassword")?.value || "",
-                      next = $("newPassword")?.value || "",
-                      confirm = $("confirmNewPassword")?.value || "",
-                      users = getUsers(),
-                      u = users.find(
-                        (x) =>
-                          x.email.toLowerCase() ===
-                          String(currentUser?.email || "").toLowerCase(),
-                      );
-                    if (!u) {
-                      toast("Could not find this account in this browser.", true);
+                  pw.onclick = async () => {
+                    const old = $("currentPassword")?.value || "";
+                    const next = $("newPassword")?.value || "";
+                    const confirm = $("confirmNewPassword")?.value || "";
+                    const client = window.finriseSupabase;
+                    if (!currentUser?.email || !client) {
+                      toast("Secure account service is unavailable. Please refresh and try again.", true);
                       return;
                     }
-                    if (old !== u.password) {
-                      toast("Your current password is incorrect.", true);
+                    if (!old) {
+                      toast("Enter your current password to continue.", true);
                       return;
                     }
-                    if (next.length < 8) {
-                      toast("New password must contain at least 8 characters.", true);
+                    if (next.length < 8 || !/[A-Z]/.test(next) || !/[a-z]/.test(next) || !/[0-9]/.test(next)) {
+                      toast("Use at least 8 characters, including uppercase, lowercase, and a number.", true);
                       return;
                     }
                     if (next !== confirm) {
                       toast("New passwords do not match.", true);
                       return;
                     }
-                    u.password = next;
-                    saveUsers(users);
-                    $("currentPassword").value = "";
-                    $("newPassword").value = "";
-                    $("confirmNewPassword").value = "";
-                    const msg = $("profileSecurityMessage");
-                    if (msg)
-                      msg.textContent =
-                        "Password updated for this browser. Use the new password next time you log in on this device.";
-                    toast("Password changed successfully.");
+                    if (old === next) {
+                      toast("Choose a password different from your current password.", true);
+                      return;
+                    }
+                    pw.disabled = true;
+                    const originalText = pw.textContent;
+                    pw.textContent = "Updating…";
+                    try {
+                      const { error: verifyError } = await client.auth.signInWithPassword({
+                        email: currentUser.email,
+                        password: old,
+                      });
+                      if (verifyError) throw new Error("Your current password is incorrect.");
+                      const { error: updateError } = await client.auth.updateUser({ password: next });
+                      if (updateError) throw updateError;
+                      $("currentPassword").value = "";
+                      $("newPassword").value = "";
+                      $("confirmNewPassword").value = "";
+                      const msg = $("profileSecurityMessage");
+                      if (msg) msg.textContent = "Password updated through Supabase Auth.";
+                      toast("Your account password was updated securely.");
+                    } catch (err) {
+                      toast(err?.message || "Could not update your password. Please try again.", true);
+                    } finally {
+                      pw.disabled = false;
+                      pw.textContent = originalText;
+                    }
                   };
                 const adminBack = $("adminProfileBack");
                 if (adminBack) adminBack.onclick = () => go("admin");
@@ -9216,28 +9152,39 @@
                 }
                 const tr = $("transferReferral");
                 if (tr)
-                  tr.onclick = () => {
-                    const amount = Number(state.referralEarnings || 0);
-                    if (amount <= 0) {
-                      toast(
-                        "No verified referral commission is available to transfer yet.",
-                        true,
-                      );
+                  tr.onclick = async () => {
+                    const amount = Number(state?.referralEarnings || 0);
+                    const client = window.finriseSupabase;
+                    if (!currentUser?.id || !client) {
+                      toast("Please sign in again before transferring referral earnings.", true);
                       return;
                     }
-                    state.referralEarnings = 0;
-                    state.balance = Number(state.balance || 0) + amount;
-                    addTransaction(
-                      "Referral transfer",
-                      amount,
-                      "Confirmed",
-                      "Verified referral commission",
-                    );
-                    saveState();
-                    go("referrals");
-                    toast(
-                      "Verified referral commission transferred to your available balance.",
-                    );
+                    if (!Number.isFinite(amount) || amount <= 0) {
+                      toast("No referral balance is available to transfer.", true);
+                      return;
+                    }
+                    // Fail closed: this must be an atomic server-side operation. Never credit local state.
+                    tr.disabled = true;
+                    const originalText = tr.textContent;
+                    tr.textContent = "Verifying transfer…";
+                    try {
+                      const { error } = await client.rpc("finrise_transfer_referral_balance");
+                      if (error) {
+                        if (/function .*finrise_transfer_referral_balance.*not found|could not find the function/i.test(error.message || "")) {
+                          throw new Error("Secure referral transfers are not enabled on the database yet. No balance was changed. Please contact the site administrator.");
+                        }
+                        throw error;
+                      }
+                      await hydrateUserStateFromSupabase();
+                      go("referrals");
+                      toast("Referral transfer completed and confirmed by the database.");
+                    } catch (err) {
+                      console.error("Referral transfer failed:", err);
+                      toast(err?.message || "Referral transfer could not be confirmed. No local balance was changed.", true);
+                    } finally {
+                      tr.disabled = false;
+                      tr.textContent = originalText;
+                    }
                   };
                 document.querySelectorAll("[data-admin-reactivate]").forEach(
                   (b) =>
@@ -9256,7 +9203,7 @@
                   reset.onclick = () =>
                     openModal(
                       "Reset account data",
-                      `<p>This deletes the local portfolio data for this account from this browser.</p><div class="quick-actions"><button class="btn btn-primary" id="confirmReset">Reset data</button><button class="btn" data-close-modal>Cancel</button></div>`,
+                      `<p>This clears cached display data stored in this browser. It does not delete your Supabase account or server-side financial records.</p><div class="quick-actions"><button class="btn btn-primary" id="confirmReset">Reset data</button><button class="btn" data-close-modal>Cancel</button></div>`,
                     );
               }
               $("menuButton").onclick = (event) => {
