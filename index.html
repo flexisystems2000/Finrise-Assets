@@ -6303,12 +6303,37 @@
                     $("authReferralCode").value = incomingReferral;
                 } catch {}
               }
+              async function notifyReferralRegistration(userId) {
+                const client = window.finriseSupabase;
+                if (!client || !userId) return;
+                for (let attempt = 0; attempt < 3; attempt++) {
+                  try {
+                    const { data, error } = await client.functions.invoke(
+                      "notify-referral-registration",
+                      { body: { referred_user_id: userId } },
+                    );
+                    if (!error && (data?.sent || data?.reason === "Already sent.")) return;
+                    if (error) console.warn("Referral notification attempt failed.", error.message);
+                  } catch (error) {
+                    console.warn("Referral email notification will retry.", error?.message || error);
+                  }
+                  if (attempt < 2) await new Promise((resolve) => setTimeout(resolve, 900));
+                }
+              }
+
               function openAuth(mode) {
                 authMode = mode;
                 renderAuthMode();
                 prefillReferralCode();
                 showView("auth");
               }
+              window.addEventListener("load", () => {
+                if (location.hash.toLowerCase() === "#register") {
+                  openAuth("register");
+                  prefillReferralCode();
+                }
+              });
+
               function renderAuthMode() {
                 const reg = authMode === "register";
                 $("authTitle").textContent = reg
@@ -6475,6 +6500,9 @@
                       },
                     });
                     if (error) throw error;
+                    if (data.user?.id && referralCode) {
+                      void notifyReferralRegistration(data.user.id);
+                    }
                     if (!data.session) {
                       setAuthNotice(
                         "Account created. Check your email to confirm your address, then log in.",
@@ -8001,8 +8029,9 @@
                     ).trim();
                     // Use the canonical production domain for shareable referral links.
                     const referralURL =
-                      "https://www.finriseasset.com/?ref=" +
-                      encodeURIComponent(ownCode);
+                      "https://finriseasset.com/?ref=" +
+                      encodeURIComponent(ownCode) +
+                      "#register";
                     return `${heading("Referral Programme", "Track invitations and review recorded referral activity.")}<section class="grid two-col"><div class="card referral-hero"><span class="plan-badge">FINRISE ASSETS PARTNERS</span><h2 class="plan-name">Grow your network.</h2><p class="subtitle">Share your personal referral link with people who may be interested in the platform.</p><div class="ref-commission">10<span>%</span></div><div class="stat-foot">STATED REFERRAL COMMISSION RATE</div><div class="divider"></div><p class="stat-label">Your personal referral link</p><div class="deposit-address" id="refLink">${esc(referralURL)}</div><div class="quick-actions" style="margin-top:13px"><button class="btn btn-primary" id="copyReferral">Copy referral link ↗</button><button class="btn btn-ghost" id="shareReferralWhatsApp" type="button">Share on WhatsApp</button></div></div><div class="card"><div class="stat-top"><span class="stat-label">Available referral balance</span><span class="stat-icon">♧</span></div><div class="stat-value" id="referralBalance">${money(state.referralEarnings || 0)}</div><p class="subtitle">Balance reflects entries recorded in this account.</p><button class="btn btn-primary referral-transfer" id="transferReferral" style="width:100%;margin-top:18px">Transfer to available balance ↓</button><div class="divider"></div><div class="market-row"><span class="muted">Referral sign-ups</span><strong>${(state.referrals || []).length}</strong></div><div class="market-row"><span class="muted">Commission rate</span><strong class="gold">10%</strong></div></div></section><section class="card section"><div class="section-head"><div><h2 style="font-size:17px">Referral history</h2><p>Invitations and commission entries recorded for this account.</p></div></div><div class="table-wrap"><table><thead><tr><th>Date</th><th>Referral</th><th>Activity</th><th>Commission</th><th>Status</th></tr></thead><tbody>${(state.referrals || []).length ? (state.referrals || []).map((r) => `<tr><td>${dateText(r.date || r.createdAt || new Date().toISOString())}</td><td>${esc(r.name || r.email || r.username || "Referral")}</td><td>${esc(r.activity || "Registration")}</td><td>${money(r.commission || 0)}</td><td><span class="status ${r.status === "confirmed" ? "confirmed" : ""}">${esc(r.status || "Recorded")}</span></td></tr>`).join("") : '<tr><td colspan="5"><div class="empty-state">No referral activity has been recorded yet.</div></td></tr>'}</tbody></table></div></section>`;
                   }
                   case "security":
@@ -8623,7 +8652,7 @@
                         password: old,
                       });
                       if (verifyError) throw new Error("Your current password is incorrect.");
-                      const { error: updateError } = await client.auth.updateUser({ password: next });
+                      const { error: updateError } = await client.auth.updateUser({ password: next, current_password: old });
                       if (updateError) throw updateError;
                       $("currentPassword").value = "";
                       $("newPassword").value = "";
@@ -10025,7 +10054,7 @@
             target.innerHTML = rows
               .map(
                 (r) =>
-                  `<tr><td><strong>${esc(r.sponsor_name || r.sponsor_email || "Sponsor")}</strong><br><span class="muted">${esc(r.sponsor_email || "Email unavailable")}</span></td><td><strong>${esc(r.referred_name || r.referred_email || "Referral")}</strong><br><span class="muted">${esc(r.referred_email || "Email unavailable")}</span></td><td><strong class="admin-referral-commission">${money(Number(r.commission_total || 0))}</strong><br><span class="muted">From ${money(Number(r.deposit_total || 0))} approved deposits</span></td></tr>`,
+                  `<tr><td><strong>${esc(r.sponsor_name || r.sponsor_email || "Sponsor")}</strong><br><span class="muted">@${esc(r.sponsor_username || "username unavailable")}</span><br><span class="muted">${esc(r.sponsor_email || "Email unavailable")}</span></td><td><strong>${esc(r.referred_name || r.referred_email || "Referral")}</strong><br><span class="muted">@${esc(r.referred_username || "username unavailable")}</span><br><span class="muted">${esc(r.referred_email || "Email unavailable")}</span><br><span class="status">${esc(r.referral_status || "registered")}</span></td><td><strong class="admin-referral-commission">${money(Number(r.commission_total || 0))}</strong><br><span class="muted">From ${money(Number(r.deposit_total || 0))} approved deposits</span></td></tr>`,
               )
               .join("");
           } catch (error) {
