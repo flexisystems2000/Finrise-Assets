@@ -8652,7 +8652,7 @@
                         password: old,
                       });
                       if (verifyError) throw new Error("Your current password is incorrect.");
-                      const { error: updateError } = await client.auth.updateUser({ password: next, current_password: old });
+                      const { error: updateError } = await client.auth.updateUser({ password: next, currentPassword: old });
                       if (updateError) throw updateError;
                       $("currentPassword").value = "";
                       $("newPassword").value = "";
