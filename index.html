@@ -4919,7 +4919,7 @@
             </div>
             <div class="ecosystem-logo">
               <img
-                src="https://cdn.simpleicons.org/kraken/5741D9"
+                src="https://i.postimg.cc/L4n0FZhv/IMG-20261026-WA0001(1).jpg"
                 alt="Kraken logo"
               />KRAKEN
             </div>
@@ -4937,7 +4937,7 @@
             </div>
             <div class="ecosystem-logo">
               <img
-                src="https://cdn.simpleicons.org/coingecko/8DC63F"
+                src="https://i.postimg.cc/G2jGTKMv/IMG-20261026-WA0002.jpg"
                 alt="CoinGecko logo"
               />COINGECKO
             </div>
@@ -5441,7 +5441,7 @@
       ></div>
     </div>
     <div class="toast-area" id="toastArea" aria-live="polite"></div>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.116.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
       // Public browser key is intended for frontend use; database access is protected by RLS.
       window.finriseSupabase = window.supabase.createClient(
@@ -12936,5 +12936,33 @@
         });
       })();
     </script>
-  </body>
+  
+<script>
+/* Automatically select a matching display currency when the language changes. */
+(function () {
+  const languageCurrency = {
+    en: "USD", fr: "EUR", es: "EUR", pt: "BRL", de: "EUR",
+    it: "EUR", nl: "EUR", sw: "KES", ha: "NGN", ig: "NGN",
+    yo: "NGN", ar: "SAR", zh: "CNY", ja: "JPY", ko: "KRW",
+    hi: "INR", ru: "RUB", tr: "TRY", bn: "BDT", ur: "PKR",
+    id: "IDR", th: "THB", vi: "VND", pl: "PLN", uk: "UAH",
+    sv: "SEK", no: "NOK", da: "DKK", fi: "EUR", el: "EUR",
+    he: "ILS", ro: "RON", hu: "HUF", cs: "CZK", sk: "EUR",
+    bg: "BGN", hr: "EUR", sr: "RSD", ms: "MYR", fa: "IRR",
+    am: "ETB", zu: "ZAR", af: "ZAR", fil: "PHP", ta: "INR",
+    te: "INR", mr: "INR", pa: "INR", ne: "NPR", ca: "EUR"
+  };
+  document.addEventListener("change", function (event) {
+    if (event.target && event.target.id === "siteLanguage") {
+      const currency = document.getElementById("siteCurrency");
+      const matchingCurrency = languageCurrency[event.target.value];
+      if (currency && matchingCurrency &&
+          Array.from(currency.options).some(o => o.value === matchingCurrency)) {
+        currency.value = matchingCurrency;
+      }
+    }
+  });
+})();
+</script>
+</body>
 </html>
