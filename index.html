@@ -5774,11 +5774,23 @@
                 return JSON.parse(JSON.stringify(x));
               }
               function money(n) {
-                return new Intl.NumberFormat("en-US", {
-                  style: "currency",
-                  currency: "USD",
-                  maximumFractionDigits: 2,
-                }).format(Number(n) || 0);
+                // Monetary values in the account/database remain USD. This formats
+                // their converted display value using the user's saved currency.
+                const prefs = (() => { try { return JSON.parse(localStorage.getItem("FINRISE ASSETS_preferences") || "{}"); } catch { return {}; } })();
+                const currency = String(prefs.cur || "USD").toUpperCase();
+                const rates = window.finriseFxRates || { USD: 1 };
+                const rate = Number(rates[currency]);
+                const usdValue = Number(n) || 0;
+                const converted = Number.isFinite(rate) && rate > 0 ? usdValue * rate : usdValue;
+                try {
+                  return new Intl.NumberFormat("en-US", {
+                    style: "currency",
+                    currency,
+                    maximumFractionDigits: ["JPY", "KRW", "VND", "IDR", "CLP"].includes(currency) ? 0 : 2,
+                  }).format(converted);
+                } catch {
+                  return `${currency} ${converted.toFixed(2)}`;
+                }
               }
               function esc(s) {
                 return String(s ?? "").replace(
@@ -7866,7 +7878,7 @@
                       })
                       .join(
                         "",
-                      )}</div><div class="deposit-layout"><div class="card" style="background:#0c0c0c"><div class="field"><label>Deposit amount (USD)</label><input id="depositAmount" type="number" min="50" step="0.01" placeholder="Enter amount, minimum $50"></div><div class="field"><label>Estimated amount to send</label><div class="deposit-summary"><strong id="depositCryptoEstimate">—</strong><p class="panel-note" id="depositEstimateNote">oops!! unavailable Finrise will notify you when available</p></div></div><div class="field"><label>Receiving network</label><input id="depositNetwork" readonly value="Bitcoin network"></div></div><div class="card" style="background:#0c0c0c"><div class="field"><label>Official receiving wallet address</label><div class="deposit-address" id="depositWalletAddress">Wallet address has not been configured yet.</div><button class="btn btn-primary" type="button" id="copyDepositAddress" style="width:100%;margin-top:10px"> Copy wallet address</button></div><div class="notice">Send only the selected coin using the matching network. A transfer on the wrong network may be unrecoverable. Confirm the address and network carefully before sending.</div><button class="btn btn-primary" id="recordDeposit" style="width:100%">Continue to deposit request</button></div></div></section>`;
+                      )}</div><div class="deposit-layout"><div class="card" style="background:#0c0c0c"><div class="field"><label>Deposit amount (<span id="depositInputCurrency">USD</span>)</label><input id="depositAmount" type="number" min="50" step="0.01" placeholder="Enter deposit amount"></div><div class="field"><label>Estimated amount to send</label><div class="deposit-summary"><strong id="depositCryptoEstimate">—</strong><p class="panel-note" id="depositEstimateNote">oops!! unavailable Finrise will notify you when available</p></div></div><div class="field"><label>Receiving network</label><input id="depositNetwork" readonly value="Bitcoin network"></div></div><div class="card" style="background:#0c0c0c"><div class="field"><label>Official receiving wallet address</label><div class="deposit-address" id="depositWalletAddress">Wallet address has not been configured yet.</div><button class="btn btn-primary" type="button" id="copyDepositAddress" style="width:100%;margin-top:10px"> Copy wallet address</button></div><div class="notice">Send only the selected coin using the matching network. A transfer on the wrong network may be unrecoverable. Confirm the address and network carefully before sending.</div><button class="btn btn-primary" id="recordDeposit" style="width:100%">Continue to deposit request</button></div></div></section>`;
                   case "withdraw":
                     return `${heading("Withdraw", "Submit a withdrawal request for administrator review.")}<section class="card form-card"><div class="field"><label>Asset</label><select id="withdrawAsset">${Object.values(
                       ASSETS,
@@ -8816,14 +8828,20 @@
                         };
                       });
                     const calc = () => {
-                      const amount = Number($("depositAmount")?.value || 0),
-                        price = Number(state.prices[da.value] || 0);
+                      const amount = Number($("depositAmount")?.value || 0);
+                      const prefs = (() => { try { return JSON.parse(localStorage.getItem("FINRISE ASSETS_preferences") || "{}"); } catch { return {}; } })();
+                      const inputCurrency = String(prefs.cur || "USD").toUpperCase();
+                      const fxRate = Number((window.finriseFxRates || {})[inputCurrency]);
+                      const usdAmount = inputCurrency === "USD" ? amount : (fxRate > 0 ? amount / fxRate : 0);
+                      const price = Number(state.prices[da.value] || 0);
                       const out = $("depositCryptoEstimate");
+                      const currencyLabel = $("depositInputCurrency");
+                      if (currencyLabel) currencyLabel.textContent = inputCurrency;
                       if (out)
                         out.value =
-                          price > 0 && amount > 0
-                            ? (amount / price).toFixed(8) + " " + da.value
-                            : "Waiting for current price / amount";
+                          price > 0 && usdAmount > 0
+                            ? (usdAmount / price).toFixed(8) + " " + da.value
+                            : (inputCurrency !== "USD" && !(fxRate > 0) ? "Loading exchange rate…" : "Waiting for current price / amount");
                     };
                     da.onchange = () => {
                       refreshDeposit();
@@ -8853,9 +8871,17 @@
                 const rd = $("recordDeposit");
                 if (rd)
                   rd.onclick = () => {
-                    const amount = Number($("depositAmount").value);
+                    const enteredAmount = Number($("depositAmount").value);
+                    const prefs = (() => { try { return JSON.parse(localStorage.getItem("FINRISE ASSETS_preferences") || "{}"); } catch { return {}; } })();
+                    const inputCurrency = String(prefs.cur || "USD").toUpperCase();
+                    const fxRate = inputCurrency === "USD" ? 1 : Number((window.finriseFxRates || {})[inputCurrency]);
+                    if (!(enteredAmount > 0) || !(fxRate > 0)) {
+                      toast("Enter a valid amount and wait for the exchange rate to load.", true);
+                      return;
+                    }
+                    const amount = inputCurrency === "USD" ? enteredAmount : enteredAmount / fxRate;
                     if (amount < 50) {
-                      toast("Minimum deposit is $50.", true);
+                      toast("Minimum deposit is $50 USD equivalent.", true);
                       return;
                     }
                     const walletText =
@@ -8889,7 +8915,10 @@
                               " | Asset: " +
                               selectedDepositAsset +
                               " | Network: " +
-                              ($("depositNetwork")?.value || selectedDepositAsset),
+                              ($("depositNetwork")?.value || selectedDepositAsset) +
+                              " | User entered: " + enteredAmount.toFixed(2) + " " + inputCurrency +
+                              " | FX rate (" + inputCurrency + "/USD): " + fxRate +
+                              " | Submitted USD equivalent: $" + amount.toFixed(2),
                           },
                         );
                         if (error) throw error;
@@ -9109,7 +9138,7 @@
                     document.documentElement.dataset.theme = theme;
                     saveState();
                     toast(
-                      "Settings saved. Currency selection is a display preference; conversion rates are not yet connected.",
+                      "Settings saved. Currency display preference saved. Amounts are converted using the latest available exchange rates.",
                     );
                   };
                 document.querySelectorAll("[data-notification-read]").forEach(
@@ -12937,31 +12966,80 @@
       })();
     </script>
   
+
+
 <script>
-/* Automatically select a matching display currency when the language changes. */
+/* Global display-currency conversion. Account values remain stored in USD. */
+(function(){
+  const FX_URL = "https://open.er-api.com/v6/latest/USD";
+  window.finriseFxRates = { USD: 1 };
+  async function loadRates(){
+    try {
+      const response = await fetch(FX_URL, {cache:"no-store"});
+      if(!response.ok) throw new Error("Exchange-rate service returned " + response.status);
+      const data = await response.json();
+      if(data && data.result === "success" && data.rates){
+        window.finriseFxRates = data.rates;
+        window.finriseFxRates.USD = 1;
+        window.finriseFxRatesUpdatedAt = data.time_last_update_utc || null;
+      }
+    }catch(error){
+      console.warn("Finrise display currency: could not load live FX rates; USD values will be shown until rates are available.", error);
+    }
+  }
+  loadRates();
+  document.addEventListener("click", function(event){
+    const button = event.target && event.target.closest ? event.target.closest("#saveSettings") : null;
+    if(!button) return;
+    // The app's own handler saves the selected currency. Reload afterward so all
+    // dashboard/page templates redraw through the shared money() formatter.
+    setTimeout(function(){ window.location.reload(); }, 350);
+  }, true);
+})();
+</script>
+
+<script>
+/* FINRISE: keep language and currency preference selects synchronized.
+   Settings are rendered dynamically by the SPA, so use delegated events. */
 (function () {
   const languageCurrency = {
-    en: "USD", fr: "EUR", es: "EUR", pt: "BRL", de: "EUR",
-    it: "EUR", nl: "EUR", sw: "KES", ha: "NGN", ig: "NGN",
-    yo: "NGN", ar: "SAR", zh: "CNY", ja: "JPY", ko: "KRW",
-    hi: "INR", ru: "RUB", tr: "TRY", bn: "BDT", ur: "PKR",
-    id: "IDR", th: "THB", vi: "VND", pl: "PLN", uk: "UAH",
-    sv: "SEK", no: "NOK", da: "DKK", fi: "EUR", el: "EUR",
-    he: "ILS", ro: "RON", hu: "HUF", cs: "CZK", sk: "EUR",
-    bg: "BGN", hr: "EUR", sr: "RSD", ms: "MYR", fa: "IRR",
-    am: "ETB", zu: "ZAR", af: "ZAR", fil: "PHP", ta: "INR",
-    te: "INR", mr: "INR", pa: "INR", ne: "NPR", ca: "EUR"
+    en: "USD", fr: "EUR", es: "EUR", pt: "EUR", de: "EUR", it: "EUR", nl: "EUR",
+    sw: "KES", ha: "NGN", ig: "NGN", yo: "NGN", ar: "SAR", zh: "CNY", ja: "JPY",
+    ko: "KRW", hi: "INR", ru: "RUB", tr: "TRY", bn: "BDT", ur: "PKR", id: "IDR",
+    th: "THB", vi: "VND", pl: "PLN", uk: "UAH", sv: "SEK", no: "NOK", da: "DKK",
+    fi: "EUR", el: "EUR", he: "ILS", ro: "RON", hu: "HUF", cs: "CZK", sk: "EUR",
+    bg: "BGN", hr: "EUR", sr: "RSD", ms: "MYR", fa: "IRR", am: "ETB", zu: "ZAR",
+    af: "ZAR", fil: "PHP", ta: "INR", te: "INR", mr: "INR", pa: "INR", ne: "NPR", ca: "EUR"
   };
+
+  function syncCurrency(languageSelect) {
+    const currencySelect = document.getElementById("siteCurrency");
+    if (!languageSelect || !currencySelect) return;
+    const currency = languageCurrency[languageSelect.value];
+    if (!currency) return;
+    // Only select currencies actually offered by the existing settings dropdown.
+    if (![...currencySelect.options].some(option => option.value === currency)) return;
+    currencySelect.value = currency;
+    currencySelect.dispatchEvent(new Event("change", { bubbles: true }));
+  }
+
   document.addEventListener("change", function (event) {
     if (event.target && event.target.id === "siteLanguage") {
-      const currency = document.getElementById("siteCurrency");
-      const matchingCurrency = languageCurrency[event.target.value];
-      if (currency && matchingCurrency &&
-          Array.from(currency.options).some(o => o.value === matchingCurrency)) {
-        currency.value = matchingCurrency;
-      }
+      // Run after the app's own change handlers, even when Settings is re-rendered.
+      syncCurrency(event.target);
     }
   });
+
+  // Initialize the currency selection when the Settings screen is opened.
+  const observer = new MutationObserver(() => {
+    const languageSelect = document.getElementById("siteLanguage");
+    const currencySelect = document.getElementById("siteCurrency");
+    if (languageSelect && currencySelect && !languageSelect.dataset.currencySyncReady) {
+      languageSelect.dataset.currencySyncReady = "1";
+      syncCurrency(languageSelect);
+    }
+  });
+  if (document.documentElement) observer.observe(document.documentElement, { childList: true, subtree: true });
 })();
 </script>
 </body>
