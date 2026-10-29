@@ -13042,5 +13042,81 @@
   if (document.documentElement) observer.observe(document.documentElement, { childList: true, subtree: true });
 })();
 </script>
+
+<script>
+/* FINRISE: Supabase is the source of truth for each authenticated user's currency preference.
+   Requires finrise_profiles.preferred_currency (see migration SQL supplied separately). */
+(function(){
+  const client = window.finriseSupabase;
+  const KEY = "FINRISE ASSETS_preferences";
+  const supported = new Set(["USD","NGN","EUR","GBP","KES","GHS","ZAR","CAD","AUD","JPY","CNY","INR","SAR","AED","PKR","BDT","IDR","MYR","PHP","THB","VND","TRY","RUB","PLN","UAH","SEK","NOK","DKK","RON","HUF","CZK","BGN","RSD","IRR","ETB","NPR","ILS"]);
+  let applyingRemote = false;
+  let lastSaved = null;
+  function readPrefs(){ try{return JSON.parse(localStorage.getItem(KEY)||"{}")}catch(_){return {}} }
+  function writeCache(currency){
+    const prefs=readPrefs(); prefs.cur=currency;
+    try{localStorage.setItem(KEY,JSON.stringify(prefs));}catch(_){}
+  }
+  function getCurrencySelect(){return document.getElementById("siteCurrency");}
+  function applyCurrency(currency){
+    if(!supported.has(String(currency||"").toUpperCase())) return;
+    const select=getCurrencySelect();
+    if(select && [...select.options].some(o=>o.value===currency)){
+      applyingRemote=true; select.value=currency;
+      select.dispatchEvent(new Event("change",{bubbles:true}));
+      setTimeout(()=>{applyingRemote=false;},0);
+    }
+    writeCache(currency);
+    // Trigger the app's normal save/settings logic where available.
+    const save=document.getElementById("saveSettings");
+    if(save) save.click();
+  }
+  async function getUser(){
+    if(!client?.auth) return null;
+    const {data,error}=await client.auth.getUser();
+    if(error) throw error;
+    return data?.user||null;
+  }
+  async function loadPreference(){
+    try{
+      const user=await getUser(); if(!user) return;
+      const {data,error}=await client.from("finrise_profiles").select("preferred_currency").eq("id",user.id).maybeSingle();
+      if(error) throw error;
+      const currency=data?.preferred_currency;
+      if(currency && supported.has(String(currency).toUpperCase())){
+        const select=getCurrencySelect();
+        if(select) applyCurrency(String(currency).toUpperCase());
+        else { writeCache(String(currency).toUpperCase()); }
+      }
+    }catch(error){console.warn("Could not load currency preference from Supabase:",error);}
+  }
+  async function savePreference(currency){
+    currency=String(currency||"").toUpperCase();
+    if(!supported.has(currency)||applyingRemote||currency===lastSaved) return;
+    writeCache(currency);
+    try{
+      const user=await getUser(); if(!user) return;
+      const {error}=await client.from("finrise_profiles").update({preferred_currency:currency}).eq("id",user.id);
+      if(error) throw error;
+      lastSaved=currency;
+      console.info("FinRise currency preference saved to Supabase:",currency);
+    }catch(error){console.error("Failed to save currency preference to Supabase:",error);}
+  }
+  document.addEventListener("change",function(event){
+    if(event.target?.id==="siteCurrency") savePreference(event.target.value);
+  });
+  // Auth can finish after this script initializes; apply the profile preference once
+  // on startup and again after a Supabase auth state change.
+  if(client?.auth){
+    loadPreference();
+    client.auth.onAuthStateChange((event)=>{
+      if(event==="SIGNED_IN"||event==="INITIAL_SESSION"||event==="TOKEN_REFRESHED") setTimeout(loadPreference,0);
+    });
+  }
+  // Expose a small explicit hook for the settings UI if it is re-rendered.
+  window.finriseLoadCurrencyPreference=loadPreference;
+})();
+</script>
+
 </body>
 </html>
