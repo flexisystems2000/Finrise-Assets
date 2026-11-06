@@ -5457,6 +5457,20 @@
             (() => {
               "use strict";
               const $ = (id) => document.getElementById(id);
+              // Bind homepage authentication controls immediately, before the rest of
+              // the application initializes. This prevents unrelated startup code
+              // from leaving the public Sign In buttons unresponsive.
+              document.addEventListener(
+                "click",
+                (event) => {
+                  const authButton = event.target.closest("[data-auth]");
+                  if (!authButton) return;
+                  event.preventDefault();
+                  event.stopPropagation();
+                  openAuth(authButton.dataset.auth || "login");
+                },
+                true,
+              );
               try {
                 const pref = JSON.parse(
                   localStorage.getItem("FINRISE ASSETS_preferences") || "{}",
@@ -6787,12 +6801,6 @@
                 e.preventDefault();
                 goHome();
               };
-              document.querySelectorAll("[data-auth]").forEach((el) =>
-                el.addEventListener("click", (e) => {
-                  if (el.tagName === "A") e.preventDefault();
-                  openAuth(el.dataset.auth);
-                }),
-              );
               $("publicMenu").onclick = () => $("siteNav").classList.toggle("open");
               $("siteNav")
                 .querySelectorAll("a")
